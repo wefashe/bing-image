@@ -52,7 +52,7 @@ function setImage(db, pageIndex, pageSize){
   }
 }
 let config = {
-    locateFile: () => "/docs/static/js/sqljs/sql-wasm-debug.wasm",
+    locateFile: () => "static/js/sqljs/sql-wasm-debug.wasm",
 };
 let pageIndex = 1, pageSize = 15
 initSqlJs(config).then(function (SQL) {
