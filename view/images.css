@@ -1,9 +1,4 @@
-.img-title {
-    width: 500px;
-    height: 100px;
-    font-size: 24px;
-    background-color: red;
-    vertical-align: middle;/*vertical-align 属性设置元素的垂直对齐方式。*/
-    display: table-cell;
-    text-align: center;/*水平居中*/
-}
+/* img.image-list-img {
+    /* filter: blur(20px); */
+    /* opacity: 0; */
+} */
