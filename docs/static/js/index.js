@@ -39,7 +39,7 @@ function setImage(db, pageIndex, pageSize){
       // 渐进式图片
       // <div class="img-title">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")} ${row.title}</div> 
       var image_html = `<div class="w3-quarter w3-padding"> 
-                          <div class="w3-card w3-round">
+                          <div class="w3-card w3-round me-card">
                             <div>
                               <a href = "https://cn.bing.com${row.copyrightlink}" target="_blank"> 
                                 <img class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" style="width:100%;max-width:100%"> 
