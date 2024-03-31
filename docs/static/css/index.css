@@ -22,12 +22,12 @@ a{
 .me-img {
     /*超出父类部分隐藏*/
     overflow:hidden;
-}
-
-.me-img img{
     /* 图片上面两个角圆角 */
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+}
+
+.me-img img{
     /* 缩小还原 */
     transition:all 0.6s ease;
 }
