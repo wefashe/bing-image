@@ -35,12 +35,17 @@ function setImage(db, pageIndex, pageSize){
   while (stmt.step()) {
       var row = stmt.getAsObject();  
       var small_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
-      var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`   
+      var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`  
+      // 预加载
+      var image_small_obj = new Image()
+      image_small_obj.src = small_img_url
+      var image_big_obj = new Image()
+      image_big_obj.src = big_img_url 
       // 渐进式图片
       // <div class="img-title">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")} ${row.title}</div> 
       var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round me-card">
-                            <div>
+                            <div class="me-img">
                               <a href = "https://cn.bing.com${row.copyrightlink}" target="_blank"> 
                                 <img class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" style="width:100%;max-width:100%"> 
                               </a> 
@@ -56,11 +61,6 @@ function setImage(db, pageIndex, pageSize){
                           </div>
                         </div>`
       image_list.innerHTML += image_html;  
-      // 预加载
-      var image_small_obj = new Image()
-      image_small_obj.src = small_img_url
-      var image_big_obj = new Image()
-      image_big_obj.src = big_img_url
   }
 }
 let config = {
