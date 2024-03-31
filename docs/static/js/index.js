@@ -37,11 +37,23 @@ function setImage(db, pageIndex, pageSize){
       var small_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
       var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`   
       // 渐进式图片
-      var image_html = `<div> 
-                          <a href = "https://cn.bing.com${row.copyrightlink}" target="_blank"> 
-                              <img class="image-list-img" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" width = 200 height = 100> 
-                          </a>
-                          <div class="img-title">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")} ${row.title}</div> 
+      // <div class="img-title">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")} ${row.title}</div> 
+      var image_html = `<div class="w3-quarter w3-padding"> 
+                          <div class="w3-card w3-round">
+                            <div>
+                              <a href = "https://cn.bing.com${row.copyrightlink}" target="_blank"> 
+                                <img class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" style="width:100%;max-width:100%"> 
+                              </a> 
+                            </div>
+                            <div class = "w3-padding-small">
+                              <div class="w3-row w3-padding-small w3-tiny"><i class="fa fa-instagram fa-lg fa-fw" style="color: orange; font-weight: bold;"></i> 必应美图</div>
+                              <div class="w3-row w3-padding-small">${row.title}</div>
+                              <div class="w3-row w3-padding-small w3-text-grey w3-small">
+                                <div class="w3-left">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")}</div>
+                                <div class="w3-right"><i class="fa fa-eye"></i> 123</div>
+                              </div>
+                            </div>
+                          </div>
                         </div>`
       image_list.innerHTML += image_html;  
       // 预加载
@@ -54,7 +66,7 @@ function setImage(db, pageIndex, pageSize){
 let config = {
     locateFile: () => "static/js/sqljs/sql-wasm-debug.wasm",
 };
-let pageIndex = 1, pageSize = 15
+let pageIndex = 1, pageSize = 27
 initSqlJs(config).then(function (SQL) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', "static/db/images.db", true);
