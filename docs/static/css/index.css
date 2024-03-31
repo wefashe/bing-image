@@ -2,6 +2,7 @@ html{
     /* 滚动条出现造成页面晃动的问题 */
     overflow-y: scroll;
 }
+
 a{
     text-decoration: none;
 }
@@ -17,15 +18,16 @@ a{
     padding-right: 48px;
     padding-top: 48px;
 }
-.me-img-title{
-    /* 标题可能多行导致对不齐 */
-    height:3em;
-}
 
 .me-img{
     /* 图片上面两个角圆角 */
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
+}
+
+.me-img-title{
+    /* 标题可能多行导致对不齐 */
+    height:3em;
 }
 
 .me-card:hover{
