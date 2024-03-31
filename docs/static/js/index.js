@@ -42,7 +42,6 @@ function setImage(db, pageIndex, pageSize){
       var image_big_obj = new Image()
       image_big_obj.src = big_img_url 
       // 渐进式图片
-      // <div class="img-title">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")} ${row.title}</div> 
       var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round me-card">
                             <div class="me-img">
@@ -53,9 +52,10 @@ function setImage(db, pageIndex, pageSize){
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny"><i class="fa fa-instagram fa-lg fa-fw" style="color: orange; font-weight: bold;"></i> 必应美图</div>
                               <div class="w3-row w3-padding-small me-img-title">${row.title}</div>
-                              <div class="w3-row w3-padding-small w3-text-grey w3-small">
+                              <div class="w3-row w3-padding-small w3-small me-meta">
                                 <div class="w3-left">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")}</div>
-                                <div class="w3-right"><i class="fa fa-eye"></i> 123</div>
+                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-heart"></i> ${Math.floor(Math.random()*(100 - 1000) + 1000)}</div>
+                                <div class="w3-right"><i class="fa fa-eye"></i> ${Math.floor(Math.random()*(100 - 1000) + 1000)}</div>
                               </div>
                             </div>
                           </div>
@@ -66,7 +66,7 @@ function setImage(db, pageIndex, pageSize){
 let config = {
     locateFile: () => "static/js/sqljs/sql-wasm-debug.wasm",
 };
-let pageIndex = 1, pageSize = 27
+let pageIndex = 1, pageSize = 36
 initSqlJs(config).then(function (SQL) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', "static/db/images.db", true);
