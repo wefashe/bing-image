@@ -47,7 +47,7 @@ function setImage(db, pageIndex, pageSize){
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny"><i class="fa fa-instagram fa-lg fa-fw" style="color: orange; font-weight: bold;"></i> 必应美图</div>
-                              <div class="w3-row w3-padding-small">${row.title}</div>
+                              <div class="w3-row w3-padding-small me-img-title">${row.title}</div>
                               <div class="w3-row w3-padding-small w3-text-grey w3-small">
                                 <div class="w3-left">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")}</div>
                                 <div class="w3-right"><i class="fa fa-eye"></i> 123</div>
