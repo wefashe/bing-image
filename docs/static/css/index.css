@@ -23,8 +23,8 @@ a{
     /*超出父类部分隐藏*/
     overflow:hidden;
     /* 图片上面两个角圆角 */
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     /* 图片未加载时高度填充*/
     position: relative;
     top: 0;
@@ -41,7 +41,9 @@ a{
 
 .me-img img{
     /* 缩小还原 */
-    transition:all 0.6s ease;
+    -webkit-transition: all .444s ease-in-out;
+    -o-transition: all .444s ease-in-out;
+    transition: all .444s ease-in-out;
     /* 图片未加载时高度填充*/
     position: absolute;
     top: 0;
@@ -52,9 +54,12 @@ a{
 
 .me-img:hover img{
     /*悬停放放大*/
-    transform:scale(1.2,1.2);
-    transition:all 0.6s ease;
-    opacity:0.7;
+    transform:scale(1.05);
+    -webkit-transition: all .444s ease-in-out;
+    -o-transition: all .444s ease-in-out;
+    transition: all .444s ease-in-out;
+    -webkit-filter: brightness(80%);
+    filter: brightness(80%)
 }
 
 .me-img-title{

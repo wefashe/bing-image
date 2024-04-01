@@ -164,7 +164,7 @@ function setImage(db, pageIndex, pageSize){
       var view_count = Math.floor(Math.random()*(100 - 1000) + 1000);
       // 渐进式图片
       var image_html = `<div class="w3-quarter w3-padding"> 
-                          <div class="w3-card w3-round me-card">
+                          <div class="w3-card w3-round-large me-card">
                             <div class="me-img">
                               <a href = "${prefix}${row.copyrightlink}" target="_blank"> 
                                 <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}"  title="${row.copyright}" alt="${prefix}${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
@@ -174,7 +174,7 @@ function setImage(db, pageIndex, pageSize){
                               <div class="w3-row w3-padding-small w3-tiny"><i class="fa fa-instagram fa-lg fa-fw" style="color: orange; font-weight: bold;"></i> 必应美图</div>
                               <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
                               <div class="w3-row w3-padding-small w3-small me-meta">
-                                <div class="w3-left">${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1/$2/$3")}</div>
+                                <div class="w3-left"><i class="fa fa-clock-o"></i> ${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")}</div>
                                 <div class="w3-right" style="margin-left:12px"><i class="fa fa-heart"></i> ${view_count}</div>
                                 <div class="w3-right"><i class="fa fa-eye"></i> ${Math.floor(Math.random()*(view_count - 1000) + 1000)}</div>
                               </div>
