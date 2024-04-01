@@ -1,3 +1,6 @@
+// 图片预加载
+
+// 图片懒加载
 function lazyload() {
   var images = document.querySelectorAll('img[data-src]')
   for (let image of images) {
@@ -5,15 +8,42 @@ function lazyload() {
     var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     if (image.offsetTop < clientHeight + scrollTop){
-      var image_obj = new Image()
-      image_obj.src = image.dataset.src
-      // 判断图片是否加载完成过
-      if(image_obj.complete) {  
+      let src =  image.dataset.src
+      if(src){
         image.src = image.dataset.src
-        image.removeAttribute('data-src')
+        // 判断图片是否加载完成
+        if(image.complete) {  
+          image.removeAttribute('data-src')
+        }
+        image.onload = function() {  
+          image.removeAttribute('data-src')
+        }  
       }
     }
   }
+}
+
+// 防抖节流
+function throttle(func, wait, immediate){
+  let last = 0, timer = null;
+  return function(...args) {
+      const now = Date.now();
+      const context = this;
+      if (now - last < wait && !immediate) {
+        // 防抖 用于控制函数触发的频率
+        // 两次触发函数的时间小于延迟时间，走防抖逻辑
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+          last = now;
+          func.apply(context, args);
+        }, wait);
+      } else {
+        // 节流 触发必须间隔一段时间
+        // 函数两次触发事件已经大于延迟，必须要给用户一个反馈，走节流逻辑
+        last = now;
+        func.apply(context, args);
+      }
+  };
 }
 
 function imgloading(oImg) {
@@ -88,7 +118,7 @@ initSqlJs(config).then(function (SQL) {
               pageIndex ++
               setImage(db,pageIndex,pageSize)
             }
-            lazyload()
+            throttle(lazyload, 200)();
         }, false);
     };
     xhr.send(); 
