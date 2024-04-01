@@ -1,6 +1,27 @@
-// 图片预加载
+// 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
+function preloader(id, small_src, big_src){
+  if(!small_src)return;
+  var small_image = new Image();
+  small_image.src = small_src;
+  small_image.style.width = '100%';
+  function imageComplete(e_id, s_src, b_src){
+    var image_obj = document.getElementById(e_id)
+    if(!image_obj.dataset.src) return
+    image_obj.src = s_src
+    var big_image = new Image();
+    big_image.src = b_src;
+    big_image.style.width = '100%';
+  }
+  if(small_image.complete) {  
+    imageComplete(id, small_src, big_src)
+  }
+  small_image.onload = function(){
+    imageComplete(id, small_src, big_src)
+  }
 
-// 图片懒加载
+}
+
+// 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
   var images = document.querySelectorAll('img[data-src]')
   for (let image of images) {
@@ -9,16 +30,23 @@ function lazyload() {
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     if (image.offsetTop < clientHeight + scrollTop){
       let src =  image.dataset.src
-      if(src){
-        image.src = image.dataset.src
-        // 判断图片是否加载完成
-        if(image.complete) {  
-          image.removeAttribute('data-src')
-        }
-        image.onload = function() {  
-          image.removeAttribute('data-src')
-        }  
+      if(!src)return;
+      var big_image = new Image();
+      big_image.src = src;
+      big_image.style.width = '100%';
+      if(big_image.complete) {  
+        image.src = src;
       }
+      big_image.onload = function() {  
+        image.src = src;
+      }  
+      // 判断图片是否加载完成
+      if(image.complete) {  
+        image.removeAttribute('data-src')
+      }
+      image.onload = function() {  
+        image.removeAttribute('data-src')
+      }  
     }
   }
 }
@@ -73,18 +101,13 @@ function setImage(db, pageIndex, pageSize){
   while (stmt.step()) {
       var row = stmt.getAsObject();  
       var small_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
-      var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`  
-      // 预加载
-      var image_small_obj = new Image()
-      image_small_obj.src = small_img_url
-      var image_big_obj = new Image()
-      image_big_obj.src = big_img_url 
+      var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`   
       // 渐进式图片
       var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round me-card">
                             <div class="me-img">
                               <a href = "https://cn.bing.com${row.copyrightlink}" target="_blank"> 
-                                <img class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
+                                <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}"  title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
                               </a> 
                             </div>
                             <div class = "w3-padding-small">
@@ -99,6 +122,8 @@ function setImage(db, pageIndex, pageSize){
                           </div>
                         </div>`
       image_list.innerHTML += image_html;  
+      // 预加载
+      preloader(row.enddate, small_img_url, big_img_url)
   }
 }
 let config = {
