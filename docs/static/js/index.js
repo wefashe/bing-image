@@ -72,8 +72,8 @@ function setImage(db, pageIndex, pageSize){
   var image_list = document.getElementById('image-list')
   while (stmt.step()) {
       var row = stmt.getAsObject();  
-      var small_img_url = `https://cn.b111ing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
-      var big_img_url = `https://cn.b111ing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`  
+      var small_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
+      var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`  
       // 预加载
       var image_small_obj = new Image()
       image_small_obj.src = small_img_url
@@ -84,7 +84,7 @@ function setImage(db, pageIndex, pageSize){
                           <div class="w3-card w3-round me-card">
                             <div class="me-img">
                               <a href = "https://cn.bing.com${row.copyrightlink}" target="_blank"> 
-                                <img class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" style="width:100%;max-width:100%"> 
+                                <img class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" title="${row.copyright}" alt="https://cn.bing.com${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
                               </a> 
                             </div>
                             <div class = "w3-padding-small">
