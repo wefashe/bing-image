@@ -78,9 +78,66 @@ function throttle(func, wait, immediate){
 window.addEventListener("error", function (event) {
     const target = event.target;
     if (target instanceof HTMLImageElement) {
-      target.classList.add("me-img-error");
+      const curTimes = Number(target.dataset.retryTimes) || 0
+      // 重试2次
+      if (curTimes >= 2) {
+        // 去除，防止滚动重复加载
+        target.removeAttribute('data-src');
+        target.classList.add("me-img-error");
+      } else {
+        target.dataset.retryTimes = curTimes + 1
+        target.src = target.src
+      }
     }
-}, true );
+}, true);
+
+// 图片下载
+function download(url, fileName){
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET',url, true)
+  xhr.responseType = 'blob'
+  // 请求成功
+  xhr.onload = function () {
+      if (xhr.status != 200) {
+          return;
+      }
+      blobSaveAsFile(this.response, fileName);
+  }
+  // 监听下载进度
+  xhr.addEventListener('progress', function (e) {
+      let percent = Math.trunc(e.loaded / e.total * 100);
+      // todo
+  });
+  // 错误处理
+  xhr.addEventListener('error', function (e) {
+      // todo
+  });
+  xhr.send()
+}
+
+// 文本下载
+function stringSaveAsFile(str, fileName){
+    const blob = new Blob([str], { type: 'text/plain' });
+    blobSaveAsFile(blob, fileName);
+}
+
+function blobSaveAsFile(blob, fileName){
+    var urlCreator = window.URL || window.webkitURL;
+    // 将Blob转化为同源的url
+    const imageUrl = urlCreator.createObjectURL(blob);
+    const tag = document.createElement('a');
+    tag.href = imageUrl;
+    tag.download = fileName || ""
+    tag.style.display = 'none';
+    document.body.appendChild(tag);
+    tag.click();
+    setTimeout(function(){
+      document.body.removeChild(tag);
+      tag.remove();
+      urlCreator.revokeObjectURL(blob);
+    }, 100);
+}
+
 
 function imgloading(oImg) {
   var n = 0;
