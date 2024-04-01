@@ -46,6 +46,14 @@ function throttle(func, wait, immediate){
   };
 }
 
+// 图片加载错误的捕获及处理
+window.addEventListener("error", function (event) {
+    const target = event.target;
+    if (target instanceof HTMLImageElement) {
+      target.classList.add("me-img-error");
+    }
+}, true );
+
 function imgloading(oImg) {
   var n = 0;
   var timer = setInterval(function () {
@@ -64,8 +72,8 @@ function setImage(db, pageIndex, pageSize){
   var image_list = document.getElementById('image-list')
   while (stmt.step()) {
       var row = stmt.getAsObject();  
-      var small_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
-      var big_img_url = `https://cn.bing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`  
+      var small_img_url = `https://cn.b111ing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=120'}`   
+      var big_img_url = `https://cn.b111ing.com${row.url.substring(0,row.url.indexOf('&')) + '&w=384&h=216'}`  
       // 预加载
       var image_small_obj = new Image()
       image_small_obj.src = small_img_url
