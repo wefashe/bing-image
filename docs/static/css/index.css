@@ -7,13 +7,13 @@ a{
     text-decoration: none;
 }
 
-.me-top{
+.me-menu{
     padding-left: 48px;
     padding-right: 48px;
     background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
 }
 
-.me-main{
+.me-list{
     padding-left: 48px;
     padding-right: 48px;
     padding-top: 48px;
