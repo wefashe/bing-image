@@ -217,3 +217,46 @@ function setImage(db, pageIndex, pageSize){
       preloader(row.enddate, small_img_url, big_img_url)
   }
 }
+
+
+function keydownHandler(event){
+    // 按空格键
+    if (event.code == 'Space') {
+      event.preventDefault();
+      toggleFullScreen(); 
+    }
+    // document.removeEventListener("keydown",keydownHandler,false);
+}
+// 监听按键
+document.addEventListener('keydown', keydownHandler);
+
+
+function fullscreenchangeHandler(event){
+  // document.removeEventListener("fullscreenchange",fullscreenchangeHandler,fal  se);
+}
+// 监听全屏
+document.addEventListener('fullscreenchange', fullscreenchangeHandler);
+
+
+function toggleFullScreen() {
+  var doc_document = document.documentElement;
+  var win_document = window.document;
+  // 请求全屏
+  var requestFullScreen = doc_document.requestFullscreen || doc_document.mozRequestFullScreen || doc_document.webkitRequestFullScreen || doc_document.msRequestFullscreen;
+  // 退出全屏
+  var exitFullScreen = win_document.exitFullscreen || win_document.mozCancelFullScreen || win_document.webkitExitFullscreen || win_document.msExitFullscreen;
+  // 判断是否全屏
+  var isFullscreen = win_document.fullscreenElement || win_document.mozFullScreenElement || win_document.webkitFullscreenElement || win_document.msFullscreenElement
+
+  if (!isFullscreen) {
+    // 如果当前不是全屏状态，则进入全屏
+    requestFullScreen.call(doc_document);
+  } else {
+    // 如果当前是全屏状态，则退出全屏
+    exitFullScreen.call(win_document);
+  }
+}
+
+
+
+
