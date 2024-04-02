@@ -21,7 +21,7 @@ a {
 
 .me-img {
     /*超出父类部分隐藏*/
-    overflow:hidden;
+    overflow: hidden;
     /* 图片上面两个角圆角 */
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -124,7 +124,17 @@ img.me-img-error::after {
 .me-lodding {
     /* 加载动画位置 */
     position: absolute;
-    top: 48%;
-    left: 48%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.me-lodding:after {
+    display:inline-block;
+    width:0;
+    height: 100%;
+    vertical-align:middle;
+    content:"";
 }
 
