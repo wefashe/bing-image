@@ -45,16 +45,18 @@ function preloader(id, small_src, big_src){
   small_image.src = small_src;
   small_image.style.width = '100%';
   function imageComplete(e_id, s_src, b_src){
-    
     var image_obj = document.getElementById(e_id)
-    image_obj.src = s_src
-
-    var a = image_obj.parentNode
-    a.classList.remove('w3-hide')
-
-    var big_image = new Image();
-    big_image.src = b_src;
-    big_image.style.width = '100%';
+    var a_img = image_obj.parentNode
+    if (a_img.getAttribute('class')) {
+      // 存在class属性
+      if (a_img.className.indexOf('w3-hide') > -1) {
+        image_obj.src = s_src
+        a_img.classList.remove('w3-hide');
+        var big_image = new Image();
+        big_image.src = b_src;
+        big_image.style.width = '100%';
+      }
+    }
   }
   if(small_image.complete) {  
     imageComplete(id, small_src, big_src)
