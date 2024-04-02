@@ -6,8 +6,8 @@ function preloader(id, small_src, big_src){
   small_image.style.width = '100%';
   function imageComplete(e_id, s_src, b_src){
     var image_obj = document.getElementById(e_id)
-    if(!image_obj.dataset.src) return
     image_obj.src = s_src
+
     var big_image = new Image();
     big_image.src = b_src;
     big_image.style.width = '100%';
@@ -31,6 +31,7 @@ function lazyload() {
     if (image.offsetTop < clientHeight + scrollTop){
       let src =  image.dataset.src
       if(!src)return;
+      
       var big_image = new Image();
       big_image.src = src;
       big_image.style.width = '100%';
