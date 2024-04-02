@@ -1,5 +1,5 @@
 const bing_api_prefix = 'https://cn.bing.com';
-let pageIndex = 1, pageSize = 36
+let pageIndex = 1, pageSize = 2
         
 function readDbFile(callback) {
   let config = {
@@ -56,7 +56,7 @@ function preloader(id, small_src, big_src){
         big_image.src = b_src;
         big_image.style.width = '100%';
       }
-    }
+    }    
   }
   if(small_image.complete) {  
     imageComplete(id, small_src, big_src)
