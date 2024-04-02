@@ -98,10 +98,9 @@ function download(url, fileName){
   xhr.responseType = 'blob'
   // 请求成功
   xhr.onload = function () {
-      if (xhr.status != 200) {
-          return;
-      }
+    if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
       blobSaveAsFile(this.response, fileName);
+    }     
   }
   // 监听下载进度
   xhr.addEventListener('progress', function (e) {
@@ -186,36 +185,86 @@ function setImage(db, pageIndex, pageSize){
       preloader(row.enddate, small_img_url, big_img_url)
   }
 }
-let config = {
-    locateFile: () => "static/js/sql-wasm.wasm",
-};
-let pageIndex = 1, pageSize = 36
-initSqlJs(config).then(function (SQL) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', "static/db/images.db",  [,async=true,]);
-    xhr.responseType = 'arraybuffer';
-    xhr.onload = e => {
-        const uInt8Array = new Uint8Array(xhr.response);
-        const db = new SQL.Database(uInt8Array);
-        setImage(db,pageIndex,pageSize)
-        // 懒加载
-        lazyload()
-        window.addEventListener('scroll', () => {
-            // 获取页面高度
-            var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-            // 获取滚动高度
-            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-            // 获取可视区域高度 这个不会变
-            var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
-            if (scrollHeight - scrollTop - clientHeight < clientHeight/2 ){
-              pageIndex ++
-              setImage(db,pageIndex,pageSize)
-            }
-            throttle(lazyload, 200)();
-        }, false);
+
+
+function readDbFile(callback) {
+    let config = {
+      locateFile: () => "static/js/sql-wasm.wasm",
     };
-    xhr.send(); 
+    initSqlJs(config).then(function (SQL) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', "static/db/images.db", true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = e => {
+            const uInt8Array = new Uint8Array(xhr.response); 
+            callback(new SQL.Database(uInt8Array));
+        };
+        xhr.send(); 
+    });
+}
+let pageIndex = 1, pageSize = 36
+readDbFile(function(db){
+  setImage(db,pageIndex,pageSize)
+  // 懒加载
+  lazyload()
+  window.addEventListener('scroll', () => {
+      // 获取页面高度
+      var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      // 获取滚动高度
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      // 获取可视区域高度 这个不会变
+      var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+      if (scrollHeight - scrollTop - clientHeight < clientHeight/2 ){
+        pageIndex ++
+        setImage(db,pageIndex,pageSize)
+      }
+      throttle(lazyload, 200)();
+  }, false);
 });
+
+// 封装DOMContentLoaded事件来检测页面DOM是否加载完毕
+function ready(func){
+  // 目前Mozilla、Opera和webkit 525+内核支持DOMContentLoaded事件
+  if(document.addEventListener) {
+      document.addEventListener('DOMContentLoaded', function() {
+          document.removeEventListener('DOMContentLoaded',arguments.callee, false);
+          func();
+      }, false);
+  } 
+  // 如果IE
+  else if(document.attachEvent) {
+      // 确保当页面是在iframe中加载时，事件依旧会被安全触发
+      document.attachEvent('onreadystatechange', function() {
+          if(document.readyState == 'complete') {
+              document.detachEvent('onreadystatechange', arguments.callee);
+              func();
+          }
+      });
+      // 如果是IE且页面不在iframe中时，轮询调用doScroll 方法检测DOM是否加载完毕
+      if(document.documentElement.doScroll && typeof window.frameElement === "undefined") {
+          try{
+              document.documentElement.doScroll('left');
+          }
+          catch(error){
+              return setTimeout(arguments.callee, 20);
+          };
+          func();
+      }
+  }
+};
+
+
+ready(function (event){
+    console.log('DOM已被完全加载和解析');
+
+}, false);
+window.onload = function () {
+  console.log('页面资源全部加载完毕');
+  document.getElementById('me-load').classList.toggle('me-load');
+}
+
+
+
 
 
 

@@ -126,7 +126,7 @@ img.me-img-error::after {
   }
 }
 
-.me-lodding {
+.me-load {
     /* 加载动画 */
     width: 30px;
     height: 30px;
