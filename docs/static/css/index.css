@@ -1,19 +1,19 @@
-html{
+html {
     /* 滚动条出现造成页面晃动的问题 */
     overflow-y: scroll;
 }
 
-a{
+a {
     text-decoration: none;
 }
 
-.me-menu{
+.me-menu {
     padding-left: 48px;
     padding-right: 48px;
     background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
 }
 
-.me-list{
+.me-list {
     padding-left: 48px;
     padding-right: 48px;
     padding-top: 48px;
@@ -39,7 +39,7 @@ a{
   padding-bottom: 60%; 
 }
 
-.me-img img{
+.me-img img {
     /* 缩小还原 */
     -webkit-transition: all .444s ease-in-out;
     -o-transition: all .444s ease-in-out;
@@ -52,7 +52,7 @@ a{
     height: 100%;
 }
 
-.me-img:hover img{
+.me-img:hover img {
     /*悬停放放大*/
     transform:scale(1.05);
     -webkit-transition: all .444s ease-in-out;
@@ -62,7 +62,7 @@ a{
     filter: brightness(80%)
 }
 
-.me-img-title{
+.me-img-title {
     /* 标题可能多行导致对不齐 */
     height:3em;
     /* 只显示两行(或多行)，超出部分用省略号 */
@@ -73,7 +73,7 @@ a{
     -webkit-box-orient: vertical;
 }
 
-.me-card:hover{
+.me-card:hover {
     box-shadow: 0 5px 10px 0 rgba(0,0,0,0.16), 0 5px 15px 0 rgba(0,0,0,0.12);
 }
 
