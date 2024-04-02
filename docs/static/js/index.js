@@ -218,7 +218,9 @@ function setImage(db, pageIndex, pageSize){
   }
 }
 
+// TODO 图片预览
 
+// 图片全屏
 function keydownHandler(event){
     // 按空格键
     if (event.code == 'Space') {
