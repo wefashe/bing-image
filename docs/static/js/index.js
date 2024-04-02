@@ -198,7 +198,7 @@ function setImage(db, pageIndex, pageSize){
       // 渐进式图片
       var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
-                            <div class="me-img">
+                            <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
                               <a class="w3-hide" href="${bing_api_prefix}${row.copyrightlink}" target="_blank"> 
                                 <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}"  title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
