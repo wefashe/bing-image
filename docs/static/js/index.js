@@ -192,7 +192,7 @@ let config = {
 let pageIndex = 1, pageSize = 36
 initSqlJs(config).then(function (SQL) {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', "static/db/images.db", true);
+    xhr.open('GET', "static/db/images.db",  [,async=true,]);
     xhr.responseType = 'arraybuffer';
     xhr.onload = e => {
         const uInt8Array = new Uint8Array(xhr.response);
