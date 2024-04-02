@@ -196,8 +196,9 @@ function readDbFile(callback) {
         xhr.open('GET', "static/db/images.db", true);
         xhr.responseType = 'arraybuffer';
         xhr.onload = e => {
-            const uInt8Array = new Uint8Array(xhr.response); 
-            callback(new SQL.Database(uInt8Array));
+          document.getElementById('me-load').classList.toggle('w3-hide');
+          const uInt8Array = new Uint8Array(xhr.response); 
+          callback(new SQL.Database(uInt8Array));
         };
         xhr.send(); 
     });
@@ -260,7 +261,6 @@ ready(function (event){
 }, false);
 window.onload = function () {
   console.log('页面资源全部加载完毕');
-  document.getElementById('me-load').classList.toggle('me-load');
 }
 
 
