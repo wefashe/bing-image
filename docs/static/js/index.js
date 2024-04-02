@@ -44,13 +44,13 @@ function preloader(id){
   if(!id)return;
   var image_obj = document.getElementById(id);
   var dataSrc = image_obj.getAttribute('data-src');
+  var lazySrc = image_obj.getAttribute('lazy-src');
   var small_image = new Image();
   small_image.src = dataSrc;
   if (small_image.complete){
     if(small_image.naturalWidth !=0 ){
       image_obj.src = dataSrc;
       image_obj.removeAttribute('data-src');
-      var lazySrc = image_obj.getAttribute('lazy-src');
       var big_image = new Image();
       big_image.src = lazySrc;
     }
@@ -59,7 +59,6 @@ function preloader(id){
         if(small_image.naturalWidth !=0 ){
           image_obj.src = dataSrc;
           image_obj.removeAttribute('data-src');
-          var lazySrc = image_obj.getAttribute('lazy-src');
           var big_image = new Image();
           big_image.src = lazySrc;
         }
@@ -126,7 +125,7 @@ window.addEventListener("error", function (event) {
       // 重试2次
       if (curTimes >= 2) {
         // 去除，防止滚动重复加载
-        target.removeAttribute('data-src');
+        target.removeAttribute('lazy-src');
         target.classList.add("me-img-error");
       } else {
         target.dataset.retryTimes = curTimes + 1
