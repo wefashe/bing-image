@@ -124,7 +124,7 @@ img.me-img-error::after {
 .me-lodding {
     /* 加载动画位置 */
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 48%;
+    left: 48%;
 }
 
