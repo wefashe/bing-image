@@ -40,61 +40,57 @@ readDbFile(function(db){
 });
 
 // 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
-function preloader(id, small_src, big_src){
-  if(!small_src)return;
+function preloader(id){
+  if(!id)return;
+  var image_obj = document.getElementById(id);
+  var dataSrc = image_obj.getAttribute('data-src');
   var small_image = new Image();
-  small_image.src = small_src;
-  small_image.style.width = '100%';
-  function imageComplete(e_id, s_src, b_src){
-    var image_obj = document.getElementById(e_id)
-    var a_img = image_obj.parentNode
-    if (a_img.getAttribute('class')) {
-      // 存在class属性
-      if (a_img.className.indexOf('w3-hide') > -1) {
-        image_obj.src = s_src
-        a_img.classList.remove('w3-hide');
-        var big_image = new Image();
-        big_image.src = b_src;
-        big_image.style.width = '100%';
-      }
-    }    
+  small_image.src = dataSrc;
+  if (small_image.complete){
+    if(small_image.naturalWidth !=0 ){
+      image_obj.src = dataSrc;
+      image_obj.removeAttribute('data-src');
+      var lazySrc = image_obj.getAttribute('lazy-src');
+      var big_image = new Image();
+      big_image.src = lazySrc;
+    }
+  } else {
+    small_image.addEventListener('load', function(){
+        if(small_image.naturalWidth !=0 ){
+          image_obj.src = dataSrc;
+          image_obj.removeAttribute('data-src');
+          var lazySrc = image_obj.getAttribute('lazy-src');
+          var big_image = new Image();
+          big_image.src = lazySrc;
+        }
+    })
   }
-  if(small_image.complete) {  
-    imageComplete(id, small_src, big_src)
-  }
-  small_image.onload = function(){
-    imageComplete(id, small_src, big_src)
-  }
-
 }
 
 // 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
-  var images = document.querySelectorAll('img[data-src]')
-  for (let image of images) {
-    if (!image.dataset.src) return
+  var images = document.querySelectorAll('img[lazy-src]')
+  for (let image_obj of images) {
+    var lazySrc = image_obj.getAttribute('lazy-src');
+    if (!lazySrc) return
     var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    if (image.offsetTop < clientHeight + scrollTop){
-      let src =  image.dataset.src
-      if(!src)return;
-
+    if (image_obj.offsetTop < clientHeight + scrollTop){
       var big_image = new Image();
-      big_image.src = src;
-      big_image.style.width = '100%';
-      if(big_image.complete) {  
-        image.src = src;
+      big_image.src = lazySrc;
+      if (big_image.complete){
+        if(big_image.naturalWidth !=0 ){
+          image_obj.src = lazySrc;
+          image_obj.removeAttribute('lazy-src');
+        }
+      } else {
+        big_image.addEventListener('load', function(){
+            if(big_image.naturalWidth !=0 ){
+              image_obj.src = lazySrc;
+              image_obj.removeAttribute('lazy-src');
+            }
+        })
       }
-      big_image.onload = function() {  
-        image.src = src;
-      }  
-      // 判断图片是否加载完成
-      if(image.complete) {  
-        image.removeAttribute('data-src')
-      }
-      image.onload = function() {  
-        image.removeAttribute('data-src')
-      }  
     }
   }
 }
@@ -200,8 +196,8 @@ function setImage(db, pageIndex, pageSize){
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <a class="w3-hide" href="${bing_api_prefix}${row.copyrightlink}" target="_blank"> 
-                                <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}"  title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
+                              <a href="${bing_api_prefix}${row.copyrightlink}" target="_blank"> 
+                                <img id="${row.enddate}" class="me-img w3-image" data-src="${small_img_url}" lazy-src="${big_img_url}"  title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
                               </a> 
                             </div>
                             <div class = "w3-padding-small">
@@ -217,7 +213,7 @@ function setImage(db, pageIndex, pageSize){
                         </div>`
       image_list.innerHTML += image_html;  
       // 预加载
-      preloader(row.enddate, small_img_url, big_img_url)
+      preloader(row.enddate)
   }
 }
 
