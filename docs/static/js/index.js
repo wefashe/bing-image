@@ -1,3 +1,43 @@
+const bing_api_prefix = 'https://cn.bing.com';
+let pageIndex = 1, pageSize = 36
+        
+function readDbFile(callback) {
+  let config = {
+    locateFile: () => "static/js/sql-wasm.wasm",
+  };
+  initSqlJs(config).then(function (SQL) {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', "static/db/images.db", true);
+      xhr.responseType = 'arraybuffer';
+      xhr.onload = e => {
+        // document.getElementById('me-load').classList.toggle('w3-hide');
+        document.getElementById('me-load').classList.add('w3-hide');
+        const uInt8Array = new Uint8Array(xhr.response); 
+        callback(new SQL.Database(uInt8Array));
+      };
+      xhr.send(); 
+  });
+}
+
+readDbFile(function(db){
+  setImage(db,pageIndex,pageSize)
+  // 懒加载
+  lazyload()
+  window.addEventListener('scroll', () => {
+      // 获取页面高度
+      var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      // 获取滚动高度
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      // 获取可视区域高度 这个不会变
+      var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+      if (scrollHeight - scrollTop - clientHeight < clientHeight/2 ){
+        pageIndex ++
+        setImage(db,pageIndex,pageSize)
+      }
+      throttle(lazyload, 200)();
+  }, false);
+});
+
 // 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
 function preloader(id, small_src, big_src){
   if(!small_src)return;
@@ -31,7 +71,7 @@ function lazyload() {
     if (image.offsetTop < clientHeight + scrollTop){
       let src =  image.dataset.src
       if(!src)return;
-      
+
       var big_image = new Image();
       big_image.src = src;
       big_image.style.width = '100%';
@@ -138,36 +178,22 @@ function blobSaveAsFile(blob, fileName){
     }, 100);
 }
 
-
-function imgloading(oImg) {
-  var n = 0;
-  var timer = setInterval(function () {
-      n++;
-      oImg.style.opacity = n / 100;
-      if (n >= 100) {
-          clearInterval(timer);
-      }
-      ;
-  }, 5);
-};
-
 function setImage(db, pageIndex, pageSize){
   var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit ($pageIndex * $pageSize), $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var image_list = document.getElementById('image-list')
-  var prefix = 'https://cn.bing.com'
   while (stmt.step()) {
       var row = stmt.getAsObject();  
       var url = row.url.substring(0,row.url.indexOf('&'));
-      var small_img_url = `${prefix}${url}&w=120`;
-      var big_img_url = `${prefix}${url}&w=384&h=216`   
+      var small_img_url = `${bing_api_prefix}${url}&w=120`;
+      var big_img_url = `${bing_api_prefix}${url}&w=384&h=216`   
       var view_count = Math.floor(Math.random()*(100 - 1000) + 1000);
       // 渐进式图片
       var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img">
-                              <a href = "${prefix}${row.copyrightlink}" target="_blank"> 
-                                <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}"  title="${row.copyright}" alt="${prefix}${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
+                              <a href = "${bing_api_prefix}${row.copyrightlink}" target="_blank"> 
+                                <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}"  title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" loading="lazy" style="width:100%;max-width:100%"> 
                               </a> 
                             </div>
                             <div class = "w3-padding-small">
@@ -186,89 +212,3 @@ function setImage(db, pageIndex, pageSize){
       preloader(row.enddate, small_img_url, big_img_url)
   }
 }
-
-
-function readDbFile(callback) {
-    let config = {
-      locateFile: () => "static/js/sql-wasm.wasm",
-    };
-    initSqlJs(config).then(function (SQL) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', "static/db/images.db", true);
-        xhr.responseType = 'arraybuffer';
-        xhr.onload = e => {
-          document.getElementById('me-load').classList.toggle('w3-hide');
-          const uInt8Array = new Uint8Array(xhr.response); 
-          callback(new SQL.Database(uInt8Array));
-        };
-        xhr.send(); 
-    });
-}
-let pageIndex = 1, pageSize = 36
-readDbFile(function(db){
-  setImage(db,pageIndex,pageSize)
-  // 懒加载
-  lazyload()
-  window.addEventListener('scroll', () => {
-      // 获取页面高度
-      var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-      // 获取滚动高度
-      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      // 获取可视区域高度 这个不会变
-      var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
-      if (scrollHeight - scrollTop - clientHeight < clientHeight/2 ){
-        pageIndex ++
-        setImage(db,pageIndex,pageSize)
-      }
-      throttle(lazyload, 200)();
-  }, false);
-});
-
-// 封装DOMContentLoaded事件来检测页面DOM是否加载完毕
-function ready(func){
-  // 目前Mozilla、Opera和webkit 525+内核支持DOMContentLoaded事件
-  if(document.addEventListener) {
-      document.addEventListener('DOMContentLoaded', function() {
-          document.removeEventListener('DOMContentLoaded',arguments.callee, false);
-          func();
-      }, false);
-  } 
-  // 如果IE
-  else if(document.attachEvent) {
-      // 确保当页面是在iframe中加载时，事件依旧会被安全触发
-      document.attachEvent('onreadystatechange', function() {
-          if(document.readyState == 'complete') {
-              document.detachEvent('onreadystatechange', arguments.callee);
-              func();
-          }
-      });
-      // 如果是IE且页面不在iframe中时，轮询调用doScroll 方法检测DOM是否加载完毕
-      if(document.documentElement.doScroll && typeof window.frameElement === "undefined") {
-          try{
-              document.documentElement.doScroll('left');
-          }
-          catch(error){
-              return setTimeout(arguments.callee, 20);
-          };
-          func();
-      }
-  }
-};
-
-
-ready(function (event){
-    console.log('DOM已被完全加载和解析');
-
-}, false);
-window.onload = function () {
-  console.log('页面资源全部加载完毕');
-}
-
-
-
-
-
-
-
-
-
