@@ -1,5 +1,6 @@
 const bing_api_prefix = 'https://cn.bing.com';
-let pageIndex = 1, pageSize = 2
+// pageIndex 第一页从0开始
+let pageIndex = 0, pageSize = 24
         
 function readDbFile(callback) {
   let config = {
@@ -185,7 +186,7 @@ function blobSaveAsFile(blob, fileName){
 }
 
 function setImage(db, pageIndex, pageSize){
-  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit ($pageIndex * $pageSize), $pageSize");
+  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset $pageIndex");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var image_list = document.getElementById('image-list')
   while (stmt.step()) {
