@@ -1,6 +1,9 @@
 const bing_api_prefix = 'https://cn.bing.com';
 // pageIndex 第一页从0开始
 let pageIndex = 0, pageSize = 24
+
+
+
         
 function readDbFile(callback) {
   let config = {
@@ -28,9 +31,9 @@ readDbFile(function(db){
       // 获取页面高度
       var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
       // 获取滚动高度
-      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
       // 获取可视区域高度 这个不会变
-      var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+      var clientHeight =window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
       if (scrollHeight - scrollTop - clientHeight < clientHeight/2 ){
         pageIndex ++
         setImage(db,pageIndex,pageSize)
@@ -53,6 +56,23 @@ function preloader(id){
   big_image.src = dataSrc;
 }
 
+// 判断一个元素是否在可视区域, 有3种方式
+function isVisible(element){
+  // 浏览器视口的高度
+  const viewPortHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  // 滚动轴滚动的距离
+  const offsetTop = element.offsetTop
+  // 图片的头部距离浏览器顶部的高度
+  var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
+  // 第一种 offsetTop、scrollTop
+  const top = offsetTop - scrollTop
+  // const top = element.getBoundingClientRect().top
+  // 第二种 getBoundingClientRect
+  console.log(top+' '+ element.getBoundingClientRect().top)
+  return top <= viewPortHeight
+  // 第三种 Intersection Observer
+}
+
 // 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
   // document.querySelectorAll('img.me-lazy[data-src]').forEach(function(img){
@@ -62,14 +82,13 @@ function lazyload() {
   //   // 如果元素可见，则替换其 src 的值
   //   img.src = img.dataset.src;
   //   img.classList.remove('lazy');
-  // }
+  // });
   var image_objs = document.querySelectorAll('img[data-src]')
   for (let image_obj of image_objs) {
     var dataSrc = image_obj.getAttribute('data-src')
     if(!dataSrc) continue;
-    var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
-    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    if (image_obj.offsetTop < clientHeight + scrollTop){
+    let visible = isVisible(image_obj);
+    if (visible){
       !function (){
         var big_image = new Image();
         big_image.onload = function (){
