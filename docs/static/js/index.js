@@ -70,16 +70,18 @@ function lazyload() {
     var clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     if (image_obj.offsetTop < clientHeight + scrollTop){
-      var big_image = new Image();
-      big_image.onload = function (){
-        big_image.onload = null;
-        image_obj.onload = function (){
-          image_obj.onload = null;
-          image_obj.removeAttribute('data-src');
+      !function (){
+        var big_image = new Image();
+        big_image.onload = function (){
+          big_image.onload = null;
+          image_obj.onload = function (){
+            image_obj.onload = null;
+            image_obj.removeAttribute('data-src');
+          }
+          image_obj.src = this.src;
         }
-        image_obj.src = dataSrc;
-      }
-      big_image.src = dataSrc;
+        big_image.src = dataSrc;
+      }()
     }
   }
 }
@@ -186,7 +188,7 @@ function setImage(db, pageIndex, pageSize){
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
                               <a href="${bing_api_prefix}${row.copyrightlink}" target="_blank"> 
-                                <img id="${row.enddate}" class="me-img w3-image" src="${small_img_url}" data-src="${big_img_url}" data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
+                                <img id="${row.enddate}" class="w3-image me-lazy" src="${small_img_url}" data-src="${big_img_url}" data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
                               </a> 
                             </div>
                             <div class = "w3-padding-small">
