@@ -1,167 +1,136 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-
-'''
-爬取必应壁纸
-'''
-
-import requests
-import ctypes
-from tqdm import tqdm
-import os
-import time
 import sqlite3
-import shutil
-import h2
+import requests
+from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
 
-# TODO 获取每天的必应壁纸
-bing_api_prefixs = ['https://cn.bing.com',
-                    'https://s.cn.bing.net',
-                    'https://global.bing.com',
-                    'https://www.bing.com']
+def get_bing_images(begin_date, end_date):
+    if begin_date > end_date: begin_date, end_date = end_date, begin_date
+    begin = datetime.strptime(str(begin_date), '%Y%m%d')
+    end = datetime.strptime(str(end_date), '%Y%m%d')
+    images = []
+    if datetime.now() - timedelta(days=15) >= end or begin > datetime.now():return images
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
+    }
+    image_dates = []
+    for i in range(7):
+        bing_api = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx={i}0&n=8&mkt=zh-CN'
+        resp = requests.get(url=bing_api, headers=headers)
+        if resp and resp.status_code == requests.codes.ok:
+            resp_json = resp.json()
+            images_json = resp_json['images']
+            for image_json in images_json:
+                date_str = str(image_json['enddate'])
+                date = datetime.strptime(date_str, '%Y%m%d')
+                if date >= begin and date <= end and date_str not in image_dates:
+                    images.append((image_json['startdate'],image_json['fullstartdate'],image_json['enddate'],image_json['url'],
+                                   image_json['urlbase'],image_json['copyright'],image_json['copyrightlink'],image_json['title'],
+                                   image_json['quiz'],image_json['hsh']))
+                    image_dates.append(date_str)
+        else:
+            print(resp.raise_for_status())
+    return images;
 
-bing_api_prefix = bing_api_prefixs[0]
-bing_api_suffix = '/HPImageArchive.aspx'
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-}
-params = {
-    'format': 'js',
-    'idx': 0,
-    'n': 7,
-    'mkt': 'zh-CN'
-}
-for prefix in bing_api_prefixs:
-    bing_api_prefix = prefix
-    bing_api = bing_api_prefix + bing_api_suffix
-    resp = requests.get(url=bing_api, headers=headers, params=params)
-    if resp and resp.status_code == requests.codes.ok:
-        break
-    else:
-        print(resp.raise_for_status())
+def get_xinac_images(begin_date, end_date):
+    if begin_date > end_date: begin_date, end_date = end_date, begin_date
+    begin = datetime.strptime(str(begin_date), '%Y%m%d')
+    end = datetime.strptime(str(end_date), '%Y%m%d')
+    images = []
+    if begin > datetime.now():return images
+    if end > datetime.now(): end = datetime.now()
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
+    }
+    pageSize = 16
+    days = (datetime.now() - end).days + 1 
+    from_pageIndex = -(-days//pageSize)
+    days = (datetime.now() - begin).days + 1 
+    to_pageIndex = -(-days//pageSize)
+    for i in range(from_pageIndex, to_pageIndex + 1):
+        xinac_api = f'https://bing.xinac.net/?page={i}'
+        resp = requests.get(url=xinac_api, headers=headers)
+        if resp and resp.status_code == requests.codes.ok:
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            articles = soup.find_all('article', class_='card')
+            for article in articles:
+                a_tag = article.find_all('a',class_='show')[0]
+                url = a_tag['href']
+                copyright = a_tag['title']
+                span_tag = article.find_all('span',class_='u-time')[0]
+                a_tag = article.select('.title h2 a')[0]
+                title = a_tag.string
+                enddate = datetime.strptime(str(span_tag.string), '%b %d, %Y').strftime("%Y%m%d")
+                images.append(('','',enddate, url,'',copyright,'',title,'',''))
+        else:
+            print(resp.raise_for_status())
+    return images
 
-# ! 上面可能所有都存在问题，导致resp没有值，这里先进行判断
-        
-resp_json = resp.json()
-images = resp_json['images']
-print(bing_api_prefix)
-
-# ! images可能没有值
-for image in images:
-    image_url = bing_api_prefix +  image['url']
-    print(image_url)
-    resp = requests.get(image_url,  headers=headers, stream=True)
-    image_path = os.path.join(os.getcwd(),'image',image['hsh'] + ".jpg")
-    if not os.path.exists(os.path.dirname(image_path)):
-        os.makedirs(os.path.dirname(image_path))
-    with open(image_path, "wb+") as image_file:
-        for chunk in resp.iter_content(chunk_size=1024):
-            if chunk:
-                image_file.write(chunk)
-
-# TODO 同步保存到数据库中
-
-
-conn = sqlite3.connect('docs/data/images.db')
-cursor = conn.cursor()
-try:
-    # 判断表是否存在，不存在则执行schema.sql脚本
-    cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{'test'}';")
-    if not cursor.fetchone():
-        script_path = 'db/schema.sql'
-        if os.path.getsize(script_path):
-            script_file = open(file=script_path, mode='r',encoding='UTF-8')
-            script = script_file.read()
-            cursor.executescript(script)
-            conn.commit()
-        
-    
-    # conn.commit()
-except sqlite3.Error as e:
-    print(e)
-    # 发生错误，回滚事务
-    conn.rollback()
-finally:
+def get_images(begin_date, end_date):
+    # 天数
+    if begin_date > end_date: begin_date, end_date = end_date, begin_date
+    begin = datetime.strptime(str(begin_date), '%Y%m%d')
+    end = datetime.strptime(str(end_date), '%Y%m%d')
+    days = (end - begin).days + 1 
+    # 1、按日期范围进行数据库查
+    conn = sqlite3.connect('docs/data/images.db')
+    cursor = conn.cursor()
+    cursor.execute('''  create table if not exists wallpaper
+                        (
+                            startdate     varchar(8)   not null default ' ',
+                            fullstartdate varchar(50)  not null default ' ',
+                            enddate       varchar(8)   not null default ' ',
+                            url           varchar(150) not null default ' ',
+                            urlbase       varchar(100) not null default ' ',
+                            copyright     varchar(150) not null default ' ',
+                            copyrightlink varchar(150) not null default ' ',
+                            title         varchar(100) not null default ' ',
+                            quiz          varchar(150) not null default ' ',
+                            hsh           varchar(50)  not null default ' ',
+                            createtime    timestamp not null default current_timestamp,
+                            updatetime    timestamp not null default current_timestamp,
+                            primary key (enddate)
+                        ); ''')
+    cursor.execute('select startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh \
+                      from wallpaper where enddate between ? and ?  order by enddate desc',(begin_date, end_date))
+    images = cursor.fetchall();
+    image_dates = []
+    for image in images:
+        if image[3] and image[5] and image[7]:
+            image_dates.append(image[2])
+    image_list = []
+    for i in range(days):
+        date = begin + timedelta(days=i)
+        date_str = date.strftime('%Y%m%d')  
+        if date_str in image_dates:
+            continue
+        # 官方api最多可获取前15天的壁纸
+        if datetime.now() - timedelta(days=15) < date:
+            # 官方api获取壁纸
+            bing_images = get_bing_images(date_str, date_str)
+            image_list.extend(bing_images)
+        else:
+            # 其他网站获取壁纸
+            xinac_images = get_xinac_images(date_str, date_str)
+            image_list.extend(xinac_images)
+    # 数据存在时先删后插
+    cursor.executemany('replace into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,updatetime) \
+                        values (?,?,?,?,?,?,?,?,?,?,current_timestamp)', image_list)
+    print(f'影响了 {cursor.rowcount} 行')
+    # 数据放入images数组中
+    # 对images按日期排序
+    # 提交改动
+    conn.commit()
+    # 关闭游标
     cursor.close()
+    # 关闭连接
     conn.close()
+    return images
 
-# TODO 壁纸在README.md文件展示
-
-# TODO 同步展示到年月份文件中
-
-# TODO 同步展示到对应的html文件中
-
-# TODO 按时间进行下载必应壁纸
-
-# TODO 预览壁纸，把壁纸设为电脑桌面壁纸
-
-# TODO 展示的html进行完善，加上故事和地图定位
- 
-
-
-# try:
-#     cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{'test'}';")
-#     result = cursor.fetchone()
-#     if not result:
-#         cursor.execute('''CREATE TABLE test
-#         (ID INT PRIMARY KEY     NOT NULL,
-#         NAME           TEXT    NOT NULL,
-#         AGE            INT     NOT NULL,
-#         ADDRESS        CHAR(50),
-#         SALARY         REAL);''')
-    # cursor.execute("INSERT INTO test (ID,NAME,AGE,ADDRESS,SALARY) \
-    #       VALUES (1, 'Paul', 32, 'California', 20000.00 )")
-        
-    # data = [('B', '一班', '女', 78, 87, 85),
-    #         ('C', '一班', '男', 98, 84, 90),
-    #         ]
-    # cursor.executemany('INSERT INTO scores VALUES (?,?,?,?,?,?)', data)
-        
-
-    # 查询数学成绩大于90分的学生
-    # sql_text_3 = "SELECT * FROM scores WHERE 数学>90"
-    # cursor.execute(sql_text_3)
-    # # 获取查询结果
-    # results  =cursor.fetchall()
-        
-#     # 受影响行数
-#     cursor.rowcount
-
-#     conn.commit()
-# except sqlite3.Error:
-#     # 发生错误，回滚事务
-#     conn.rollback()
-# finally:
-#     cursor.close()
-#     conn.close()
-
-# # 创建数据库备份
-# shutil.copy2('mydatabase.db', 'mydatabase_backup.db')
-
-# bing_api = f'https://cn.bing.com/HPImageArchive.aspx'
-# headers = {
-#     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-# }
-# params = {
-#     'format': 'js',
-#     'idx': 0,
-#     'n': 7,
-#     'mkt': 'zh-CN'
-# }
-# for i in tqdm(range(1000)): 
-#     time.sleep(0.001)
-# resp = requests.get(bing_api,  params=params, headers=headers)
-# if resp and resp.status_code != requests.codes.ok:
-#     print(resp.raise_for_status())
-#     exit()
-# resp_json = resp.json()
-# images = resp_json['images']
-# for image in tqdm(images):
-# # for i in tqdm(range(len(images))):
-#     # image = images[i]
-#     # print(image['url'])
-#     resp = requests.get('https://cn.bing.com/'+image['url'],  headers=headers)
-#     filepath = os.path.join(os.getcwd(),image['hsh'] + ".jpg")
-#     with open(filepath,"wb+")as img_write:
-#         img_write.write(resp.content)
-#     # ctypes.windll.user32.SystemParametersInfoW(20, 0, filepath, 0)
+if __name__ == '__main__':
+    # 获取今天的必应壁纸
+    images = get_images('20240409', '20240101')
+    # images = get_bing_images('20240402', '20240401')
+    # get_xinac_images('20240409', '20240402')
+    # print(len(images))
