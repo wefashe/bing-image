@@ -36,6 +36,10 @@ readDbFile(function(db){
         setImage(db,pageIndex,pageSize)
       }
       throttle(lazyload, 200)();
+      // 当浏览器窗口大小改变时，运行函数
+      // window.addEventListener('resize', lazyloader);
+      // 当设备的纵横方向改变时，运行函数
+      // window.addEventListener('orientationChange', lazyloader);
   }, false);
 });
 
@@ -51,6 +55,14 @@ function preloader(id){
 
 // 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
+  // document.querySelectorAll('img.me-lazy[data-src]').forEach(function(img){
+  //   let rect = img.getBoundingClientRect();
+  //   let visible = rect.top<=window.innerHeight && rect.bottom>=0;
+  //   if(!visible){return;}
+  //   // 如果元素可见，则替换其 src 的值
+  //   img.src = img.dataset.src;
+  //   img.classList.remove('lazy');
+  // }
   var image_objs = document.querySelectorAll('img[data-src]')
   for (let image_obj of image_objs) {
     var dataSrc = image_obj.getAttribute('data-src')
