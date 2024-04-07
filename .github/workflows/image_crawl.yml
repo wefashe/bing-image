@@ -1,0 +1,47 @@
+name: image crawl
+
+on:
+  schedule:
+    # UTC时间与北京时间8小时时差
+    # UTC时间 18点执行一次，即UTC+8北京时间 2点执行一次
+    - cron:  '0 18 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # 设置服务器时区为东八区
+    - name: Set time zone
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
+    - name: checkout actions
+    - uses: actions/checkout@main
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+        cache: 'python-cache' 
+
+    - name: Update paper list
+      run: |
+        python image_Get.py
+
+    - name: Commit files
+      run: |
+         git config --local user.email "wefashe@qq.com"
+         git config --local user.name "Java CI"
+         git add .
+         git commit -m "$(git config user.name) Auto Save Wallpaper At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
+      continue-on-error: true
+    - name: Check on failures
+      if: steps.commit.outputs.status == 'failure'
+      run: exit 1
+    - name: Push changes
+      uses:  ad-m/github-push-action@master
+      with:
+         github_token: ${{ secrets.MY_GIT_TOKEN }}
+         branch: main
