@@ -11,7 +11,7 @@ function readDbFile(callback) {
   };
   initSqlJs(config).then(function (SQL) {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', "static/db/images.db", true);
+      xhr.open('GET', "data/images.db", true);
       xhr.responseType = 'arraybuffer';
       xhr.onload = e => {
         // document.getElementById('me-load').classList.toggle('w3-hide');
@@ -68,7 +68,6 @@ function isVisible(element){
   const top = offsetTop - scrollTop
   // const top = element.getBoundingClientRect().top
   // 第二种 getBoundingClientRect
-  console.log(top+' '+ element.getBoundingClientRect().top)
   return top <= viewPortHeight
   // 第三种 Intersection Observer
 }

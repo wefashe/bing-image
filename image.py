@@ -51,7 +51,7 @@ for image in images:
     image_url = bing_api_prefix +  image['url']
     print(image_url)
     resp = requests.get(image_url,  headers=headers, stream=True)
-    image_path = os.path.join(os.getcwd(),'images',image['hsh'] + ".jpg")
+    image_path = os.path.join(os.getcwd(),'image',image['hsh'] + ".jpg")
     if not os.path.exists(os.path.dirname(image_path)):
         os.makedirs(os.path.dirname(image_path))
     with open(image_path, "wb+") as image_file:
@@ -62,7 +62,7 @@ for image in images:
 # TODO 同步保存到数据库中
 
 
-conn = sqlite3.connect('data/images.db')
+conn = sqlite3.connect('docs/data/images.db')
 cursor = conn.cursor()
 try:
     # 判断表是否存在，不存在则执行schema.sql脚本
