@@ -43,8 +43,8 @@ jobs:
       # 提交文件
       - name: commit files
         run: |
-          git config --local user.name ${{ vars.MY_GIT_NAME }}
-          git config --local user.email ${{ vars.MY_GIT_EMAIL }}
+          git config --local user.name 'Github Action'
+          git config --local user.email 'wefashe@qq.com'
           git add .
           git commit -m "$(git config user.name) Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
         continue-on-error: true
