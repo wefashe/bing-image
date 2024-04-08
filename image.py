@@ -147,7 +147,7 @@ def get_images(begin_date, end_date):
     # 数据存在时先删后插
     cursor.executemany('replace into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,updatetime) \
                         values (?,?,?,?,?,?,?,?,?,?,current_timestamp)', image_list)
-    print(f'更新了 {cursor.rowcount} 行数据')
+    print(f'共更新 {cursor.rowcount} 日数据')
     # 数据放入images数组中
     # 对images按日期排序
     # 提交改动
