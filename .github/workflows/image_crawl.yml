@@ -61,3 +61,7 @@ jobs:
           git add .
           git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
           git push
+        continue-on-error: true
+      - name: check on failures
+        if: steps.commit.outputs.status == 'failure'
+        run: exit 1
