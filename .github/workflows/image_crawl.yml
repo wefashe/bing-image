@@ -38,6 +38,7 @@ jobs:
       # 爬取壁纸
       - name: crawl bing image
         run: |
+          python -m pip install --upgrade pip
           pip install requests
           pip install BeatifulSoup4
           pip install tqdm
