@@ -1,10 +1,6 @@
 const bing_api_prefix = 'https://cn.bing.com';
-// pageIndex 第一页从0开始
-let pageIndex = 0, pageSize = 24
+let pageIndex = 1, pageSize = 24
 
-
-
-        
 function readDbFile(callback) {
   let config = {
     locateFile: () => "static/js/sql-wasm.wasm",
@@ -191,7 +187,7 @@ function blobSaveAsFile(blob, fileName){
 }
 
 function setImage(db, pageIndex, pageSize){
-  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset $pageIndex");
+  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var image_list = document.getElementById('image-list')
   while (stmt.step()) {
