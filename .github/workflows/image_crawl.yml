@@ -44,8 +44,8 @@ jobs:
       # 提交文件
       - name: commit files
         run: |
-          git config --local user.name 'wefashe'
-          git config --local user.email 'wefashe@qq.com'
+          git config user.name 'wefashe'
+          git config user.email 'wefashe@qq.com'
           git add .
           git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
           git push
