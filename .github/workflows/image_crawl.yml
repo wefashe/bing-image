@@ -38,7 +38,7 @@ jobs:
       # 爬取壁纸
       - name: crawl bing image
         run: |
-          python image_Get.py
+          python image.py
       # 提交文件
       - name: commit files
         run: |
