@@ -86,8 +86,8 @@ def get_images(begin_date, end_date):
                         (
                             startdate     varchar(8)   not null default ' ',
                             fullstartdate varchar(50)  not null default ' ',
-                            enddate       varchar(8)   not null default ' ',
-                            url           varchar(150) not null default ' ',
+                            enddate       varchar(8)   not null default ' ' primary key,
+                            url           varchar(150) not null default ' ' unique,
                             urlbase       varchar(100) not null default ' ',
                             copyright     varchar(150) not null default ' ',
                             copyrightlink varchar(150) not null default ' ',
@@ -95,8 +95,7 @@ def get_images(begin_date, end_date):
                             quiz          varchar(150) not null default ' ',
                             hsh           varchar(50)  not null default ' ',
                             createtime    timestamp not null default current_timestamp,
-                            updatetime    timestamp not null default current_timestamp,
-                            primary key (enddate)
+                            updatetime    timestamp not null default current_timestamp
                         ); ''')
     cursor.execute('select startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh \
                       from wallpaper where enddate between ? and ?  order by enddate desc',(begin_date, end_date))
