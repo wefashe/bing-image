@@ -34,7 +34,7 @@ jobs:
           ref: ${{ github.ref }}
       # 安装 Python 环境 
       - name: set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v2
         with:
           python-version: 3.10
       # 爬取壁纸
