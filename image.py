@@ -4,6 +4,7 @@ import sqlite3
 import requests
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 def get_bing_images(begin_date, end_date):
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
@@ -48,6 +49,7 @@ def get_xinac_images(begin_date, end_date):
     from_pageIndex = -(-days//pageSize)
     days = (datetime.now() - begin).days + 1 
     to_pageIndex = -(-days//pageSize)
+    image_dates = []
     for i in range(from_pageIndex, to_pageIndex + 1):
         xinac_api = f'https://bing.xinac.net/?page={i}'
         resp = requests.get(url=xinac_api, headers=headers)
@@ -57,12 +59,16 @@ def get_xinac_images(begin_date, end_date):
             for article in articles:
                 a_tag = article.find_all('a',class_='show')[0]
                 url = a_tag['href']
+                url = url[url.find("/th?id="):]
                 copyright = a_tag['title']
                 span_tag = article.find_all('span',class_='u-time')[0]
                 a_tag = article.select('.title h2 a')[0]
                 title = a_tag.string
-                enddate = datetime.strptime(str(span_tag.string), '%b %d, %Y').strftime("%Y%m%d")
-                images.append(('','',enddate, url,'',copyright,'',title,'',''))
+                enddate = datetime.strptime(str(span_tag.string), '%b %d, %Y')
+                enddate_str = enddate.strftime("%Y%m%d")
+                if enddate >= begin and enddate <= end and enddate_str not in image_dates:
+                    images.append(('','',enddate_str, url,'',copyright,'',title,'',''))
+                    image_dates.append(enddate_str)
         else:
             print(resp.raise_for_status())
     return images
@@ -100,7 +106,7 @@ def get_images(begin_date, end_date):
         if image[3] and image[5] and image[7]:
             image_dates.append(image[2])
     image_list = []
-    for i in range(days):
+    for i in tqdm(range(days)):
         date = begin + timedelta(days=i)
         date_str = date.strftime('%Y%m%d')  
         if date_str in image_dates:
@@ -130,7 +136,5 @@ def get_images(begin_date, end_date):
 
 if __name__ == '__main__':
     # 获取今天的必应壁纸
-    images = get_images('20240409', '20240101')
-    # images = get_bing_images('20240402', '20240401')
-    # get_xinac_images('20240409', '20240402')
-    # print(len(images))
+    today = datetime.now().strftime('%Y%m%d')  
+    images = get_images(today, today)
