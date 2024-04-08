@@ -1,0 +1,59 @@
+name: image crawl
+
+# on 触发条件
+on:
+  # 定时触发
+  schedule:
+    # UTC时间与北京时间8小时时差
+    # UTC时间 18点执行一次，即UTC+8北京时间 2点执行一次
+    - cron:  '0 18 * * *'
+  # 监听 git push 到指定分支时触发
+  push:
+    branches:
+      - main
+  # 人工触发
+  workflow_dispatch:
+
+env:
+  # 需要用到本地时间
+  TZ: Asia/Shanghai
+    
+jobs:
+  build:
+    # 指定执行系统环境
+    runs-on: ubuntu-latest
+    # 执行的步骤
+    steps:
+      # 拉取分支代码
+      - name: checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      # 安装 Python 环境 
+      - name: set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+          architecture: 'x64'
+          cache: 'python-cache' 
+      # 爬取壁纸
+      - name: crawl bing image
+        run: |
+          python image_Get.py
+      # 提交文件
+      - name: commit files
+        run: |
+          git config --local user.name ${{ vars.MY_GIT_NAME }}
+          git config --local user.email ${{ vars.MY_GIT_EMAIL }}
+          git add .
+          git commit -m "$(git config user.name) Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
+        continue-on-error: true
+      # 检查失败
+      - name: check on failures
+        if: steps.commit.outputs.status == 'failure'
+        run: exit 1
+      # 推送修改
+      - name: push changes
+        uses:  ad-m/github-push-action@master
+        with:
+          branch: main
