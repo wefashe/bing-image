@@ -138,10 +138,10 @@ if __name__ == '__main__':
     print(len(sys.argv))
     begin_date =  datetime.now().strftime('%Y%m%d')
     end_date =  datetime.now().strftime('%Y%m%d')
-    if len(sys.argv) == 2:
+    if len(sys.argv) > 1:
         if sys.argv[1]:
             begin_date = sys.argv[1]
-    if len(sys.argv) == 3:
+    if len(sys.argv) > 2:
         if sys.argv[2]:
             end_date = sys.argv[2]
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
