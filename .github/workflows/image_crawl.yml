@@ -56,5 +56,5 @@ jobs:
       - name: push changes
         uses:  ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.for_Action }}
+          github_token: ${{ secrets.MY_GIT_TOKEN }}
           branch: ${{ github.ref }}
