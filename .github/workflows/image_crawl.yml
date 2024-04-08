@@ -48,11 +48,6 @@ jobs:
           git add .
           git commit -m "$(git config user.name) Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
         continue-on-error: true
-      # 检查失败
-      - name: check on failures
-        if: steps.commit.outputs.status == 'failure'
-        run: exit 1
-      # 推送修改
       - name: push changes
         uses:  ad-m/github-push-action@master
         with:
