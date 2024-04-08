@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+import sys
 import sqlite3
 import requests
 from datetime import datetime, timedelta
@@ -134,6 +135,15 @@ def get_images(begin_date, end_date):
     return images
 
 if __name__ == '__main__':
-    # 获取今天的必应壁纸
-    today = datetime.now().strftime('%Y%m%d')  
-    images = get_images(today, today)
+    print(len(sys.argv))
+    begin_date =  datetime.now().strftime('%Y%m%d')
+    end_date =  datetime.now().strftime('%Y%m%d')
+    if len(sys.argv) == 2:
+        if sys.argv[1]:
+            begin_date = sys.argv[1]
+    if len(sys.argv) == 3:
+        if sys.argv[2]:
+            end_date = sys.argv[2]
+    if begin_date > end_date: begin_date, end_date = end_date, begin_date
+    print(f'爬取的时间范围: {begin_date} - {end_date}')
+    images = get_images(begin_date, end_date)
