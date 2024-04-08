@@ -32,7 +32,17 @@ def get_bing_images(begin_date, end_date):
                                    image_json['quiz'],image_json['hsh']))
                     image_dates.append(date_str)
         else:
-            print(resp.raise_for_status())
+            try:
+                resp.raise_for_status()
+            except requests.exceptions.HTTPError as errh:
+                print("HTTP错误:", errh)
+            except requests.exceptions.ConnectionError as errc:
+                print("连接错误:", errc)
+            except requests.exceptions.Timeout as errt:
+                print("超时错误:", errt)
+            except requests.exceptions.RequestException as err:
+                print("其他错误:", err)
+            continue
     return images;
 
 def get_xinac_images(begin_date, end_date):
@@ -71,7 +81,17 @@ def get_xinac_images(begin_date, end_date):
                     images.append(('','',enddate_str, url,'',copyright,'',title,'',''))
                     image_dates.append(enddate_str)
         else:
-            print(resp.raise_for_status())
+            try:
+                resp.raise_for_status()
+            except requests.exceptions.HTTPError as errh:
+                print("HTTP错误:", errh)
+            except requests.exceptions.ConnectionError as errc:
+                print("连接错误:", errc)
+            except requests.exceptions.Timeout as errt:
+                print("超时错误:", errt)
+            except requests.exceptions.RequestException as err:
+                print("其他错误:", err)
+            continue
     return images
 
 def get_images(begin_date, end_date):
