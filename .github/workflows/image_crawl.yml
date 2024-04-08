@@ -38,7 +38,8 @@ jobs:
       # 爬取壁纸
       - name: crawl bing image
         run: |
-          pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com; fi
           python image.py
       # 提交文件
       - name: commit files
@@ -47,14 +48,4 @@ jobs:
           git config --local user.email 'wefashe@qq.com'
           git add .
           git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
-        continue-on-error: true
-      # 检查失败
-      - name: check on failures
-        if: steps.commit.outputs.status == 'failure'
-        run: exit 1
-      # 推送修改
-      - name: push changes
-        uses:  ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.MY_GIT_TOKEN }}
-          branch: ${{ github.ref }}
+          git push
