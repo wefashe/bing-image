@@ -78,7 +78,7 @@ def get_xinac_images(begin_date, end_date):
                 enddate = datetime.strptime(str(span_tag.string), '%b %d, %Y')
                 enddate_str = enddate.strftime("%Y%m%d")
                 if enddate >= begin and enddate <= end and enddate_str not in image_dates:
-                    images.append(('','',enddate_str, url,'',copyright,'',title,'',''))
+                    images.append(('','',enddate_str.strip(), url.strip(),'',copyright.strip(),'',title.strip(),'',''))
                     image_dates.append(enddate_str)
         else:
             try:
@@ -95,7 +95,6 @@ def get_xinac_images(begin_date, end_date):
     return images
 
 def get_images(begin_date, end_date):
-    # 天数
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
     begin = datetime.strptime(str(begin_date), '%Y%m%d')
     end = datetime.strptime(str(end_date), '%Y%m%d')
@@ -123,7 +122,12 @@ def get_images(begin_date, end_date):
     images = cursor.fetchall();
     image_dates = []
     for image in images:
-        if image[3] and image[5] and image[7]:
+        end_date = image[2]
+        url = image[3]
+        copyright = image[5]
+        title = image[7]
+        if end_date and end_date.strip() and url and url.strip() \
+           and copyright and copyright.strip() and title and title.strip():
             image_dates.append(image[2])
     image_list = []
     for i in tqdm(range(days)):
@@ -143,7 +147,7 @@ def get_images(begin_date, end_date):
     # 数据存在时先删后插
     cursor.executemany('replace into wallpaper(startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh,updatetime) \
                         values (?,?,?,?,?,?,?,?,?,?,current_timestamp)', image_list)
-    print(f'影响了 {cursor.rowcount} 行')
+    print(f'更新了 {cursor.rowcount} 行数据')
     # 数据放入images数组中
     # 对images按日期排序
     # 提交改动
@@ -155,7 +159,6 @@ def get_images(begin_date, end_date):
     return images
 
 if __name__ == '__main__':
-    print(len(sys.argv))
     begin_date =  datetime.now().strftime('%Y%m%d')
     end_date =  datetime.now().strftime('%Y%m%d')
     if len(sys.argv) > 1:
