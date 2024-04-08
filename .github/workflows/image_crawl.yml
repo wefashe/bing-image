@@ -29,15 +29,14 @@ jobs:
     steps:
       # 拉取分支代码
       - name: checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          ref: main
+          ref: ${{ github.ref }}
       # 安装 Python 环境 
-      - name: set up Python 3.7
-        uses: actions/setup-python@v2
+      - name: set up Python
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.7
-          architecture: 'x64'
+          python-version: 3.10
       # 爬取壁纸
       - name: crawl bing image
         run: |
@@ -47,8 +46,8 @@ jobs:
       # 提交文件
       - name: commit files
         run: |
-          git config user.name 'wefashe'
-          git config user.email 'wefashe@qq.com'
+          git config --local user.name 'Github Action'
+          git config --local user.email 'github-actions@github.com'
           git add .
           git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
           git push
