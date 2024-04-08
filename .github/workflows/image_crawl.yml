@@ -54,7 +54,7 @@ jobs:
         run: exit 1
       # 推送修改
       - name: push changes
-        env:
-         ACCESS_TOKEN: ${{ secrets.MY_GIT_TOKEN }}
-        run: |
-         git push HEAD:${{ github.ref }}
+        uses:  ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.for_Action }}
+          branch: ${{ github.ref }}
