@@ -35,7 +35,6 @@ jobs:
         with:
           python-version: 3.8
           architecture: 'x64'
-          cache: 'python-cache' 
       # 爬取壁纸
       - name: crawl bing image
         run: |
