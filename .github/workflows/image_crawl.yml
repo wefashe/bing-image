@@ -22,6 +22,9 @@ jobs:
   build:
     # 指定执行系统环境
     runs-on: ubuntu-latest
+    permissions:
+      # 为这个 Job 新增了写权限
+      contents: write
     # 执行的步骤
     steps:
       # 拉取分支代码
