@@ -1,0 +1,36 @@
+// https://dt-blog.gitee.io/docs/notes/base/vscode%E4%B9%8Bsetting.html
+
+{
+    // 自动保存 文件焦点变化时自动保存
+    "files.autoSave": "onFocusChange",
+    // 代码提示
+    "editor.suggestSelection": "recentlyUsedByPrefix",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    // 文件夹紧凑模式显示
+    "explorer.compactFolders": true,
+     // 默认 lf 结尾
+    "files.eol": "\n",
+    // 关闭 vscode 自动更新提示
+    "update.mode": "none",
+    // 不需要删除二次确认 可使用 cmd + z 撤销删除行为
+    "explorer.confirmDelete": false,
+    // 设置代码行号
+    "editor.lineNumbers":"on",
+    // 每次保存的时候自动格式化
+    "editor.formatOnSave": true,
+    // 粘贴自动格式化
+    "editor.formatOnPaste": true,
+    // 这些文件将不会显示在工作空间中
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.github":true,
+        "**/.vscode":true
+    },
+    // 配置 Tab 空格数
+    "editor.tabSize": 2,
+}
