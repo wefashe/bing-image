@@ -54,4 +54,6 @@
     "workbench.settings.useSplitJSON": true,
     // 在读取和写入文件时使用的默认字符集编码
     "files.encoding": "utf8",
+    // 鼠标滚轮缩放字体大小
+    "editor.mouseWheelZoom": true,
 }
