@@ -82,4 +82,6 @@
     "editor.guides.bracketPairs": "active",
     // 控制是否在编辑器中自动显示内联建议。
     "editor.inlineSuggest.enabled": true,
+    // 在编辑器顶部的滚动过程中显示嵌套的当前作用域
+    "editor.stickyScroll.enabled": false
 }
