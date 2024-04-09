@@ -56,4 +56,30 @@
     "files.encoding": "utf8",
     // 鼠标滚轮缩放字体大小
     "editor.mouseWheelZoom": true,
+    // 关闭 vscode 推荐插件的行为
+    "extensions.ignoreRecommendations": true,
+    // 已启用的插件才开启自动 update 更新功能
+    "extensions.autoUpdate": "onlyEnabledExtensions",
+    // diff 行为默认会忽略尾部空字符, 关闭忽略行为
+    "diffEditor.ignoreTrimWhitespace": false,
+    // 原生复现 彩色括号
+    "workbench.colorCustomizations": {
+        "editorBracketHighlight.foreground1": "#ffd700",
+        "editorBracketPairGuide.activeBackground1": "#ffd7007f",
+        "editorBracketHighlight.foreground2": "#da70d6",
+        "editorBracketPairGuide.activeBackground2": "#da70d67f",
+        "editorBracketHighlight.foreground3": "#87cefa",
+        "editorBracketPairGuide.activeBackground3": "#87cefa7f",
+        "editorBracketHighlight.foreground4": "#ffd700",
+        "editorBracketPairGuide.activeBackground4": "#ffd7007f",
+        "editorBracketHighlight.foreground5": "#da70d6",
+        "editorBracketPairGuide.activeBackground5": "#da70d67f",
+        "editorBracketHighlight.foreground6": "#87cefa",
+        "editorBracketPairGuide.activeBackground6": "#87cefa7f",
+        "editorBracketHighlight.unexpectedBracket.foreground": "#ff0000",
+    },
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    // 控制是否在编辑器中自动显示内联建议。
+    "editor.inlineSuggest.enabled": true,
 }
