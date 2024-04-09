@@ -6,6 +6,8 @@ import requests
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import json
+import re
 
 def get_bing_images(begin_date, end_date):
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
@@ -158,6 +160,34 @@ def get_images(begin_date, end_date):
     conn.close()
     return images
 
+def get_bing_image():
+    url = 'https://cn.bing.com'
+
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+    }
+
+    res = requests.get(url, headers=headers)
+    res.encoding = res.apparent_encoding
+
+    ret = re.search("var _model =(\{.*?\});", res.text)
+    if not ret:
+        return
+
+    data = json.loads(ret.group(1))
+    image_content = data['MediaContents'][0]['ImageContent']
+
+    return {
+        'headline': image_content['Headline'],
+        'title': image_content['Title'],
+        'description': image_content['Description'],
+        'Copyright': image_content['Copyright'],
+        'Url': image_content['Image']['Url'],
+        'Wallpaper': image_content['Image']['Wallpaper'],
+        'main_text': image_content['QuickFact']['MainText'],
+        'BackstageUrl': image_content['BackstageUrl']
+    }
+
 if __name__ == '__main__':
     begin_date =  datetime.now().strftime('%Y%m%d')
     end_date =  datetime.now().strftime('%Y%m%d')
@@ -170,3 +200,6 @@ if __name__ == '__main__':
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
     print(f'爬取的时间范围: {begin_date} - {end_date}')
     images = get_images(begin_date, end_date)
+
+    # res = get_bing_image()
+    # print(json.dumps(res, ensure_ascii=False, indent=2))
