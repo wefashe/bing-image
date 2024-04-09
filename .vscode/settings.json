@@ -1,5 +1,4 @@
-// https://dt-blog.gitee.io/docs/notes/base/vscode%E4%B9%8Bsetting.html
-
+// 我的VsCode配置
 {
     // 自动保存 文件焦点变化时自动保存
     "files.autoSave": "onFocusChange",
@@ -8,18 +7,22 @@
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     // 文件夹紧凑模式显示
     "explorer.compactFolders": true,
-     // 默认 lf 结尾
+    // 默认 lf 结尾
     "files.eol": "\n",
     // 关闭 vscode 自动更新提示
     "update.mode": "none",
-    // 不需要删除二次确认 可使用 cmd + z 撤销删除行为
-    "explorer.confirmDelete": false,
+    // 删除二次确认 可使用 cmd + z 撤销删除行为
+    "explorer.confirmDelete": true,
     // 设置代码行号
-    "editor.lineNumbers":"on",
+    "editor.lineNumbers": "on",
     // 每次保存的时候自动格式化
     "editor.formatOnSave": true,
+    // 设置输入完成后是否自动格式化当前行
+    "editor.formatOnType": true,
     // 粘贴自动格式化
     "editor.formatOnPaste": true,
+    // 设置保存文件时格式化整个文件还是仅被修改处。该配置项仅在 "editor.formatOnPaste" 为 true时生效
+    "editor.formatOnSaveMode": "file",
     // 这些文件将不会显示在工作空间中
     "files.exclude": {
         "**/.git": true,
@@ -28,9 +31,27 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
-        "**/.github":true,
-        "**/.vscode":true
+        "**/.github": true,
+        "**/.vscode": true,
     },
     // 配置 Tab 空格数
     "editor.tabSize": 2,
+    // 显示缩略图
+    "editor.minimap.enabled": false,
+    // 开启自动检测 空格 或 制表符
+    "editor.detectIndentation": true,
+    // 按 Tab 键时插入空格
+    "editor.insertSpaces": true,
+    // 新建文件后的默认文件类型
+    "files.defaultLanguage": "txt",
+    //控制是否启用字体连字
+    "editor.fontLigatures": true,
+    // 主题
+    "workbench.colorTheme": "Visual Studio Dark",
+    // 图标
+    "workbench.iconTheme": "vscode-icons",
+    // 设置 setting.json分栏显示, 左侧全局配置，右侧用户配置
+    "workbench.settings.useSplitJSON": true,
+    // 在读取和写入文件时使用的默认字符集编码
+    "files.encoding": "utf8",
 }
