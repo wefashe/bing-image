@@ -43,8 +43,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.10
-          # 解释器架构 默认x64
-          architecture: 'x64'
           # 缓存pip全局缓存目录
           cache: 'pip'
       # 爬取壁纸
