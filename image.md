@@ -36,3 +36,10 @@
 - it-IT 意大利
 - ja-JP 日本
 - zh-CN 中国
+
+
+- https://bing.com 
+- https://cn.bing.com 
+- https://s.cn.bing.net  
+- https://global.bing.com 
+- https://www.bing.com
