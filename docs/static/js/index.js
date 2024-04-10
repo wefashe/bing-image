@@ -211,9 +211,11 @@ function setImage(db, pageIndex, pageSize) {
     var small_img_url = `${bing_api_prefix}${url}&w=120`;
     var big_img_url = `${bing_api_prefix}${url}&w=384&h=216`
     var view_count = Math.floor(Math.random() * (100 - 1000) + 1000);
+    // 20210101转为2021-01-01
     var date_str = row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+    // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
     var date = new Date(date_str.replace(/-/g, "/"));
-    var today = new Date();
+    var isToday = date.toLocaleDateString() == new Date().toLocaleDateString()
     // 渐进式图片 w3-amber w3-blue
     var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
@@ -225,8 +227,8 @@ function setImage(db, pageIndex, pageSize) {
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
-                                <div class="${date.toLocaleDateString() == today.toLocaleDateString() ? 'w3-blue' : 'w3-yellow'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
-                                  <i class="fa fa-circle w3-transparent"></i> ${date.toLocaleDateString() == today.toLocaleDateString() ? '必应今日' : '必应美图'}
+                                <div class="${isToday ? 'w3-blue' : 'w3-yellow'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
+                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? '必应今日' : '必应美图'}
                                 </div>
                               </div>
                               <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
