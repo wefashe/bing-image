@@ -40,9 +40,9 @@ jobs:
           ref: ${{ github.ref }}
       # 安装 Python 环境 
       - name: set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: 3.9
           # 缓存pip全局缓存目录
           cache: 'pip'
       # 爬取壁纸
