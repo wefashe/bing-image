@@ -73,6 +73,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: upload production artifacts
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
