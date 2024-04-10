@@ -211,7 +211,10 @@ function setImage(db, pageIndex, pageSize) {
     var small_img_url = `${bing_api_prefix}${url}&w=120`;
     var big_img_url = `${bing_api_prefix}${url}&w=384&h=216`
     var view_count = Math.floor(Math.random() * (100 - 1000) + 1000);
-    // 渐进式图片
+    var date_str = row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+    var date = new Date(date_str.replace(/-/g, "/"));
+    var today = new Date();
+    // 渐进式图片 w3-amber w3-blue
     var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
@@ -221,10 +224,14 @@ function setImage(db, pageIndex, pageSize) {
                               </a> 
                             </div>
                             <div class = "w3-padding-small">
-                              <div class="w3-row w3-padding-small w3-tiny"><i class="fa fa-circle" style="color: #ff5745; font-weight: bold;"></i> 必应壁纸</div>
+                              <div class="w3-row w3-padding-small w3-tiny" >
+                                <div class="${date.toLocaleDateString() == today.toLocaleDateString() ? 'w3-blue' : 'w3-yellow'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
+                                  <i class="fa fa-circle w3-transparent"></i> ${date.toLocaleDateString() == today.toLocaleDateString() ? '必应今日' : '必应美图'}
+                                </div>
+                              </div>
                               <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
                               <div class="w3-row w3-padding-small w3-small me-meta">
-                                <div class="w3-left"><i class="fa fa-clock-o"></i> ${row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")}</div>
+                                <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
                                 <div class="w3-right" style="margin-left:12px"><i class="fa fa-heart"></i> ${view_count}</div>
                                 <div class="w3-right"><i class="fa fa-eye"></i> ${Math.floor(Math.random() * (view_count - 1000) + 1000)}</div>
                               </div>
