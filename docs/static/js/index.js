@@ -216,7 +216,7 @@ function setImage(db, pageIndex, pageSize) {
     // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
     var date = new Date(date_str.replace(/-/g, "/"));
     var isToday = date.toLocaleDateString() == new Date().toLocaleDateString()
-    // 渐进式图片 w3-amber w3-blue
+    // 渐进式图片
     var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
@@ -227,7 +227,7 @@ function setImage(db, pageIndex, pageSize) {
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
-                                <div class="${isToday ? 'w3-blue' : 'w3-yellow'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
+                                <div class="${isToday ? 'w3-blue' : 'w3-orange'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
                                   <i class="fa fa-circle w3-transparent"></i> ${isToday ? '必应今日' : '必应美图'}
                                 </div>
                               </div>
