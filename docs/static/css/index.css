@@ -30,13 +30,14 @@ a {
     top: 0;
     left: 0;
     width: 100%;
+    background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
 }
 
 .me-img:after {
-  content: "";
-  display: block;
-  /* 图片未加载时高度填充*/
-  padding-bottom: 60%; 
+    content: "";
+    display: block;
+    /* 图片未加载时高度填充*/
+    padding-bottom: 60%;
 }
 
 .me-img img {
@@ -54,7 +55,7 @@ a {
 
 .me-img:hover img {
     /*悬停放放大*/
-    transform:scale(1.05);
+    transform: scale(1.05);
     -webkit-transition: all .444s ease-in-out;
     -o-transition: all .444s ease-in-out;
     transition: all .444s ease-in-out;
@@ -64,20 +65,20 @@ a {
 
 .me-img-title {
     /* 标题可能多行导致对不齐 */
-    height:3em;
+    height: 3em;
     /* 只显示两行(或多行)，超出部分用省略号 */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp:2;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 
 .me-card:hover {
-    box-shadow: 0 5px 10px 0 rgba(0,0,0,0.16), 0 5px 15px 0 rgba(0,0,0,0.12);
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.16), 0 5px 15px 0 rgba(0, 0, 0, 0.12);
 }
 
-.me-meta{
+.me-meta {
     color: #999fa5 !important;
 }
 
@@ -131,10 +132,9 @@ img.me-img-error::after {
 }
 
 .me-lodding:after {
-    display:inline-block;
-    width:0;
+    display: inline-block;
+    width: 0;
     height: 100%;
-    vertical-align:middle;
-    content:"";
+    vertical-align: middle;
+    content: "";
 }
-
