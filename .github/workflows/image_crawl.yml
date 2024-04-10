@@ -63,20 +63,22 @@ jobs:
       - name: check on failures
         if: steps.commit.outputs.status == 'failure'
         run: exit 1
-  # deploy:
-  #   needs: build
-  #   permissions:
-  #     pages: write
-  #     id-token: write
-  #   environment:
-  #     name: github-pages
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: upload production artifacts
-  #       uses: actions/upload-pages-artifact@v3
-  #       with:
-  #         path: docs
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v4
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: my-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/_site
+          name: my-pages
+          retention-days: 1
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
