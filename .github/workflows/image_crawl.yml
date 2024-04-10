@@ -37,24 +37,28 @@ jobs:
     # 执行的步骤
     steps:
       # 拉取分支代码
-      - name: checkout code
-        uses: actions/checkout@v3
+      - name: checkout out
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
       # 安装 Python 环境 
       - name: set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: 3.10
+          # 解释器架构 默认x64
           architecture: 'x64'
-      # 爬取壁纸
-      - name: crawl bing image
+          # 缓存pip全局缓存目录
+          cache: 'pip'
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com; fi
+      # 爬取壁纸
+      - name: crawl bing image
+        run: |
           python image.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
       # 提交文件
-      - name: commit files
+      - name: commit and push
         run: |
           git config --local user.name 'Github Action'
           git config --local user.email 'github-actions@github.com'
