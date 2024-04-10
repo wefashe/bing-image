@@ -54,7 +54,7 @@ jobs:
       # 提交文件
       - name: commit and push
         run: |
-          git config --local user.name 'Github Action'
+          git config --local user.name 'github-actions'
           git config --local user.email 'github-actions@github.com'
           git add .
           git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
@@ -63,20 +63,20 @@ jobs:
       - name: check on failures
         if: steps.commit.outputs.status == 'failure'
         run: exit 1
-  deploy:
-    needs: build
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: upload production artifacts
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  # deploy:
+  #   needs: build
+  #   permissions:
+  #     pages: write
+  #     id-token: write
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: upload production artifacts
+  #       uses: actions/upload-pages-artifact@v3
+  #       with:
+  #         path: docs
+  #     - name: Deploy to GitHub Pages
+  #       id: deployment
+  #       uses: actions/deploy-pages@v4
