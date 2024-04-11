@@ -235,7 +235,7 @@ function setImage(db, pageIndex, pageSize) {
     const tags = new Map([
       [0, '必应今日'],
       [1, '去年今日'],
-      [3, '前年今日'],
+      [2, '前年今日'],
       ['default', '往年今日'],
     ])
     // 渐进式图片
