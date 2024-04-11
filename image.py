@@ -10,6 +10,15 @@ from tqdm import tqdm
 import json
 import re
 
+'''
+    生成单个项目中的使用到的安装包文件 requirements.txt
+    pip install pipreqs
+    pipreqs ./ --encoding=utf8 --force
+    使用安装 requirements.txt 文件
+    pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
+
+'''
+
 # 国内北京时间
 today = datetime.now(pytz.timezone('Asia/Shanghai'))
 # 请求头
