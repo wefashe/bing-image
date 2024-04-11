@@ -3,21 +3,48 @@
 import sys
 import sqlite3
 import requests
+import pytz
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 import json
 import re
 
+# 国内北京时间
+today = datetime.now(pytz.timezone('Asia/Shanghai'))
+# 请求头
+headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
+}
+
+def get_bing_today_image():
+    url = 'https://cn.bing.com'
+    res = requests.get(url, headers=headers)
+    res.encoding = res.apparent_encoding
+
+    ret = re.search("var _model =(\{.*?\});", res.text)
+    if not ret:
+        return
+
+    data = json.loads(ret.group(1))
+    image_content = data['MediaContents'][0]['ImageContent']
+
+    return {
+        'date': today.strftime('%Y%m%d'),
+        'title': image_content['Headline'],
+        'url': image_content['Image']['Wallpaper'],
+        'Copyright': image_content['Title']+' ('+image_content['Copyright']+')',
+        'quickfact': image_content['QuickFact']['MainText'],
+        'description': image_content['Description'],
+        'copyrightlink': image_content['BackstageUrl']
+    }
+
 def get_bing_images(begin_date, end_date):
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
     begin = datetime.strptime(str(begin_date), '%Y%m%d')
     end = datetime.strptime(str(end_date), '%Y%m%d')
     images = []
-    if datetime.now() - timedelta(days=15) >= end or begin > datetime.now():return images
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-    }
+    if today - timedelta(days=15) >= end or begin > today:return images
     image_dates = []
     for i in range(7):
         bing_api = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx={i}0&n=8&mkt=zh-CN'
@@ -52,15 +79,12 @@ def get_xinac_images(begin_date, end_date):
     begin = datetime.strptime(str(begin_date), '%Y%m%d')
     end = datetime.strptime(str(end_date), '%Y%m%d')
     images = []
-    if begin > datetime.now():return images
-    if end > datetime.now(): end = datetime.now()
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-    }
+    if begin > today:return images
+    if end > today: end = today
     pageSize = 16
-    days = (datetime.now() - end).days + 1 
+    days = (today - end).days + 1 
     from_pageIndex = -(-days//pageSize)
-    days = (datetime.now() - begin).days + 1 
+    days = (today - begin).days + 1 
     to_pageIndex = -(-days//pageSize)
     image_dates = []
     for i in range(from_pageIndex, to_pageIndex + 1):
@@ -151,7 +175,7 @@ def get_images(begin_date, end_date):
         if date_str in image_dates:
             continue
         # 官方api最多可获取前15天的壁纸
-        if datetime.now() - timedelta(days=15) < date:
+        if today - timedelta(days=15) < date:
             # 官方api获取壁纸
             bing_images = get_bing_images(date_str, date_str)
             image_list.extend(bing_images)
@@ -173,37 +197,9 @@ def get_images(begin_date, end_date):
     conn.close()
     return images
 
-def get_bing_image():
-    url = 'https://cn.bing.com'
-
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
-    }
-
-    res = requests.get(url, headers=headers)
-    res.encoding = res.apparent_encoding
-
-    ret = re.search("var _model =(\{.*?\});", res.text)
-    if not ret:
-        return
-
-    data = json.loads(ret.group(1))
-    image_content = data['MediaContents'][0]['ImageContent']
-
-    return {
-        'headline': image_content['Headline'],
-        'title': image_content['Title'],
-        'description': image_content['Description'],
-        'Copyright': image_content['Copyright'],
-        'Url': image_content['Image']['Url'],
-        'Wallpaper': image_content['Image']['Wallpaper'],
-        'main_text': image_content['QuickFact']['MainText'],
-        'BackstageUrl': image_content['BackstageUrl']
-    }
-
 if __name__ == '__main__':
-    begin_date =  datetime.now().strftime('%Y%m%d')
-    end_date =  datetime.now().strftime('%Y%m%d')
+    begin_date =  today.strftime('%Y%m%d')
+    end_date =  today.strftime('%Y%m%d')
     if len(sys.argv) > 1:
         if sys.argv[1]:
             begin_date = sys.argv[1]
