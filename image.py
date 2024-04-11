@@ -119,6 +119,21 @@ def get_images(begin_date, end_date):
                             createtime    timestamp not null default current_timestamp,
                             updatetime    timestamp not null default current_timestamp
                         ); ''')
+    '''
+    create table if not exists bing_image  /* 必应美图表 */
+    (
+        id integer not null  primary key autoincrement, /* 自增主键 */
+        date varchar(8) not null default ' ', /* 日期 */
+        headline varchar(150) not null default ' ', /* 头条 */
+        title varchar(150) not null default ' ', /* 标题 */
+        copyright varchar(50) not null default ' ', /* 版权 */
+        wallpaper varchar(200) not null default ' ' unique, /* 壁纸 */
+        description text not null default ' ', /* 描述 */
+        quickfact varchar(200) not null default ' ', /* 速览 */
+        backstageurl varchar(200) not null default ' ', /* 搜索地址 */
+        updatetime timestamp not null default (datetime('now', '+8 hour')) /* 修改时间 */
+    );
+    '''
     cursor.execute('select startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh \
                       from wallpaper where enddate between ? and ?  order by enddate desc',(begin_date, end_date))
     images = cursor.fetchall();
