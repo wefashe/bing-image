@@ -201,6 +201,20 @@ function blobSaveAsFile(blob, fileName) {
   }, 100);
 }
 
+function chinaDate(timeString) {
+  let time = !timeString ? new Date() : new Date(timeString);
+  if (time.toString() === 'Invalid Date') {
+    time = new Date();
+  }
+  // 东八区时差为 +8
+  const timezoneOffset = 8;
+  // 转为 UTC 时间
+  const utc = time.getTime() + (time.getTimezoneOffset() * 60000);
+  // 加上时差得到东八区时间
+  const chinaDate = new Date(utc + (timezoneOffset * 60 * 60 * 1000));
+  return chinaDate;
+}
+
 function setImage(db, pageIndex, pageSize) {
   var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
@@ -214,8 +228,16 @@ function setImage(db, pageIndex, pageSize) {
     // 20210101转为2021-01-01
     var date_str = row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
     // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
-    var date = new Date(date_str.replace(/-/g, "/"));
-    var isToday = date.toLocaleDateString() == new Date().toLocaleDateString()
+    var date = chinaDate(date_str.replace(/-/g, "/"));
+    var today = chinaDate();
+    var isToday = date.getMonth() == today.getMonth() && date.getDate() == today.getDate();
+    var year = today.getFullYear() - date.getFullYear()
+    const tags = new Map([
+      [0, '必应今日'],
+      [1, '去年今日'],
+      [3, '前年今日'],
+      ['default', '往年今日'],
+    ])
     // 渐进式图片
     var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
@@ -228,7 +250,7 @@ function setImage(db, pageIndex, pageSize) {
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
                                 <div class="${isToday ? 'w3-blue' : 'w3-orange'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
-                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? '必应今日' : '必应美图'}
+                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(year) || tags.get('default') : '必应美图'}
                                 </div>
                               </div>
                               <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
