@@ -19,12 +19,19 @@ import re
 
 '''
 
-# 国内北京时间
-today = datetime.now(pytz.timezone('Asia/Shanghai'))
 # 请求头
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
 }
+
+# 国内北京时间
+today = datetime.now(pytz.timezone('Asia/Shanghai'))
+# 时间转字符串
+def date_to_str(date):
+    return date.strftime("%Y%m%d")
+# 字符串转时间
+def str_to_date(str):
+    return datetime.strptime(str, '%Y%m%d').replace(tzinfo=pytz.timezone('Asia/Shanghai'))
 
 def get_bing_today_image():
     url = 'https://cn.bing.com'
@@ -39,7 +46,7 @@ def get_bing_today_image():
     image_content = data['MediaContents'][0]['ImageContent']
 
     return {
-        'date': today.strftime('%Y%m%d'),
+        'date': date_to_str(today), 
         'title': image_content['Headline'],
         'url': image_content['Image']['Wallpaper'],
         'Copyright': image_content['Title']+' ('+image_content['Copyright']+')',
@@ -50,8 +57,8 @@ def get_bing_today_image():
 
 def get_bing_images(begin_date, end_date):
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
-    begin = datetime.strptime(str(begin_date), '%Y%m%d')
-    end = datetime.strptime(str(end_date), '%Y%m%d')
+    begin = str_to_date(str(begin_date))
+    end =  str_to_date(str(end_date))
     images = []
     if today - timedelta(days=15) >= end or begin > today:return images
     image_dates = []
@@ -63,7 +70,7 @@ def get_bing_images(begin_date, end_date):
             images_json = resp_json['images']
             for image_json in images_json:
                 date_str = str(image_json['enddate'])
-                date = datetime.strptime(date_str, '%Y%m%d')
+                date = str_to_date(date_str)
                 if date >= begin and date <= end and date_str not in image_dates:
                     images.append((image_json['startdate'],image_json['fullstartdate'],image_json['enddate'],image_json['url'],
                                    image_json['urlbase'],image_json['copyright'],image_json['copyrightlink'],image_json['title'],
@@ -85,8 +92,8 @@ def get_bing_images(begin_date, end_date):
 
 def get_xinac_images(begin_date, end_date):
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
-    begin = datetime.strptime(str(begin_date), '%Y%m%d')
-    end = datetime.strptime(str(end_date), '%Y%m%d')
+    begin = str_to_date(str(begin_date))
+    end = str_to_date(str(end_date))
     images = []
     if begin > today:return images
     if end > today: end = today
@@ -111,7 +118,7 @@ def get_xinac_images(begin_date, end_date):
                 a_tag = article.select('.title h2 a')[0]
                 title = a_tag.string
                 enddate = datetime.strptime(str(span_tag.string), '%b %d, %Y')
-                enddate_str = enddate.strftime("%Y%m%d")
+                enddate_str =date_to_str(enddate)
                 if enddate >= begin and enddate <= end and enddate_str not in image_dates:
                     images.append(('','',enddate_str.strip(), url.strip(),'',copyright.strip(),'',title.strip(),'',''))
                     image_dates.append(enddate_str)
@@ -131,8 +138,8 @@ def get_xinac_images(begin_date, end_date):
 
 def get_images(begin_date, end_date):
     if begin_date > end_date: begin_date, end_date = end_date, begin_date
-    begin = datetime.strptime(str(begin_date), '%Y%m%d')
-    end = datetime.strptime(str(end_date), '%Y%m%d')
+    begin = str_to_date(str(begin_date))
+    end = str_to_date(str(end_date))
     days = (end - begin).days + 1 
     # 1、按日期范围进行数据库查
     conn = sqlite3.connect('docs/data/images.db')
@@ -180,7 +187,7 @@ def get_images(begin_date, end_date):
     image_list = []
     for i in tqdm(range(days)):
         date = begin + timedelta(days=i)
-        date_str = date.strftime('%Y%m%d')  
+        date_str = date_to_str(date)
         if date_str in image_dates:
             continue
         # 官方api最多可获取前15天的壁纸
@@ -207,8 +214,8 @@ def get_images(begin_date, end_date):
     return images
 
 if __name__ == '__main__':
-    begin_date =  today.strftime('%Y%m%d')
-    end_date =  today.strftime('%Y%m%d')
+    begin_date =  date_to_str(today)
+    end_date =  date_to_str(today)
     if len(sys.argv) > 1:
         if sys.argv[1]:
             begin_date = sys.argv[1]
