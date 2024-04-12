@@ -4,11 +4,14 @@ import sys
 import sqlite3
 import requests
 import pytz
+import time
+import random
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 import json
 import re
+from faker import Factory
 
 '''
     生成单个项目中的使用到的安装包文件 requirements.txt
@@ -18,11 +21,7 @@ import re
     pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com
 
 '''
-
-# 请求头
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-}
+fc = Factory.create()
 
 # 国内北京时间
 today = datetime.now(pytz.timezone('Asia/Shanghai'))
@@ -35,6 +34,9 @@ def str_to_date(str):
 
 def get_bing_today_image():
     url = 'https://cn.bing.com'
+    headers = {
+        'User-Agent': fc.user_agent(),
+    }
     res = requests.get(url, headers=headers)
     res.encoding = res.apparent_encoding
 
@@ -63,6 +65,10 @@ def get_bing_images(begin_date, end_date):
     if today - timedelta(days=15) >= end or begin > today:return images
     image_dates = []
     for i in range(7):
+        headers = {
+            'User-Agent': fc.user_agent(),
+        }
+        time.sleep(random.uniform(0.5, 1))
         bing_api = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx={i}0&n=8&mkt=zh-CN'
         resp = requests.get(url=bing_api, headers=headers)
         if resp and resp.status_code == requests.codes.ok:
@@ -104,6 +110,10 @@ def get_xinac_images(begin_date, end_date):
     to_pageIndex = -(-days//pageSize)
     image_dates = []
     for i in range(from_pageIndex, to_pageIndex + 1):
+        headers = {
+            'User-Agent': fc.user_agent(),
+        }
+        time.sleep(random.uniform(0.5, 1))
         xinac_api = f'https://bing.xinac.net/?page={i}'
         resp = requests.get(url=xinac_api, headers=headers)
         if resp and resp.status_code == requests.codes.ok:
