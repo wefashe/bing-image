@@ -27,15 +27,21 @@
 8K：7680*4320
 
 > 已知国家地区
-- de-DE 德国
+- pt-BR 巴西
 - en-CA 加拿大
-- en-GB 英国
-- en-IN 印度
 - en-US 美国
-- fr-FR 法国
-- it-IT 意大利
 - ja-JP 日本
 - zh-CN 中国
+- it-IT 意大利
+- fr-FR 法国
+- de-DE 德国
+- en-GB 英国
+- en-IN 印度
+- es-ES 西班牙
+
+
+
+
 
 
 - https://bing.com 
