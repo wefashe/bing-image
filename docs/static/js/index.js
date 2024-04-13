@@ -26,7 +26,7 @@ function readDbFile(callback) {
     xhr.responseType = 'arraybuffer';
     xhr.onload = e => {
       // document.getElementById('me-load').classList.toggle('w3-hide');
-      document.getElementById('me-load').classList.add('w3-hide');
+      document.getElementById('me-full-load').classList.add('w3-hide');
       const uInt8Array = new Uint8Array(xhr.response);
       callback(new SQL.Database(uInt8Array));
     };
