@@ -309,6 +309,14 @@ function toggleFullScreen() {
   }
 }
 
+// 滚动到顶部
+document.addEventListener("keydown", function (event) {
+  if (event.code == 'ArrowUp') {
+    event.preventDefault();
+    window.scrollTo({ behavior: "smooth", top: 0 })
+  }
+});
+
 
 
 
