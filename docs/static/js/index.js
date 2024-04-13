@@ -27,6 +27,7 @@ function readDbFile(callback) {
     xhr.onload = e => {
       // document.getElementById('me-load').classList.toggle('w3-hide');
       document.getElementById('me-full-load').classList.add('w3-hide');
+      document.getElementById('me-bottom-load').classList.add('w3-hide');
       const uInt8Array = new Uint8Array(xhr.response);
       callback(new SQL.Database(uInt8Array));
     };
@@ -46,6 +47,7 @@ readDbFile(function (db) {
     // 获取可视区域高度 这个不会变
     var clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     if (scrollHeight - scrollTop - clientHeight < clientHeight / 2) {
+      document.getElementById('me-bottom-load').classList.remove('w3-hide');
       pageIndex++
       setImage(db, pageIndex, pageSize)
     }
