@@ -236,5 +236,5 @@ if __name__ == '__main__':
     print(f'爬取的时间范围: {begin_date} - {end_date}')
     images = get_images(begin_date, end_date)
 
-    # res = get_bing_image()
+    # res = get_bing_today_image()
     # print(json.dumps(res, ensure_ascii=False, indent=2))

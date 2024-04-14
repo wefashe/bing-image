@@ -245,7 +245,7 @@ function setImage(db, pageIndex, pageSize) {
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <a href="${bing_api_prefix}${row.copyrightlink}" target="_blank"> 
+                              <a href="${bing_api_prefix + row.copyrightlink}" target="_blank"> 
                                 <img id="${row.enddate}" class="w3-image me-lazy" src="${small_img_url}" data-src="${big_img_url}" data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
                               </a> 
                             </div>
