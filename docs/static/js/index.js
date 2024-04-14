@@ -48,8 +48,7 @@ readDbFile(function (db) {
     var clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     if (scrollHeight - scrollTop - clientHeight < clientHeight / 2) {
       document.getElementById('me-bottom-load').classList.remove('w3-hide');
-      pageIndex++
-      setImage(db, pageIndex, pageSize)
+      setImage(db)
     }
     throttle(lazyload, 200)();
     // 当浏览器窗口大小改变时，运行函数
@@ -217,11 +216,13 @@ function chinaDate(timeString) {
   return chinaDate;
 }
 
-function setImage(db, pageIndex, pageSize) {
+function setImage(db) {
   var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var image_list = document.getElementById('image-list')
+  var count = 0;
   while (stmt.step()) {
+    count++;
     var row = stmt.getAsObject();
     var url = row.url.substring(0, row.url.indexOf('&'));
     var small_img_url = `${bing_api_prefix}${url}&w=120`;
@@ -267,6 +268,11 @@ function setImage(db, pageIndex, pageSize) {
     image_list.innerHTML += image_html;
     // 预加载
     preloader(row.enddate)
+  }
+  if (count == 0) {
+    pageIndex = 1;
+  } else {
+    pageIndex++;
   }
 }
 
