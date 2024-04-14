@@ -258,8 +258,8 @@ function setImage(db, pageIndex, pageSize) {
                               <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
                               <div class="w3-row w3-padding-small w3-small me-meta">
                                 <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
-                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-heart"></i> ${view_count}</div>
-                                <div class="w3-right"><i class="fa fa-eye"></i> ${Math.floor(Math.random() * (view_count - 1000) + 1000)}</div>
+                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download"></i> ${view_count}</div>
+                                <div class="w3-right"><i class="fa fa-heart"></i> ${Math.floor(Math.random() * (view_count - 1000) + 1000)}</div>
                               </div>
                             </div>
                           </div>
