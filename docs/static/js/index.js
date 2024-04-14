@@ -185,6 +185,15 @@ function download(element, url, download) {
         tag.download = url.substring(url.lastIndexOf('id=') + 3, url.length) || ""
       } else {
         tag.target = '_blank';
+        // 堵住钓鱼安全漏洞
+        tag.rel = 'noopener noreferrer';
+        // 禁用右键和拖拽
+        // tag.oncontextmenu = function () {
+        //   return false;
+        // };
+        // tag.ondragstart = function () {
+        //   return false;
+        // }
       }
       tag.style.display = 'none';
       document.body.appendChild(tag);
