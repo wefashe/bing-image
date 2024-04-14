@@ -172,6 +172,10 @@ function download(element, url, download) {
       // 文本下载
       // const blob = new Blob(['你好123'], { type: 'text/plain' });
       // var blob = new Blob([this.response], { type: 'image/png' });
+      // if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      //   // 兼容IE/Edge
+      //   window.navigator.msSaveOrOpenBlob(blob, fileName)
+      // }
       var urlCreator = window.URL || window.webkitURL;
       // 将Blob转化为同源的url
       const imageUrl = urlCreator.createObjectURL(blob);
