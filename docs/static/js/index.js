@@ -157,14 +157,44 @@ window.addEventListener("error", function (event) {
 }, true);
 
 // 图片下载
-function download(url, fileName) {
+function download(element, url, download) {
+  if (!url) {
+    element.classList.remove('me-cursor-pointer');
+    element.onclick = null;
+  }
   const xhr = new XMLHttpRequest();
   xhr.open('GET', url, true)
   xhr.responseType = 'blob'
   // 请求成功
   xhr.onload = function () {
     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
-      blobSaveAsFile(this.response, fileName);
+      var blob = this.response;
+      // 文本下载
+      // const blob = new Blob(['你好123'], { type: 'text/plain' });
+      // var blob = new Blob([this.response], { type: 'image/png' });
+      var urlCreator = window.URL || window.webkitURL;
+      // 将Blob转化为同源的url
+      const imageUrl = urlCreator.createObjectURL(blob);
+      const tag = document.createElement('a');
+      tag.href = imageUrl;
+      if (download) {
+        tag.download = url.substring(url.lastIndexOf('id=') + 3, url.length) || ""
+      } else {
+        tag.target = '_blank';
+      }
+      tag.style.display = 'none';
+      document.body.appendChild(tag);
+      tag.click();
+      setTimeout(function () {
+        document.body.removeChild(tag);
+        tag.remove();
+        urlCreator.revokeObjectURL(blob);
+        const val = element.nextElementSibling.innerText || '0';
+        element.nextElementSibling.innerText = parseInt(val.trim()) + 1
+      }, 100);
+    } else {
+      element.classList.remove('me-cursor-pointer');
+      element.onclick = null;
     }
   }
   // 监听下载进度
@@ -177,29 +207,6 @@ function download(url, fileName) {
     // todo
   });
   xhr.send()
-}
-
-// 文本下载
-function stringSaveAsFile(str, fileName) {
-  const blob = new Blob([str], { type: 'text/plain' });
-  blobSaveAsFile(blob, fileName);
-}
-
-function blobSaveAsFile(blob, fileName) {
-  var urlCreator = window.URL || window.webkitURL;
-  // 将Blob转化为同源的url
-  const imageUrl = urlCreator.createObjectURL(blob);
-  const tag = document.createElement('a');
-  tag.href = imageUrl;
-  tag.download = fileName || ""
-  tag.style.display = 'none';
-  document.body.appendChild(tag);
-  tag.click();
-  setTimeout(function () {
-    document.body.removeChild(tag);
-    tag.remove();
-    urlCreator.revokeObjectURL(blob);
-  }, 100);
 }
 
 function chinaDate(timeString) {
@@ -259,8 +266,8 @@ function setImage(db) {
                               <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
                               <div class="w3-row w3-padding-small w3-small me-meta">
                                 <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
-                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download"></i> ${view_count}</div>
-                                <div class="w3-right"><i class="fa fa-heart"></i> ${Math.floor(Math.random() * (view_count - 1000) + 1000)}</div>
+                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${bing_api_prefix + url}',true)></i> <span>${view_count}</span></div>
+                                <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${bing_api_prefix + url}',false)></i> <span>${Math.floor(Math.random() * (view_count - 1000) + 1000)}</span></div>
                               </div>
                             </div>
                           </div>
