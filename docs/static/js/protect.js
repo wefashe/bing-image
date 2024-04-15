@@ -16,3 +16,9 @@
     block();
   } catch (err) { }
 })();
+
+// 禁止右键菜单
+document.oncontextmenu = function () {
+  return false;
+};
+
