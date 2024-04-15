@@ -278,6 +278,8 @@ function setImage(db) {
       copyrightlink = '';
     }
 
+    var uhdurl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), 'UHD');
+
     // 渐进式图片
     var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
@@ -298,7 +300,7 @@ function setImage(db) {
                               </div>
                               <div class="w3-row w3-padding-small w3-small me-meta">
                                 <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
-                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${bing_api_prefix + url}',true)></i> <span>${view_count}</span></div>
+                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${bing_api_prefix + uhdurl}',true)></i> <span>${view_count}</span></div>
                                 <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${bing_api_prefix + url}',false)></i> <span>${Math.floor(Math.random() * (view_count - 1000) + 1000)}</span></div>
                               </div>
                             </div>
