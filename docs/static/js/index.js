@@ -268,8 +268,7 @@ function setImage(db) {
     ])
     var copyrightlink = row.copyrightlink;
     try {
-      var url = new URL(row.copyrightlink);
-      var keyCode = url.searchParams.get("q");
+      var keyCode = new URL(row.copyrightlink).searchParams.get("q");
       // 月份从0开始，需要加1
       var month_str = (month + 1).toString().padStart(2, '0');
       var day_str = (day - 1).toString().padStart(2, '0');
