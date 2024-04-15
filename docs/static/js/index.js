@@ -61,7 +61,7 @@ readDbFile(function (db) {
 // 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
 function preloader(id) {
   if (!id) return;
-  var image_obj = document.getElementById(id);
+  var image_obj = document.querySelectorAll(`.me-img img[data-id='${id}']`)[0];
   var dataSrc = image_obj.getAttribute('data-src');
   if (!dataSrc) return;
   var big_image = new Image();
@@ -238,6 +238,16 @@ function chinaDate(timeString) {
   return chinaDate;
 }
 
+function changeDate(date, days) {
+  var date_str = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+  var date_obj = chinaDate(date_str.replace(/-/g, "/"));
+  var year = date_obj.getFullYear();
+  var month = date_obj.getMonth() + 1;
+  days = days || 0
+  var day = date_obj.getDate() + days;
+  return year + month.toString().padStart(2, '0') + day.toString().padStart(2, '0')
+}
+
 function setImage(db) {
   var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
@@ -252,8 +262,9 @@ function setImage(db) {
     var view_count = Math.floor(Math.random() * (100 - 1000) + 1000);
     // 20210101转为2021-01-01
     var date_str = row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+    var date_str2 = date_str.replace(/-/g, "/")
     // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
-    var date = chinaDate(date_str.replace(/-/g, "/"));
+    var date = chinaDate(date_str2);
     var today = chinaDate();
     var year = date.getFullYear();
     var month = date.getMonth();
@@ -269,11 +280,8 @@ function setImage(db) {
     var copyrightlink = row.copyrightlink;
     try {
       var keyCode = new URL(row.copyrightlink).searchParams.get("q");
-      // 月份从0开始，需要加1
-      var month_str = (month + 1).toString().padStart(2, '0');
-      var day_str = (day - 1).toString().padStart(2, '0');
       // " 双引号用 %22 表示
-      copyrightlink = `${bing_api_prefix}/search?q=${keyCode}&filters=HpDate:%22${year + month_str + day_str}_1600%22`
+      copyrightlink = `${bing_api_prefix}/search?q=${keyCode}&filters=HpDate:%22${changeDate(date_str2, -1)}_1600%22`
     } catch (err) {
       copyrightlink = '';
     }
@@ -285,7 +293,7 @@ function setImage(db) {
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <img id="${row.enddate}" class="w3-image me-lazy" src="${small_img_url}" data-src="${big_img_url}" data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
+                              <img data-id="${row.enddate}" class="w3-image me-lazy" onclick=preview(this) src="${small_img_url}" data-src="${big_img_url}"  data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
@@ -317,7 +325,54 @@ function setImage(db) {
   }
 }
 
-// TODO 图片预览
+// 图片预览
+function preview(img) {
+  bigImg = img.cloneNode(true)
+  insImg = img.cloneNode(true)
+
+  const view = document.getElementById('me-view')
+  view.classList.remove('w3-hide');
+
+
+  // 注册蒙层的点击事件，关闭弹窗
+  const clickFunc = function () {
+    view.removeChild(this)
+    // originalEl.style.opacity = 1
+    mask.removeEventListener('click', clickFunc)
+  }
+  mask.addEventListener("click", clickFunc)
+  const bigImgView = document.getElementById('me-big-img-show')
+  const insImgView = document.getElementById('me-ins-img-show')
+  bigImg.classList.add('me-big-img')
+  insImg.classList.add('me-ins-img')
+  insImg.classList.add('w3-opacity')
+  insImg.classList.add('w3-hover-opacity-off')
+  bigImgView.appendChild(bigImg)
+  insImgView.appendChild(insImg)
+}
+
+
+var slideDate = 1;
+function plusImg(n) {
+  slideDate = changeDate(slideDate, n);
+  currentImg(slideDate)
+}
+
+function currentImg(date) {
+  var i;
+  var bigImgs = document.getElementsByClassName("me-big-img");
+  for (i = 0; i < bigImgs.length; i++) {
+    bigImgs[i].style.display = "none";
+  }
+  var insImgs = document.getElementsByClassName("me-ins-img");
+  for (i = 0; i < insImgs.length; i++) {
+    insImgs[i].className = insImgs[i].className.replace(" w3-opacity-off", "");
+  }
+  bigImgs.querySelectorAll(`img[data-id='${date}']`)[0].style.display = "block";
+  insImgs.querySelectorAll(`img[data-id='${date}']`)[0].className += " w3-opacity-off";
+  slideDate = date;
+}
+
 
 // 图片全屏
 function keydownHandler(event) {
