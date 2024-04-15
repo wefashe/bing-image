@@ -29,3 +29,35 @@ document.onkeydown = function (e) {
   }
 };
 
+// 禁止复制
+document.oncopy = function (e) {
+  return false;
+}
+
+// 禁止粘贴
+document.onpaste = function (e) {
+  return false;
+}
+
+// 屏蔽剪切
+document.oncut = function (e) {
+  return false;
+}
+
+// 禁止选中
+document.onselectstart = function (e) {
+  return false;
+}
+
+// 禁止鼠标拖动
+document.ondragstart = function (e) {
+  return false;
+}
+
+// 禁止鼠标拖动
+document.onselect = function (e) {
+  document.selection.empty();
+  return false;
+}
+
+
