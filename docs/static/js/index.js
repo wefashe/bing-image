@@ -255,30 +255,48 @@ function setImage(db) {
     // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
     var date = chinaDate(date_str.replace(/-/g, "/"));
     var today = chinaDate();
-    var isToday = date.getMonth() == today.getMonth() && date.getDate() == today.getDate();
-    var year = today.getFullYear() - date.getFullYear()
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var isToday = month == today.getMonth() && day == today.getDate();
+    var days = today.getFullYear() - year
     const tags = new Map([
       [0, '必应今日'],
       [1, '去年今日'],
       [2, '前年今日'],
       ['default', '往年今日'],
     ])
+    var copyrightlink = row.copyrightlink;
+    try {
+      var url = new URL(row.copyrightlink);
+      var keyCode = url.searchParams.get("q");
+      // 月份从0开始，需要加1
+      var month_str = (month + 1).toString().padStart(2, '0');
+      var day_str = (day - 1).toString().padStart(2, '0');
+      // " 双引号用 %22 表示
+      copyrightlink = `${bing_api_prefix}/search?q=${keyCode}&filters=HpDate:%22${year + month_str + day_str}_1600%22`
+    } catch (err) {
+      copyrightlink = '';
+    }
+
     // 渐进式图片
     var image_html = `<div class="w3-quarter w3-padding"> 
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <a href="${bing_api_prefix + row.copyrightlink}" target="_blank"> 
-                                <img id="${row.enddate}" class="w3-image me-lazy" src="${small_img_url}" data-src="${big_img_url}" data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
-                              </a> 
+                              <img id="${row.enddate}" class="w3-image me-lazy" src="${small_img_url}" data-src="${big_img_url}" data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
                                 <div class="${isToday ? 'w3-blue' : 'w3-orange'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
-                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(year) || tags.get('default') : '必应美图'}
+                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(days) || tags.get('default') : '必应美图'}
                                 </div>
                               </div>
-                              <div class="w3-row w3-padding-small me-img-title" title="${row.title}">${row.title}</div>
+                              <div class="w3-row w3-padding-small me-img-title" title="${row.title}">
+                                <a href="${copyrightlink}" target="_blank" ${copyrightlink ? '' : 'onclick="return false" class="me-cursor-default"'}> 
+                                  ${row.title}
+                                </a> 
+                              </div>
                               <div class="w3-row w3-padding-small w3-small me-meta">
                                 <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
                                 <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${bing_api_prefix + url}',true)></i> <span>${view_count}</span></div>
