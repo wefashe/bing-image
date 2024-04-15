@@ -22,3 +22,10 @@ document.oncontextmenu = function () {
   return false;
 };
 
+// 禁止F12快捷键
+document.onkeydown = function (e) {
+  if (e.code === 'F12') {
+    return false;
+  }
+};
+
