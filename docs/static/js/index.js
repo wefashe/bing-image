@@ -161,6 +161,7 @@ function download(element, url, download) {
   if (!url) {
     element.classList.remove('me-cursor-pointer');
     element.onclick = null;
+    return;
   }
   const xhr = new XMLHttpRequest();
   xhr.open('GET', url, true)
