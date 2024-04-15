@@ -22,9 +22,9 @@ document.oncontextmenu = function () {
   return false;
 };
 
-// 禁止F12快捷键
+// 禁止F12、ctrl+shift+i打开控制台，禁用shift+f10打开右键
 document.onkeydown = function (e) {
-  if (e.code === 'F12') {
+  if (e.code === 'F12' || e.ctrlKey && e.shiftKey && e.code === 'KeyI' || e.shiftKey && e.code === 'F10') {
     return false;
   }
 };
