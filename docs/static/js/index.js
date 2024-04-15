@@ -186,7 +186,7 @@ function download(element, url, download) {
       } else {
         tag.target = '_blank';
         // 堵住钓鱼安全漏洞
-        tag.rel = 'noopener noreferrer';
+        tag.rel = 'noopener noreferrer nofollow';
         // 禁用右键和拖拽
         // tag.oncontextmenu = function () {
         //   return false;
