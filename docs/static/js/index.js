@@ -207,6 +207,7 @@ function download(element, url, download) {
       }, 100);
     } else {
       element.classList.remove('me-cursor-pointer');
+      element.classList.add('me-cursor-not-allowed');
       element.onclick = null;
     }
   }
