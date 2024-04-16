@@ -25,7 +25,7 @@
 <body>
     <!-- !ME FULL LOAD -->
     <div id="me-full-load" class="me-full-load">
-        <div class="me-mask w3-modal">
+        <div class="me-load-mask w3-modal">
             <div class="me-lodding w3-center">
                 <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
             </div>
@@ -59,33 +59,40 @@
     </div>
 
     <!-- !ME VIEW -->
-    <div id="me-view" class="me-view w3-hide me-mask w3-modal">
-        <div class="me-big-img-view">
+    <div id="me-view" class="me-view w3-hide me-view-mask w3-opacity-off w3-modal">
+        <div class="w3-top w3-bar">
+            <!-- 关闭预览 -->
+            <bdutton class="w3-button w3-transparent w3-hover-none w3-right"><i
+                    class="fa fa-close w3-text-white w3-opacity w3-hover-opacity-off"></i></bdutton>
+            <!-- 下载图片 -->
+            <button class="w3-button w3-transparent w3-hover-none w3-right"><i
+                    class="fa fa-download w3-text-white w3-opacity w3-hover-opacity-off"></i></button>
+            <!-- 全屏查看 -->
+            <button class="w3-button w3-transparent w3-hover-none w3-right"><i
+                    class="fa fa-arrows-alt w3-text-white w3-opacity w3-hover-opacity-off"></i></button>
+        </div>
+        <div class=" me-big-img-view">
             <!-- 大图显示区域 -->
             <div class="me-big-img-btn">
-                <button class="w3-button w3-transparent w3-text-teal w3-hover-none w3-hover-text-black w3-display-left"
-                    onclick="currentDiv(-1)">&#10094;</button>
-                <button class="w3-button w3-transparent w3-text-teal w3-hover-none w3-hover-text-black w3-display-right"
-                    onclick="currentDiv(1)">&#10095;</button>
-                <!-- 左右切换 -->
-
-                <!-- 关闭预览 -->
-                <!-- 图片指示器显示切换 -->
-                <!-- 全屏 -->
-                <!-- 下载 -->
+                <!-- 上一张 -->
+                <button class="w3-button w3-transparent w3-hover-none w3-display-left" onclick="currentDiv(-1)"><i
+                        class="fa fa-chevron-left w3-text-white w3-opacity w3-hover-opacity-off"></i></button>
+                <!-- 下一张 -->
+                <button class="w3-button w3-transparent w3-hover-none w3-display-right" onclick="currentDiv(1)"><i
+                        class="fa fa-chevron-right w3-text-white w3-opacity w3-hover-opacity-off"></i></button>
             </div>
             <div id="me-big-img-show" class="me-big-img-show">
+                <!-- 小图显示区 -->
             </div>
         </div>
-        <div class="me-ins-img-view">
-            <!-- 大图指示器 -->
-            <div class="me-ins-img-btn">
-                <button class="w3-button w3-transparent w3-text-teal w3-hover-none w3-hover-text-black w3-display-left"
-                    onclick="currentDiv(-1)">&#10094;</button>
-                <button class="w3-button w3-transparent w3-text-teal w3-hover-none w3-hover-text-black w3-display-right"
-                    onclick="currentDiv(1)">&#10095;</button>
-            </div>
+        <div class="me-ins-img-view w3-row-padding">
+            <!-- 切换显示 -->
+            <button class="w3-button w3-transparent w3-hover-none"><i
+                    class="fa fa-th w3-text-white w3-opacity w3-hover-opacity-off"></i></button>
+            <!-- 上一张 -->
+            <!-- 下一张 -->
             <div id="me-ins-img-show" class="me-ins-img-show">
+                <!-- 小图显示区 -->
             </div>
         </div>
     </div>

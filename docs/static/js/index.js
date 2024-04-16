@@ -336,18 +336,24 @@ function preview(img) {
 
   // 注册蒙层的点击事件，关闭弹窗
   const clickFunc = function () {
-    view.removeChild(this)
+    view.classList.add('w3-hide');
     // originalEl.style.opacity = 1
-    mask.removeEventListener('click', clickFunc)
+    view.removeEventListener('click', clickFunc)
   }
-  mask.addEventListener("click", clickFunc)
+  view.addEventListener("click", clickFunc)
   const bigImgView = document.getElementById('me-big-img-show')
   const insImgView = document.getElementById('me-ins-img-show')
   bigImg.classList.add('me-big-img')
   insImg.classList.add('me-ins-img')
-  insImg.classList.add('w3-opacity')
-  insImg.classList.add('w3-hover-opacity-off')
-  bigImgView.appendChild(bigImg)
+  insImg.classList.add('w3-hover-opacity')
+  insImg.classList.add('w3-round')
+  insImg.classList.add('w3-border')
+  insImg.classList.add('w3-padding')
+  insImg.classList.add('w3-col')
+  insImg.classList.add('s3')
+  insImg.classList.add('w3-container')
+  // insImg.classList.add('w3-hover-opacity-off')
+  // bigImgView.appendChild(bigImg)
   insImgView.appendChild(insImg)
 }
 

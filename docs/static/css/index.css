@@ -116,10 +116,17 @@ img.me-img-error::after {
     text-overflow: ellipsis;
 }
 
-.me-mask {
+.me-load-mask {
     /* 遮罩层 */
     background-color: rgba(255, 255, 255, 0.8);
     display: inline-block;
+}
+
+.me-view-mask {
+    /* 遮罩层 */
+    /* background-color: rgba(255, 255, 255, 0.8); */
+    display: inline-block;
+    /* overflow: hidden; */
 }
 
 .me-lodding {
@@ -158,4 +165,14 @@ img.me-img-error::after {
 .me-cursor-not-allowed {
     /* 光标呈现为红色的圈加一个斜杠，表示禁止的意思 */
     cursor: not-allowed;
+}
+
+.me-cursor-zoom-in {
+    /* 光标呈现为黑色的圈加一个加号，表示放大的意思 */
+    cursor: zoom-in;
+}
+
+.me-cursor-zoom-out {
+    /* 光标呈现为黑色的圈加一个减号，表示缩小的意思 */
+    cursor: zoom-out;
 }
