@@ -122,13 +122,6 @@ img.me-img-error::after {
     display: inline-block;
 }
 
-.me-view-mask {
-    /* 遮罩层 */
-    /* background-color: rgba(255, 255, 255, 0.8); */
-    display: inline-block;
-    /* overflow: hidden; */
-}
-
 .me-lodding {
     /* 加载动画位置 */
     position: absolute;
@@ -175,4 +168,18 @@ img.me-img-error::after {
 .me-cursor-zoom-out {
     /* 光标呈现为黑色的圈加一个减号，表示缩小的意思 */
     cursor: zoom-out;
+}
+
+
+.me-view-mask {
+    /* 遮罩层 */
+    background-color: rgba(255, 255, 255, 0.8);
+    display: inline-block;
+    /* backdrop-filter: blur(6rpx); */
+    /* filter: blur(6px); */
+    background-color: rgba(0, 0, 0, .3);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    overflow: hidden;
 }

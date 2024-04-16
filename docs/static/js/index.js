@@ -345,7 +345,7 @@ function preview(img) {
   const insImgView = document.getElementById('me-ins-img-show')
   bigImg.classList.add('me-big-img')
   insImg.classList.add('me-ins-img')
-  insImg.classList.add('w3-hover-opacity')
+  // insImg.classList.add('w3-hover-opacity')
   insImg.classList.add('w3-round')
   insImg.classList.add('w3-border')
   insImg.classList.add('w3-padding')
@@ -353,7 +353,7 @@ function preview(img) {
   insImg.classList.add('s3')
   insImg.classList.add('w3-container')
   // insImg.classList.add('w3-hover-opacity-off')
-  // bigImgView.appendChild(bigImg)
+  bigImgView.appendChild(bigImg)
   insImgView.appendChild(insImg)
 }
 
