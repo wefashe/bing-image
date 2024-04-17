@@ -368,14 +368,28 @@ function preview(img) {
     }
     plusImg(n);
   };
+  const sizeBtn = document.getElementById('me-view-size-btn');
+  const sizeIcon = sizeBtn.getElementsByTagName('i')[0];
+  const bigImgView = document.getElementById('me-big-img-show');
+  const sizeFunc = function () {
+    sizeIcon.classList.toggle("fa-search-plus");
+    sizeIcon.classList.toggle("fa-search-minus");
+    bigImgView.classList.toggle("me-cursor-zoom-in");
+    bigImgView.classList.toggle("me-cursor-zoom-out");
+  };
+
   const closeBtn = document.getElementById('me-view-close-btn')
   const clickFunc = function () {
     view.classList.add('w3-hide');
-    closeBtn.removeEventListener('click', clickFunc)
-    view.removeEventListener("onmousewheel", wheelFunc);
+    closeBtn.removeEventListener('click', clickFunc);
+    sizeBtn.removeEventListener('click', sizeFunc)
+    bigImgView.removeEventListener('click', sizeFunc)
+    // view.removeEventListener("onmousewheel", wheelFunc);
   };
 
   closeBtn.addEventListener("click", clickFunc);
+  sizeBtn.addEventListener("click", sizeFunc);
+  bigImgView.addEventListener("click", sizeFunc);
   // view.addEventListener("mousewheel", wheelFunc);
 
   const date = img.getAttribute('data-date')
