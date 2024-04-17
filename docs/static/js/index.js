@@ -327,34 +327,40 @@ function setImage(db) {
 
 // 图片预览
 function preview(img) {
-  bigImg = img.cloneNode(true)
-  insImg = img.cloneNode(true)
 
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
 
+  bigImg = img.cloneNode(true)
+  insImg = img.cloneNode(true)
+
+
+
 
   // 注册蒙层的点击事件，关闭弹窗
+
+  const viewCloseBtn = document.getElementById('me-view-close-btn')
+  view.classList.remove('w3-hide');
   const clickFunc = function () {
     view.classList.add('w3-hide');
     // originalEl.style.opacity = 1
-    view.removeEventListener('click', clickFunc)
+    viewCloseBtn.removeEventListener('click', clickFunc)
   }
-  view.addEventListener("click", clickFunc)
-  const bigImgView = document.getElementById('me-big-img-show')
-  const insImgView = document.getElementById('me-ins-img-show')
-  bigImg.classList.add('me-big-img')
-  insImg.classList.add('me-ins-img')
-  // insImg.classList.add('w3-hover-opacity')
-  insImg.classList.add('w3-round')
-  insImg.classList.add('w3-border')
-  insImg.classList.add('w3-padding')
-  insImg.classList.add('w3-col')
-  insImg.classList.add('s3')
-  insImg.classList.add('w3-container')
-  // insImg.classList.add('w3-hover-opacity-off')
-  bigImgView.appendChild(bigImg)
-  insImgView.appendChild(insImg)
+  viewCloseBtn.addEventListener("click", clickFunc)
+  // const bigImgView = document.getElementById('me-big-img-show')
+  // const insImgView = document.getElementById('me-ins-img-show')
+  // bigImg.classList.add('me-big-img')
+  // insImg.classList.add('me-ins-img')
+  // // insImg.classList.add('w3-hover-opacity')
+  // insImg.classList.add('w3-round')
+  // insImg.classList.add('w3-border')
+  // insImg.classList.add('w3-padding')
+  // insImg.classList.add('w3-col')
+  // insImg.classList.add('s3')
+  // insImg.classList.add('w3-container')
+  // // insImg.classList.add('w3-hover-opacity-off')
+  // bigImgView.appendChild(bigImg)
+  // insImgView.appendChild(insImg)
 }
 
 

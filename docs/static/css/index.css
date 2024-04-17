@@ -173,7 +173,7 @@ img.me-img-error::after {
 
 .me-view-mask {
     /* 遮罩层 */
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 0, 0, .5);
     display: inline-block;
     /* backdrop-filter: blur(6rpx); */
     /* filter: blur(6px); */
