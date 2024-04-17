@@ -11,6 +11,61 @@
  * 8、高分屏优化
  * 9、占位图  视觉空白问题  css渐变色背景 为其设置背景色
  * 10、其他，字体图标不如用SVG responsive设计 media query、以及srcset属性、picture元素、src-N、mxhr
+ * 
+ * 页面功能
+ * 1、图片列表
+ *  1.1 滚动加载  已完成
+ *  1.2 图片下载  已完成
+ *  2.3 明细预览
+ *  2.4 鼠标滑过动画 已完成
+ *  2.5 图片加载动画 已完成
+ *  2.6 图片加载错误页面 已完成
+ *  2.7 首页加载动画 已完成
+ *  2.8 滚动下拉加载动画 已完成
+ *  2.9 加载db文件获取数据
+ *  2.10 页面seo优化
+ *  2.11 页面设备响应式
+ *  2.12 必应前缀选择
+ *  2.13 图片卡片标签优化
+ *  2.14 图片标题长度过长显示3个点 已完成
+ *  2.15 图片卡片时间显示优化
+ * 2、图片预览
+ *  2.1 图片切换：
+ *    2.1.1 鼠标滚轮滚动 
+ *    2.1.2 页面左右按钮，已完成
+ *    2.1.3 键盘左右按键，已完成
+ *    2.1.4 鼠标左右拖动
+ *    2.1.5 鼠标上下拖动关闭预览
+ *  2.2 图片大小：
+ *    2.2.1 鼠标光标样式及图标样式的切换 已完成
+ *    2.2.2 图片放大放小 已完成
+ *    2.2.3 图片放大到最大且保持长宽比例
+ *    2.2.4 图片放大缩小动画
+ *  2.3 图片下载：
+ *  2.4 列表和预览同步加载：
+ *  2.5 缩略图展示，自动跟随切换：
+ *  2.6 焦点放大动画：
+ *  2.7 关闭自动跳转对应图片卡片：
+ *  2.8 预览界面美化：
+ *  2.9 大图片居中展示：已完成
+ * 3、图片明细
+ *  3.1 今天图片首页展示
+ *  3.2 明细界面蒙板
+ *  3.3 每日图片明细点击展示
+ *  3.4 图片下载，图片标签
+ *  3.5 图片定位，图片地图
+ *  3.6 图片文字介绍
+ *  3.7 今日图片首页展示与顶部菜单的融合
+ *  3.8 顶部菜单滚动动画
+ * 4、图片查询
+ *  4.1 展示存在的所有年月日
+ *  4.2 按年、月、日进行过滤查询
+ *  4.3 此时禁用滚动查询
+ *  4.4 重新进入首页后进行滚动查询
+ * 优化部分
+ * 1、db文件加载耗时
+ * 2、图标字体文件加载耗时
+ * 3、Github Actions优化，是否可以直接部署
  */
 
 const bing_api_prefix = 'https://cn.bing.com';
@@ -348,7 +403,8 @@ function showImg(date) {
   imgShowObj.classList.remove('w3-hide');
 }
 
-// 图片预览
+// 图片预览功能
+
 function preview(img) {
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
@@ -377,7 +433,7 @@ function preview(img) {
     bigImgView.classList.toggle("me-cursor-zoom-in");
     bigImgView.classList.toggle("me-cursor-zoom-out");
     bigImgView.classList.toggle("w3-threequarter");
-    bigImgView.classList.toggle("w3-col");
+    bigImgView.classList.toggle("w3-rest");
   };
 
   const closeBtn = document.getElementById('me-view-close-btn')
@@ -388,7 +444,7 @@ function preview(img) {
     bigImgView.classList.add("me-cursor-zoom-in");
     bigImgView.classList.remove("me-cursor-zoom-out");
     bigImgView.classList.add("w3-threequarter");
-    bigImgView.classList.remove("w3-col");
+    bigImgView.classList.remove("w3-half");
     closeBtn.removeEventListener('click', clickFunc);
     sizeBtn.removeEventListener('click', sizeFunc)
     bigImgView.removeEventListener('click', sizeFunc)
