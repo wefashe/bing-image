@@ -293,7 +293,7 @@ function setImage(db) {
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <img data-date="${row.enddate}" class="w3-image me-lazy" onclick=preview(this) src="${small_img_url}" data-src="${big_img_url}"  data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
+                              <img data-date="${row.enddate}" class="w3-image me-cursor-pointer me-lazy" onclick=preview(this) src="${small_img_url}" data-src="${big_img_url}"  data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
@@ -342,6 +342,7 @@ function showImg(date) {
     imgShowObj.classList.add('w3-hide');
     imgShowObj.setAttribute('data-date', date);
     imgShowObj.classList.add('w3-image');
+    imgShowObj.classList.add('w3-animate-opacity');
     bigImgView.appendChild(imgShowObj)
   }
   imgShowObj.classList.remove('w3-hide');
