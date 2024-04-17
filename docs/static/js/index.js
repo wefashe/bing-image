@@ -383,6 +383,12 @@ function preview(img) {
   const closeBtn = document.getElementById('me-view-close-btn')
   const clickFunc = function () {
     view.classList.add('w3-hide');
+    sizeIcon.classList.add("fa-search-plus");
+    sizeIcon.classList.remove("fa-search-minus");
+    bigImgView.classList.add("me-cursor-zoom-in");
+    bigImgView.classList.remove("me-cursor-zoom-out");
+    bigImgView.classList.add("w3-threequarter");
+    bigImgView.classList.remove("w3-col");
     closeBtn.removeEventListener('click', clickFunc);
     sizeBtn.removeEventListener('click', sizeFunc)
     bigImgView.removeEventListener('click', sizeFunc)
