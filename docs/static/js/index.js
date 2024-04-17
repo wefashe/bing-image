@@ -376,6 +376,8 @@ function preview(img) {
     sizeIcon.classList.toggle("fa-search-minus");
     bigImgView.classList.toggle("me-cursor-zoom-in");
     bigImgView.classList.toggle("me-cursor-zoom-out");
+    bigImgView.classList.toggle("w3-threequarter");
+    bigImgView.classList.toggle("w3-col");
   };
 
   const closeBtn = document.getElementById('me-view-close-btn')
