@@ -351,12 +351,32 @@ function showImg(date) {
 function preview(img) {
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
+  const wheelFunc = function (e) {
+    console.log(e.wheelDelta)
+    e.preventDefault;
+    let n = 0;
+    if (e.wheelDelta > 0) {
+      n = 1;
+    } else if (e.wheelDelta < 0) {
+      n = -1;
+    } else {
+      n = 0;
+    }
+    if (n == 0) {
+      return false;
+    }
+    plusImg(n);
+  };
   const closeBtn = document.getElementById('me-view-close-btn')
   const clickFunc = function () {
     view.classList.add('w3-hide');
     closeBtn.removeEventListener('click', clickFunc)
-  }
-  closeBtn.addEventListener("click", clickFunc)
+    view.removeEventListener("onmousewheel", wheelFunc);
+  };
+
+  closeBtn.addEventListener("click", clickFunc);
+  // view.addEventListener("mousewheel", wheelFunc);
+
   const date = img.getAttribute('data-date')
   showImg(date)
 }
