@@ -61,7 +61,7 @@ readDbFile(function (db) {
 // 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
 function preloader(id) {
   if (!id) return;
-  var image_obj = document.querySelectorAll(`.me-img img[data-id='${id}']`)[0];
+  var image_obj = document.querySelectorAll(`.me-img img[data-date='${id}']`)[0];
   var dataSrc = image_obj.getAttribute('data-src');
   if (!dataSrc) return;
   var big_image = new Image();
@@ -293,7 +293,7 @@ function setImage(db) {
                           <div class="w3-card w3-round-large me-card">
                             <div class="me-img w3-center">
                               <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <img data-id="${row.enddate}" class="w3-image me-lazy" onclick=preview(this) src="${small_img_url}" data-src="${big_img_url}"  data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
+                              <img data-date="${row.enddate}" class="w3-image me-lazy" onclick=preview(this) src="${small_img_url}" data-src="${big_img_url}"  data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
                             </div>
                             <div class = "w3-padding-small">
                               <div class="w3-row w3-padding-small w3-tiny" >
@@ -325,49 +325,54 @@ function setImage(db) {
   }
 }
 
-// 图片预览
-function preview(img) {
-
-  const view = document.getElementById('me-view')
-  view.classList.remove('w3-hide');
-
-  bigImg = img.cloneNode(true)
-  insImg = img.cloneNode(true)
-
-
-
-
-  // 注册蒙层的点击事件，关闭弹窗
-
-  const viewCloseBtn = document.getElementById('me-view-close-btn')
-  view.classList.remove('w3-hide');
-  const clickFunc = function () {
-    view.classList.add('w3-hide');
-    // originalEl.style.opacity = 1
-    viewCloseBtn.removeEventListener('click', clickFunc)
+function showImg(date) {
+  let imgShowObj = null;
+  const bigImgView = document.getElementById('me-big-img-show');
+  const bigImgs = bigImgView.getElementsByTagName("img");;
+  for (let img_obj of bigImgs) {
+    img_obj.classList.add('w3-hide');
+    if (img_obj.getAttribute('data-date') == date) {
+      imgShowObj = img_obj;
+    }
   }
-  viewCloseBtn.addEventListener("click", clickFunc)
-  // const bigImgView = document.getElementById('me-big-img-show')
-  // const insImgView = document.getElementById('me-ins-img-show')
-  // bigImg.classList.add('me-big-img')
-  // insImg.classList.add('me-ins-img')
-  // // insImg.classList.add('w3-hover-opacity')
-  // insImg.classList.add('w3-round')
-  // insImg.classList.add('w3-border')
-  // insImg.classList.add('w3-padding')
-  // insImg.classList.add('w3-col')
-  // insImg.classList.add('s3')
-  // insImg.classList.add('w3-container')
-  // // insImg.classList.add('w3-hover-opacity-off')
-  // bigImgView.appendChild(bigImg)
-  // insImgView.appendChild(insImg)
+  if (!imgShowObj) {
+    const img_obj = document.querySelectorAll(`#image-list img[data-date='${date}']`)[0];
+    imgShowObj = new Image();
+    imgShowObj.src = img_obj.src.substring(0, img_obj.src.indexOf('&'));
+    imgShowObj.classList.add('w3-hide');
+    imgShowObj.setAttribute('data-date', date);
+    imgShowObj.classList.add('w3-image');
+    bigImgView.appendChild(imgShowObj)
+  }
+  imgShowObj.classList.remove('w3-hide');
 }
 
+// 图片预览
+function preview(img) {
+  const view = document.getElementById('me-view')
+  view.classList.remove('w3-hide');
+  const closeBtn = document.getElementById('me-view-close-btn')
+  const clickFunc = function () {
+    view.classList.add('w3-hide');
+    closeBtn.removeEventListener('click', clickFunc)
+  }
+  closeBtn.addEventListener("click", clickFunc)
+  const date = img.getAttribute('data-date')
+  showImg(date)
+}
 
-var slideDate = 1;
 function plusImg(n) {
-  slideDate = changeDate(slideDate, n);
-  currentImg(slideDate)
+  let imgShowObj = null;
+  const bigImgView = document.getElementById('me-big-img-show');
+  const bigImgs = bigImgView.getElementsByTagName("img");;
+  for (let img_obj of bigImgs) {
+    if (!img_obj.classList.contains('w3-hide')) {
+      imgShowObj = img_obj;
+    }
+  }
+
+  const slideDate = changeDate(imgShowObj.getAttribute('data-date'), n);
+  showImg(slideDate)
 }
 
 function currentImg(date) {
@@ -380,8 +385,8 @@ function currentImg(date) {
   for (i = 0; i < insImgs.length; i++) {
     insImgs[i].className = insImgs[i].className.replace(" w3-opacity-off", "");
   }
-  bigImgs.querySelectorAll(`img[data-id='${date}']`)[0].style.display = "block";
-  insImgs.querySelectorAll(`img[data-id='${date}']`)[0].className += " w3-opacity-off";
+  bigImgs.querySelectorAll(`img[data-date='${date}']`)[0].style.display = "block";
+  insImgs.querySelectorAll(`img[data-date='${date}']`)[0].className += " w3-opacity-off";
   slideDate = date;
 }
 
