@@ -537,6 +537,11 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
+// 获取真实图片长宽
+// myImage.addEventListener('onload', function () {
+//   console.log('我的宽度是: ', this.naturalWidth);
+//   console.log('我的高度是: ', this.naturalHeight);
+// });
 
 
 
