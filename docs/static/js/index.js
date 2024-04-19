@@ -68,10 +68,13 @@
  * 3、Github Actions优化，是否可以直接部署
  */
 
+// 前缀
 const bing_api_prefix = 'https://cn.bing.com';
+// 分页
 let pageIndex = 1, pageSize = 24
 
-function readDbFile(callback) {
+// 读取文件
+function dbFileGet(callback) {
   let config = {
     locateFile: () => "static/js/sql-wasm.wasm",
   };
@@ -80,51 +83,38 @@ function readDbFile(callback) {
     xhr.open('GET', "data/images.db", true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = e => {
-      // document.getElementById('me-load').classList.toggle('w3-hide');
-      document.getElementById('me-full-load').classList.add('w3-hide');
-      document.getElementById('me-bottom-load').classList.add('w3-hide');
-      const uInt8Array = new Uint8Array(xhr.response);
-      callback(new SQL.Database(uInt8Array));
+      callback(new SQL.Database(new Uint8Array(xhr.response)));
     };
     xhr.send();
   });
-}
+};
 
-readDbFile(function (db) {
-  setImage(db, pageIndex, pageSize)
-  // 懒加载
-  lazyload()
-  window.addEventListener('scroll', () => {
-    // 获取页面高度
-    var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-    // 获取滚动高度
-    var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
-    // 获取可视区域高度 这个不会变
-    var clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    if (scrollHeight - scrollTop - clientHeight < clientHeight / 2) {
-      document.getElementById('me-bottom-load').classList.remove('w3-hide');
-      setImage(db)
+// 隐藏元素
+function hideElementById(elementId, hide) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    if (hide) {
+      element.classList.add('w3-hide');
+    } else {
+      element.classList.remove('w3-hide');
     }
-    throttle(lazyload, 200)();
-    // 当浏览器窗口大小改变时，运行函数
-    // window.addEventListener('resize', lazyloader);
-    // 当设备的纵横方向改变时，运行函数
-    // window.addEventListener('orientationChange', lazyloader);
-  }, false);
-});
+  }
+};
 
-// 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
-function preloader(id) {
-  if (!id) return;
-  var image_obj = document.querySelectorAll(`.me-img img[data-date='${id}']`)[0];
-  var dataSrc = image_obj.getAttribute('data-src');
-  if (!dataSrc) return;
-  var big_image = new Image();
-  big_image.src = dataSrc;
+// 是否接近底部
+function isNearBottom() {
+  // 获取页面高度
+  var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+  // 获取滚动高度
+  var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
+  // 获取可视区域高度 这个不会变
+  var clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  // 判断是否到屏幕下半部分
+  return scrollHeight - scrollTop - clientHeight < clientHeight / 2
 }
 
 // 判断一个元素是否在可视区域, 有3种方式
-function isVisible(element) {
+function isViewArea(element) {
   // 浏览器视口的高度
   const viewPortHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
   // 滚动轴滚动的距离
@@ -139,36 +129,140 @@ function isVisible(element) {
   // 第三种 Intersection Observer
 }
 
+function loadData(db) {
+  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
+  stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
+  var content = '';
+  var count = 0;
+  while (stmt.step()) {
+    var row = stmt.getAsObject();
+    count++;
+    const url = row.url;
+    // 预览图片
+    const viewImg = bing_api_prefix + url.substring(0, url.indexOf('&'));
+    // 渐进小图
+    const insImg = `${viewImg}&w=120`;
+    // 渐进大图
+    const bigImg = `${viewImg}&w=384&h=216`;
+    // 超清图片
+    const uhdImg = viewImg.replace(viewImg.substring(viewImg.lastIndexOf('_') + 1, viewImg.lastIndexOf('.')), 'UHD');
+    var view_count = Math.floor(Math.random() * (100 - 1000) + 1000);
+    // 20210101转为2021-01-01
+    var date_str = row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+    var date_str2 = date_str.replace(/-/g, "/")
+    // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
+    var date = chinaDate(date_str2);
+    var today = chinaDate();
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var isToday = month == today.getMonth() && day == today.getDate();
+    var days = today.getFullYear() - year
+    const tags = new Map([
+      [0, '必应今日'],
+      [1, '去年今日'],
+      [2, '前年今日'],
+      ['default', '往年今日'],
+    ])
+    var copyrightlink = row.copyrightlink;
+    try {
+      var keyCode = new URL(row.copyrightlink).searchParams.get("q");
+      // " 双引号用 %22 表示
+      copyrightlink = `${bing_api_prefix}/search?q=${keyCode}&filters=HpDate:%22${changeDate(date_str2, -1)}_1600%22`
+    } catch (err) {
+      copyrightlink = '';
+    }
+
+    // 渐进式图片
+    content += `<div class="w3-quarter w3-padding"> 
+                          <div class="w3-card w3-round-large me-card">
+                            <div class="me-img w3-center">
+                              <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
+                              <img data-date="${row.enddate}" class="w3-image me-cursor-pointer me-lazy" onclick=preview(this) src="${insImg}" data-big="${bigImg}" data-view=${viewImg} data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
+                            </div>
+                            <div class = "w3-padding-small">
+                              <div class="w3-row w3-padding-small w3-tiny" >
+                                <div class="${isToday ? 'w3-blue' : 'w3-orange'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
+                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(days) || tags.get('default') : '必应美图'}
+                                </div>
+                              </div>
+                              <div class="w3-row w3-padding-small me-img-title" title="${row.title}">
+                                <a href="${copyrightlink}" target="_blank" ${copyrightlink ? '' : 'onclick="return false" class="me-cursor-default"'}> 
+                                  ${row.title}
+                                </a> 
+                              </div>
+                              <div class="w3-row w3-padding-small w3-small me-meta">
+                                <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
+                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${uhdImg}',true)></i> <span>${view_count}</span></div>
+                                <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${uhdImg}',false)></i> <span>${Math.floor(Math.random() * (view_count - 1000) + 1000)}</span></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>`;
+    // 预加载
+    // preloader(row.enddate)
+  }
+  document.getElementById('image-list').innerHTML += content;
+  if (count == 0) {
+    pageIndex = 1;
+  } else {
+    pageIndex++;
+  }
+}
+
+dbFileGet(function (session) {
+  hideElementById('me-full-load', true);
+  hideElementById('me-bottom-load', true);
+  loadData(session)
+  lazyload()
+  window.addEventListener('scroll', () => {
+    // 浏览器滚动触发
+    if (isNearBottom()) {
+      hideElementById('me-bottom-load', false);
+      loadData(session)
+    }
+    throttle(lazyload, 200)();
+  });
+});
+
+
+
+document.querySelector('#image-list').onclick = (event) => {
+  const target = event.target
+  // if (target.nodeName === 'LI') {
+  // console.log(target.nodeName)
+  // }
+}
+
+
+// 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
+function preloader(id) {
+  if (!id) return;
+  var image_obj = document.querySelectorAll(`.me-img img[data-date='${id}']`)[0];
+  var dataSrc = image_obj.getAttribute('data-src');
+  if (!dataSrc) return;
+  var big_image = new Image();
+  big_image.src = dataSrc;
+}
+
+
+
 // 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
-  // document.querySelectorAll('img.me-lazy[data-src]').forEach(function(img){
-  //   let rect = img.getBoundingClientRect();
-  //   let visible = rect.top<=window.innerHeight && rect.bottom>=0;
-  //   if(!visible){return;}
-  //   // 如果元素可见，则替换其 src 的值
-  //   img.src = img.dataset.src;
-  //   img.classList.remove('lazy');
-  // });
-  var image_objs = document.querySelectorAll('img[data-src]')
-  for (let image_obj of image_objs) {
-    var dataSrc = image_obj.getAttribute('data-src')
-    if (!dataSrc) continue;
-    let visible = isVisible(image_obj);
-    if (visible) {
-      !function () {
-        var big_image = new Image();
-        big_image.onload = function () {
-          big_image.onload = null;
-          image_obj.onload = function () {
-            image_obj.onload = null;
-            image_obj.removeAttribute('data-src');
-          }
-          image_obj.src = this.src;
+  document.querySelectorAll('img[data-big]').forEach(function (img) {
+    if (isViewArea(img)) {
+      var image = new Image();
+      image.onload = function () {
+        image.onload = null;
+        img.onload = function () {
+          img.onload = null;
+          img.removeAttribute('data-big');
         }
-        big_image.src = dataSrc;
-      }()
+        img.src = image.src;
+      }
+      image.src = img.getAttribute('data-big');
     }
-  }
+  });
 }
 
 // 防抖节流
@@ -301,83 +395,6 @@ function changeDate(date, days) {
   days = days || 0
   var day = date_obj.getDate() + days;
   return year + month.toString().padStart(2, '0') + day.toString().padStart(2, '0')
-}
-
-function setImage(db) {
-  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
-  stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
-  var image_list = document.getElementById('image-list')
-  var count = 0;
-  while (stmt.step()) {
-    count++;
-    var row = stmt.getAsObject();
-    var url = row.url.substring(0, row.url.indexOf('&'));
-    var small_img_url = `${bing_api_prefix}${url}&w=120`;
-    var big_img_url = `${bing_api_prefix}${url}&w=384&h=216`
-    var view_count = Math.floor(Math.random() * (100 - 1000) + 1000);
-    // 20210101转为2021-01-01
-    var date_str = row.enddate.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
-    var date_str2 = date_str.replace(/-/g, "/")
-    // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
-    var date = chinaDate(date_str2);
-    var today = chinaDate();
-    var year = date.getFullYear();
-    var month = date.getMonth();
-    var day = date.getDate();
-    var isToday = month == today.getMonth() && day == today.getDate();
-    var days = today.getFullYear() - year
-    const tags = new Map([
-      [0, '必应今日'],
-      [1, '去年今日'],
-      [2, '前年今日'],
-      ['default', '往年今日'],
-    ])
-    var copyrightlink = row.copyrightlink;
-    try {
-      var keyCode = new URL(row.copyrightlink).searchParams.get("q");
-      // " 双引号用 %22 表示
-      copyrightlink = `${bing_api_prefix}/search?q=${keyCode}&filters=HpDate:%22${changeDate(date_str2, -1)}_1600%22`
-    } catch (err) {
-      copyrightlink = '';
-    }
-
-    var uhdurl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), 'UHD');
-
-    // 渐进式图片
-    var image_html = `<div class="w3-quarter w3-padding"> 
-                          <div class="w3-card w3-round-large me-card">
-                            <div class="me-img w3-center">
-                              <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                              <img data-date="${row.enddate}" class="w3-image me-cursor-pointer me-lazy" onclick=preview(this) src="${small_img_url}" data-src="${big_img_url}"  data-load="0" title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%"> 
-                            </div>
-                            <div class = "w3-padding-small">
-                              <div class="w3-row w3-padding-small w3-tiny" >
-                                <div class="${isToday ? 'w3-blue' : 'w3-orange'} w3-left w3-padding-small w3-round" style="color: white!important; font-weight: bold;">
-                                  <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(days) || tags.get('default') : '必应美图'}
-                                </div>
-                              </div>
-                              <div class="w3-row w3-padding-small me-img-title" title="${row.title}">
-                                <a href="${copyrightlink}" target="_blank" ${copyrightlink ? '' : 'onclick="return false" class="me-cursor-default"'}> 
-                                  ${row.title}
-                                </a> 
-                              </div>
-                              <div class="w3-row w3-padding-small w3-small me-meta">
-                                <div class="w3-left"><i class="fa fa-clock-o"></i> ${date_str}</div>
-                                <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${bing_api_prefix + uhdurl}',true)></i> <span>${view_count}</span></div>
-                                <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${bing_api_prefix + url}',false)></i> <span>${Math.floor(Math.random() * (view_count - 1000) + 1000)}</span></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>`
-    image_list.innerHTML += image_html;
-    // 预加载
-    preloader(row.enddate)
-  }
-  if (count == 0) {
-    pageIndex = 1;
-  } else {
-    pageIndex++;
-  }
 }
 
 function showImg(date) {
