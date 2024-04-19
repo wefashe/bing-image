@@ -303,8 +303,10 @@ window.addEventListener("error", function (event) {
     // 重试2次
     if (curTimes >= 2) {
       // 去除，防止滚动重复加载
-      target.removeAttribute('lazy-src');
+      target.removeAttribute('data-big');
       target.classList.add("me-img-error");
+      target.classList.remove("me-cursor-pointer");
+      target.onclick = null;
     } else {
       target.dataset.retryTimes = curTimes + 1
       target.src = target.src
