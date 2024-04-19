@@ -415,7 +415,7 @@ function showImg(date) {
     }
   }
   if (!imgShowObj) {
-    const img_obj = document.querySelectorAll(`#image - list img[data - date= '${date}']`)[0];
+    const img_obj = document.querySelectorAll(`#image-list img[data-date= '${date}']`)[0];
     imgShowObj = new Image();
     imgShowObj.src = img_obj.src.substring(0, img_obj.src.indexOf('&'));
     imgShowObj.classList.add('w3-hide');
