@@ -450,7 +450,7 @@ function preview(img) {
     bigImgView.classList.toggle("me-cursor-zoom-in");
     bigImgView.classList.toggle("me-cursor-zoom-out");
     bigImgView.classList.toggle("w3-threequarter");
-    bigImgView.classList.toggle("w3-rest");
+    bigImgView.classList.toggle("w3-col");
   };
 
   const closeBtn = document.getElementById('me-view-close-btn')
@@ -461,7 +461,7 @@ function preview(img) {
     bigImgView.classList.add("me-cursor-zoom-in");
     bigImgView.classList.remove("me-cursor-zoom-out");
     bigImgView.classList.add("w3-threequarter");
-    bigImgView.classList.remove("w3-half");
+    bigImgView.classList.remove("w3-col");
     closeBtn.removeEventListener('click', clickFunc);
     sizeBtn.removeEventListener('click', sizeFunc)
     bigImgView.removeEventListener('click', sizeFunc)
