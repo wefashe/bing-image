@@ -2,3 +2,4 @@ User-agent: *
 Disallow: 
 Disallow: /data/
 Sitemap: sitemap.xml
+Host: https://wefashe.github.io/bing-image
