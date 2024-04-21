@@ -179,10 +179,10 @@ function loadData(db) {
     // 渐进式图片
     content += `
     <div class="w3-quarter w3-padding" >
-        <div class="w3-card w3-round-large me-card">
+        <div class="w3-card w3-round-large me-card" data-view=${viewImg}>
             <div class="me-list-img w3-center">
                 <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-view=${viewImg} data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
+                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
             </div>
             <div class="w3-padding-small">
                 <div class="w3-row w3-padding-small w3-tiny" >
@@ -197,8 +197,8 @@ function loadData(db) {
                 </div>
                 <div class="w3-row w3-padding-small w3-small me-meta">
                     <div class="w3-left"><i class="fa fa-clock-o"></i> ${dateShow}</div>
-                    <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${viewImg}',true)></i> <span>${viewCount}</span></div>
-                    <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${viewImg}',false)></i> <span>${downCount}</span></div>
+                    <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer"></i> <span>${viewCount}</span></div>
+                    <div class="w3-right"><i class="fa fa-eye me-cursor-pointer"></i> <span>${downCount}</span></div>
                 </div>
             </div>
         </div >
@@ -239,8 +239,11 @@ document.querySelector('#image-list').onclick = (event) => {
   if (target.classList.contains('w3-image')) {
     preview(target)
   }
-  if (target.nodeName === 'LI') {
-    console.log(target.nodeName)
+  if (target.classList.contains('fa-download')) {
+    download(target, target.parentNode.parentNode.getAttribute('data-view'), true)
+  }
+  if (target.classList.contains('fa-eye')) {
+    download(target, target.parentNode.parentNode.getAttribute('data-view'), false)
   }
 }
 
@@ -422,14 +425,19 @@ function showImg(date) {
   if (!imgShowObj) {
     const img_obj = document.querySelectorAll(`#image-list img[data-date= '${date}']`)[0];
     imgShowObj = new Image();
+    imgShowObj.onload = function () {
+      imgShowObj.classList.remove('w3-hide');
+    }
     imgShowObj.src = img_obj.src.substring(0, img_obj.src.indexOf('&'));
     imgShowObj.classList.add('w3-hide');
     imgShowObj.setAttribute('data-date', date);
     imgShowObj.classList.add('w3-image');
     imgShowObj.classList.add('w3-animate-opacity');
     bigImgView.appendChild(imgShowObj)
+  } else {
+    imgShowObj.classList.remove('w3-hide');
   }
-  imgShowObj.classList.remove('w3-hide');
+
 }
 
 // 图片预览功能
