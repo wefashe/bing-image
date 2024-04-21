@@ -240,10 +240,10 @@ document.querySelector('#image-list').onclick = (event) => {
     preview(target)
   }
   if (target.classList.contains('fa-download')) {
-    download(target, target.parentNode.parentNode.getAttribute('data-view'), true)
+    download(target, target.parentNode.parentNode.parentNode.parentNode.getAttribute('data-view'), true);
   }
   if (target.classList.contains('fa-eye')) {
-    download(target, target.parentNode.parentNode.getAttribute('data-view'), false)
+    download(target, target.parentNode.parentNode.parentNode.parentNode.getAttribute('data-view'), false);
   }
 }
 
