@@ -180,9 +180,9 @@ function loadData(db) {
     content += `
     <div class="w3-quarter w3-padding" >
         <div class="w3-card w3-round-large me-card">
-            <div class="me-img w3-center">
+            <div class="me-list-img w3-center">
                 <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" onclick=preview(this) src="${insImg}" data-big="${bigImg}" data-view=${viewImg} data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
+                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-view=${viewImg} data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
             </div>
             <div class="w3-padding-small">
                 <div class="w3-row w3-padding-small w3-tiny" >
@@ -236,9 +236,12 @@ dbFileGet(function (session) {
 
 document.querySelector('#image-list').onclick = (event) => {
   const target = event.target
-  // if (target.nodeName === 'LI') {
-  // console.log(target.nodeName)
-  // }
+  if (target.classList.contains('w3-image')) {
+    preview(target)
+  }
+  if (target.nodeName === 'LI') {
+    console.log(target.nodeName)
+  }
 }
 
 

@@ -19,7 +19,7 @@ a {
     padding-top: 48px;
 }
 
-.me-img {
+.me-list-img {
     /*超出父类部分隐藏*/
     overflow: hidden;
     /* 图片上面两个角圆角 */
@@ -33,14 +33,14 @@ a {
     background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
 }
 
-.me-img:after {
+.me-list-img:after {
     content: "";
     display: block;
     /* 图片未加载时高度填充*/
     padding-bottom: 60%;
 }
 
-.me-img img {
+.me-list-img img {
     /* 缩小还原 */
     -webkit-transition: all .444s ease-in-out;
     -o-transition: all .444s ease-in-out;
@@ -53,7 +53,7 @@ a {
     height: 100%;
 }
 
-.me-img:hover img {
+.me-list-img:hover img {
     /*悬停放放大*/
     transform: scale(1.05);
     -webkit-transition: all .444s ease-in-out;
