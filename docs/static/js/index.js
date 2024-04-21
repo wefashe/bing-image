@@ -134,16 +134,16 @@ function loadData(db) {
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
   while (stmt.step()) {
-    var row = stmt.getAsObject();
-    const url = row.url;
+    const row = stmt.getAsObject();
+    // 切换超清图片
+    const url = row.url.substring(0, row.url.indexOf('&'));
+    const uhdUrl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), 'UHD');
     // 预览图片
-    const viewImg = bing_api_prefix + url.substring(0, url.indexOf('&'));
+    var viewImg = bing_api_prefix + uhdUrl;
     // 渐进小图
-    const insImg = `${viewImg}&w=120`;
+    const insImg = bing_api_prefix + `${uhdUrl}&w=50`;
     // 渐进大图
-    const bigImg = `${viewImg}&w=384&h=216`;
-    // 超清图片
-    const uhdImg = viewImg.replace(viewImg.substring(viewImg.lastIndexOf('_') + 1, viewImg.lastIndexOf('.')), 'UHD');
+    const bigImg = bing_api_prefix + `${uhdUrl}&w=384&h=216`;
 
     const viewCount = Math.floor(Math.random() * (100 - 1000) + 1000);
     const downCount = Math.floor(Math.random() * (100 - viewCount) + 1000);
@@ -197,8 +197,8 @@ function loadData(db) {
                 </div>
                 <div class="w3-row w3-padding-small w3-small me-meta">
                     <div class="w3-left"><i class="fa fa-clock-o"></i> ${dateShow}</div>
-                    <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${uhdImg}',true)></i> <span>${viewCount}</span></div>
-                    <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${uhdImg}',false)></i> <span>${downCount}</span></div>
+                    <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer" onclick=download(this,'${viewImg}',true)></i> <span>${viewCount}</span></div>
+                    <div class="w3-right"><i class="fa fa-eye me-cursor-pointer" onclick=download(this,'${viewImg}',false)></i> <span>${downCount}</span></div>
                 </div>
             </div>
         </div >
