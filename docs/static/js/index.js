@@ -178,7 +178,7 @@ function loadData(db) {
 
     // 渐进式图片
     content += `
-    <div class="w3-quarter w3-padding" >
+    <div class="w3-padding w3-col l3 m4 s6">
         <div class="w3-card w3-round-large me-card" data-view=${viewImg}>
             <div class="me-list-img w3-center">
                 <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
@@ -197,8 +197,10 @@ function loadData(db) {
                 </div>
                 <div class="w3-row w3-padding-small w3-small me-meta">
                     <div class="w3-left"><i class="fa fa-clock-o"></i> ${dateShow}</div>
-                    <div class="w3-right" style="margin-left:12px"><i class="fa fa-download me-cursor-pointer"></i> <span>${viewCount}</span></div>
-                    <div class="w3-right"><i class="fa fa-eye me-cursor-pointer"></i> <span>${downCount}</span></div>
+                    <div class="w3-right w3-row-padding">
+                        <div class="w3-show-inline-block"><i class="fa fa-download me-cursor-pointer"></i> <span>${viewCount}</span></div>
+                        <div class="w3-show-inline-block"><i class="fa fa-eye me-cursor-pointer"></i> <span>${downCount}</span></div>
+                    </div>
                 </div>
             </div>
         </div >
