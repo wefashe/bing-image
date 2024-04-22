@@ -195,7 +195,7 @@ function loadData(db) {
                         ${row.title}
                     </a>
                 </div>
-                <div class="w3-row w3-padding-small w3-small me-meta w3-justify">
+                <div class="w3-row w3-padding-small w3-small me-meta">
                     <div class="w3-left w3-show-inline-block"><i class="fa fa-clock-o"></i> ${dateShow}</div>
                     <div class="w3-right w3-show-inline-block w3-row-padding">
                         <div class="w3-show-inline-block"><i class="fa fa-eye me-cursor-pointer"></i> <span>${viewCount}</span></div>
