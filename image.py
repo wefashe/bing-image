@@ -174,7 +174,7 @@ def get_images(begin_date, end_date):
     (
         date          varchar(8)   not null default ' ' primary key,              /* 日期      */
         title         varchar(150) not null default ' ',                          /* 标题      */
-        url           varchar(200) not null default ' ' unique,                   /* 图片地址   */
+        url           varchar(200) not null default ' ',                          /* 图片地址   */
         keyword       varchar(100) not null default ' ',                          /* 关键词     */
         copyright     varchar(150) not null default ' ',                          /* 版权      */
         quickfact     varchar(200) not null default ' ',                          /* 速览      */
