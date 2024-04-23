@@ -152,7 +152,7 @@ def get_images(begin_date, end_date):
     end = str_to_date(str(end_date))
     days = (end - begin).days + 1 
     # 1、按日期范围进行数据库查
-    conn = sqlite3.connect('docs/data/mybak.db')
+    conn = sqlite3.connect('docs/data/images.db')
     cursor = conn.cursor()
     cursor.execute('''  create table if not exists wallpaper
                         (
