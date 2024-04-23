@@ -172,14 +172,14 @@ def get_images(begin_date, end_date):
     '''
     create table if not exists bing_image                                         /* 必应美图表 */
     (
-        date          varchar(8)   not null default ' ' primary key,              /* 日期    */
-        title         varchar(150) not null default ' ',                          /* 标题    */
-        url           varchar(200) not null default ' ' unique,                   /* 图片地址 */
-        copyright     varchar(150) not null default ' ',                          /* 版权    */
-        quickfact     varchar(200) not null default ' ',                          /* 速览    */
-        description   text         not null default ' ',                          /* 描述    */
-        updatetime    timestamp    not null default (datetime('now', '+8 hour')), /* 修改时间 */
-        copyrightlink varchar(200) not null default ' '                           /* 版权链接 */
+        date          varchar(8)   not null default ' ' primary key,              /* 日期      */
+        title         varchar(150) not null default ' ',                          /* 标题      */
+        url           varchar(200) not null default ' ' unique,                   /* 图片地址   */
+        keyword       varchar(100) not null default ' '                           /* 关键词     */
+        copyright     varchar(150) not null default ' ',                          /* 版权      */
+        quickfact     varchar(200) not null default ' ',                          /* 速览      */
+        description   text         not null default ' ',                          /* 描述      */
+        updatetime    timestamp    not null default (datetime('now', '+8 hour')), /* 修改时间   */
     );
     '''
     cursor.execute('select startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh \
