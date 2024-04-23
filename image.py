@@ -152,7 +152,7 @@ def get_images(begin_date, end_date):
     end = str_to_date(str(end_date))
     days = (end - begin).days + 1 
     # 1、按日期范围进行数据库查
-    conn = sqlite3.connect('docs/data/images.db')
+    conn = sqlite3.connect('docs/data/mybak.db')
     cursor = conn.cursor()
     cursor.execute('''  create table if not exists wallpaper
                         (
@@ -175,11 +175,11 @@ def get_images(begin_date, end_date):
         date          varchar(8)   not null default ' ' primary key,              /* 日期      */
         title         varchar(150) not null default ' ',                          /* 标题      */
         url           varchar(200) not null default ' ' unique,                   /* 图片地址   */
-        keyword       varchar(100) not null default ' '                           /* 关键词     */
+        keyword       varchar(100) not null default ' ',                          /* 关键词     */
         copyright     varchar(150) not null default ' ',                          /* 版权      */
         quickfact     varchar(200) not null default ' ',                          /* 速览      */
         description   text         not null default ' ',                          /* 描述      */
-        updatetime    timestamp    not null default (datetime('now', '+8 hour')), /* 修改时间   */
+        updatetime    timestamp    not null default (datetime('now', '+8 hour'))  /* 修改时间   */
     );
     '''
     cursor.execute('select startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh \
