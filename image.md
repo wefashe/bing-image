@@ -49,6 +49,10 @@
 - https://s.cn.bing.net  
 - https://global.bing.com 
 - https://www.bing.com
+- https://s1.cn.bing.net
+- https://s2.cn.bing.net
+- https://s3.cn.bing.net
+- https://s4.cn.bing.net 
 
 
 https://cn.bing.com/cnhp/coverstory?d=20181212

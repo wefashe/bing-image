@@ -130,14 +130,19 @@ function isViewArea(element) {
 }
 
 function loadData(db) {
-  var stmt = db.prepare("select * from wallpaper w  order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
+  var stmt = db.prepare("select * from wallpaper w where enddate <='20200331' order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
   while (stmt.step()) {
     const row = stmt.getAsObject();
     // 切换超清图片
-    const url = row.url.substring(0, row.url.indexOf('&'));
-    const uhdUrl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), 'UHD');
+    const index = row.url.indexOf('&');
+    var url = row.url;
+    if (index != -1) {
+      url = url.substring(0, index);
+    }
+
+    const uhdUrl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), '1920x1080');
     // 预览图片
     var viewImg = bing_api_prefix + uhdUrl;
     // 渐进小图
