@@ -130,7 +130,7 @@ function isViewArea(element) {
 }
 
 function loadData(db) {
-  var stmt = db.prepare("select * from wallpaper w where enddate <='20200331' order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
+  var stmt = db.prepare("select * from wallpaper w order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
   while (stmt.step()) {
