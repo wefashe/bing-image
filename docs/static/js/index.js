@@ -131,6 +131,9 @@ function isViewArea(element) {
 
 function loadData(db) {
   var stmt = db.prepare("select * from wallpaper w order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
+
+  // select distinct substring(enddate,0,5) year from wallpaper order by enddate desc
+  // select * from wallpaper where substring(enddate, 1, 4) = '2024' and substring(enddate, 5, 2) = '03' order by enddate desc
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
   while (stmt.step()) {
