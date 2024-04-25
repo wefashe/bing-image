@@ -145,7 +145,7 @@ function loadData(db) {
       url = url.substring(0, index);
     }
     // 图片不存在时默认显示LaDigue_UHD.jpg
-    url += "&rf=LaDigue_UHD.jpg";
+    url += "&rf=LaDigue_1920x1080.jpg";
     const uhdUrl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), '1920x1080');
     // 预览图片
     var viewImg = bing_api_prefix + uhdUrl;

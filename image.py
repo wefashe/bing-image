@@ -78,7 +78,12 @@ def get_bing_images(begin_date, end_date):
                 date_str = str(image_json['enddate'])
                 date = str_to_date(date_str)
                 if date >= begin and date <= end and date_str not in image_dates:
-                    images.append((image_json['startdate'],image_json['fullstartdate'],image_json['enddate'],image_json['url'],
+                    url = image_json['url']
+                    index = url.find('&')
+                    if index != -1 :
+                        url = url[0:index]
+                    url = url.replace('_UHD.jpg','_1920x1080.jpg')+'&rf=LaDigue_1920x1080.jpg'
+                    images.append((image_json['startdate'],image_json['fullstartdate'],image_json['enddate'],url,
                                    image_json['urlbase'],image_json['copyright'],image_json['copyrightlink'],image_json['title'],
                                    image_json['quiz'],image_json['hsh']))
                     image_dates.append(date_str)
