@@ -38,6 +38,7 @@
 - en-GB 英国
 - en-IN 印度
 - es-ES 西班牙
+- ROW
 
 
 
