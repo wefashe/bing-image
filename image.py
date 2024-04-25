@@ -26,11 +26,11 @@ fc = Factory.create()
 # 国内北京时间
 today = datetime.now(pytz.timezone('Asia/Shanghai'))
 # 时间转字符串
-def date_to_str(date):
-    return date.strftime("%Y%m%d")
+def date_to_str(date, format='%Y%m%d'):
+    return date.strftime(format)
 # 字符串转时间
-def str_to_date(str):
-    return datetime.strptime(str, '%Y%m%d').replace(tzinfo=pytz.timezone('Asia/Shanghai'))
+def str_to_date(str, format='%Y%m%d'):
+    return datetime.strptime(str, format).replace(tzinfo=pytz.timezone('Asia/Shanghai'))
 
 def get_bing_today_image():
     url = 'https://cn.bing.com'
