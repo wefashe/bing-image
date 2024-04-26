@@ -49,20 +49,30 @@ def get_image_listByDays(days):
     return first_list
 
 def get_image_coverstory(date='20240101'):
+    if date_utils.str_to_date(date) > date_utils.date_now():
+        date = date_utils.date_to_str(date_utils.date_now())
     headers = {
       'User-Agent': fc.user_agent(),
       'Referer': 'https://cn.bing.com'
     }
-    # https://cn.bing.com/cnhp/coverstory?d=20181212
-    # https://cn.bing.com/search?q=1&filters=HpDate:"20240425_1600"
-    url =f'https://cn.bing.com/search?q=1&filters=HpDate:"{date_utils.str_date_add(date, -1)}_1600"'
-    resp = requests.get(url=url, headers=headers)
-    resp.encoding = resp.apparent_encoding
-    soup = BeautifulSoup(resp.text, 'html.parser')
-     # 格式化显示输出
-    print(soup.prettify())
-    tags = soup.select('#encycloCanvas.encycloCanvas_Medium')
-    print(tags)
+    if '20140501' <= date and date <='20190228':
+      # https://cn.bing.com/cnhp/coverstory?d=20181212
+      url =f'https://cn.bing.com/cnhp/coverstory?d={date}'
+      resp = requests.get(url=url, headers=headers)
+      resp.encoding = resp.apparent_encoding
+      return resp.json()
+    else:
+      # https://cn.bing.com/search?q=1&filters=HpDate:"20240425_1600"  
+      url =f'https://cn.bing.com/search?q=1&filters=HpDate:"{date_utils.str_date_add(date, -1)}_1600"'
+      resp = requests.get(url=url, headers=headers)
+      resp.encoding = resp.apparent_encoding
+      resp = requests.get(url=url, headers=headers)
+      resp.encoding = resp.apparent_encoding
+      soup = BeautifulSoup(resp.text, 'html.parser')
+      # 格式化显示输出
+      print(soup.prettify())
+      tags = soup.select('#encycloCanvas.encycloCanvas_Medium')
+      print(tags)
 
 def get_today_image():
     '''
@@ -93,8 +103,9 @@ def get_today_image():
     }
 
 if __name__ == '__main__':
-    list = get_image_listByDays(15)
+    list = get_image_listByDays(3)
     print(json.dumps(list, ensure_ascii=False, indent=2))
-    get_image_coverstory('20240426')
+    coverstory = get_image_coverstory('20170426')
+    print(json.dumps(coverstory, ensure_ascii=False, indent=2))
     detail = get_today_image()
     print(json.dumps(detail, ensure_ascii=False, indent=2))
