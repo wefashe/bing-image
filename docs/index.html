@@ -17,10 +17,28 @@
     <link rel="icon" type="image/vnd.microsoft.icon" href="static/img/bing.ico" />
     <link rel="preconnect" href="./" />
     <link rel="dns-prefetch" href="./" />
+    <!-- 安卓平台 chrome -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="static/img/bing.ico">
+    <!-- ios平台 safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="必应壁纸 - 每日一图" />
+    <link rel="apple-touch-icon-precomposed" href="static/img/bing.ico">
+    <link rel="apple-touch-icon" sizes="57x57" href="static/img/bing.ico" />
+    <link rel="apple-touch-icon" sizes="60x60" href="static/img/bing.ico" />
+    <link rel="apple-touch-icon" sizes="72x72" href="static/img/bing.ico" />
+    <link rel="apple-touch-icon" sizes="76x76" href="static/img/bing.ico" />
+    <link rel="apple-touch-icon" sizes="120x120" href="static/img/bing.ico" />
+    <link rel="apple-touch-icon" sizes="144x144" href="static/img/bing.ico" />
+    <link rel="apple-touch-icon" sizes="152x152" href="static/img/bing.ico" />
+    <!-- win8以上 平台 磁贴 -->
+    <meta name="msapplication-TileImage" content="static/img/bing.ico">
+    <meta name="msapplication-TileColor" content="#0e90d2">
     <link rel="preload" type="font/woff2" href="static/fonts/fontawesome-webfont.woff2?v=4.7.0" as="font" crossorigin />
     <link rel="preload" href="static/js/sql-wasm.wasm" as="fetch" crossorigin />
     <link rel="preload" href="data/images.db" as="fetch" crossorigin />
-    <link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css?display=swap" />
+    <link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="static/css/w3.css" />
     <link rel="stylesheet" type="text/css" href="static/css/index.css" />
 </head>
@@ -113,7 +131,7 @@
 
 </body>
 <script type="text/javascript" src="static/js/sql-wasm.js"></script>
-<!-- <script async type="text/javascript" src="static/js/protect.js"></script> -->
+<script async type="text/javascript" src="static/js/protect.js"></script>
 <script async type="text/javascript" src="static/js/index.js"></script>
 
 </html>
