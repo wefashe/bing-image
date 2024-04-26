@@ -12,6 +12,11 @@ from tqdm import tqdm
 import json
 import re
 from faker import Factory
+import crawl.bing as bing
+import crawl.plmeizi as plmeizi
+import crawl.todbi as todbi
+import crawl.wilii as wilii
+import crawl.xinac as xinac
 
 '''
     生成单个项目中的使用到的安装包文件 requirements.txt
