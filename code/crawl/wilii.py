@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-
+import os
 import json
 import requests
 from faker import Factory
-fc = Factory.create()
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import utils.date as date
 
 # https://bing.wilii.cn 网站爬虫
+
+fc = Factory.create()
 
 def get_image_listByPage(pageIndex=1, pageSize=16):
     '''
@@ -22,7 +26,20 @@ def get_image_listByPage(pageIndex=1, pageSize=16):
     url = f'https://api.wilii.cn/api/bing?page={pageIndex}&pageSize={pageSize}'
     resp = requests.get(url, headers=headers)
     resp.encoding = resp.apparent_encoding
-    return resp.json()
+    resp_json = resp.json()
+    list = []
+    for data in resp_json['response']['data']:
+        url = data['filepath']
+        url = url[url.rfind('/')+1:]
+        url = url[0:url.rfind('_')]
+        list.append({
+            'guid': data['guid'],
+            'date': date.date_to_str(date.str_to_date(data['date'],'%Y-%m-%d')),
+            'title': data['headline'],
+            'url': '/th?id=OHR.'+url+'_1920x1080.jpg&rf=LaDigue_1920x1080.jpg',
+            'copyright': data['title'] +' (' + data['copyright'] + ')',
+        })
+    return list
 
 def get_image_listByDate(year=2024, month=1):
     '''

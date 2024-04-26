@@ -46,7 +46,7 @@ def get_image_listByDate(year=2024, month=1, area='cn'):
     tags = soup.select('div.list-item.block')
     list = []
     for tag in tags:
-        list.append({'date':date.date_to_str(date.str_to_date(tag.div['data-date'],'%Y-%m-%d')),
+        list.append({'date': date.date_to_str(date.str_to_date(tag.div['data-date'],'%Y-%m-%d')),
                      'title': tag.div['data-title'].strip(),
                      'url': tag.div['data-bg'],
                     })
