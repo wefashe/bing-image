@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-
+import os
 import re
 import json
 import requests
 from faker import Factory
-fc = Factory.create()
+from bs4 import BeautifulSoup
+import sys
+from datetime import datetime, timedelta
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import utils.date as date_utils
 
 # https://cn.bing.com 网站爬虫
+
+fc = Factory.create()
 
 def get_image_listByDays(days):
     '''
@@ -42,6 +48,22 @@ def get_image_listByDays(days):
     first_list['images'] = first_list['images'] + second_list['images'][1:]
     return first_list
 
+def get_image_coverstory(date='20240101'):
+    headers = {
+      'User-Agent': fc.user_agent(),
+      'Referer': 'https://cn.bing.com'
+    }
+    # https://cn.bing.com/cnhp/coverstory?d=20181212
+    # https://cn.bing.com/search?q=1&filters=HpDate:"20240425_1600"
+    url =f'https://cn.bing.com/search?q=1&filters=HpDate:"{date_utils.str_date_add(date, -1)}_1600"'
+    resp = requests.get(url=url, headers=headers)
+    resp.encoding = resp.apparent_encoding
+    soup = BeautifulSoup(resp.text, 'html.parser')
+     # 格式化显示输出
+    print(soup.prettify())
+    tags = soup.select('#encycloCanvas.encycloCanvas_Medium')
+    print(tags)
+
 def get_today_image():
     '''
       获取当天的信息
@@ -73,5 +95,6 @@ def get_today_image():
 if __name__ == '__main__':
     list = get_image_listByDays(15)
     print(json.dumps(list, ensure_ascii=False, indent=2))
+    get_image_coverstory('20240426')
     detail = get_today_image()
     print(json.dumps(detail, ensure_ascii=False, indent=2))

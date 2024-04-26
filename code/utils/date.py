@@ -15,3 +15,16 @@ def date_to_str(date, format='%Y%m%d'):
 def str_to_date(str, format='%Y%m%d'):
     # 字符串转时间
     return datetime.strptime(str, format).replace(tzinfo=pytz.timezone('Asia/Shanghai'))
+
+def date_add(date, days):
+  return date + timedelta(days=days) 
+
+def str_date_add(date, days, format='%Y%m%d'):
+  return date_to_str(date_add(str_to_date(date, format), days))
+
+
+if __name__ == '__main__':
+  now = date_now()
+  print(str_date_add('20210101',-1))
+
+   
