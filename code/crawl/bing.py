@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import utils.date as date_utils
 
 # https://cn.bing.com 网站爬虫
-
+# https://cn.bing.com/cnhp/life?currentDate=20180704
 fc = Factory.create()
 
 def get_image_listByDays(days):
