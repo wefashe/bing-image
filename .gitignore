@@ -159,4 +159,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-image/
+#  排除test文件夹内除.gitkeep文件外的文件
+test/
+!test/.gitkeep
