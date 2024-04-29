@@ -4,7 +4,11 @@
 import sqlite3
 
 def get_sqllite_cursor(path=r'docs/data/images.db'):
+    '''
+        dict true 字典形式,取值image['enddate']; false 元组形式 取值image[3]
+    '''
     connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
     '''
         create table if not exists bing_image                                         /* 必应美图表 */
@@ -58,6 +62,14 @@ def get_sqllite_cursor(path=r'docs/data/images.db'):
                 ''')
     connection.commit()
     return connection, cursor
+
+def query_image_list(condition=''):
+    connection, cursor = get_sqllite_cursor()
+    cursor.execute(f"SELECT * FROM wallpaper where 1=1 {condition} order by enddate desc")
+    images = cursor.fetchall()
+    close_sqllite_cursor(connection, cursor)
+    return images
+      
 
 def update_image_list(images):
     if len(images) == 0:
