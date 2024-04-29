@@ -5448,4 +5448,7 @@ begin
 
 end
 ;
+CREATE INDEX idx_title on wallpaper (title);
+CREATE INDEX idx_url on wallpaper (url);
+CREATE INDEX idx_copyright on wallpaper (copyright);
 COMMIT;
