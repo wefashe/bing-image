@@ -80,6 +80,7 @@ def update_image_list(images):
         fullstartdate = image.get('fullstartdate', ' ')
         enddate = image.get('enddate', ' ')
         url = image.get('url', ' ')
+        url = url.replace('&pid=hp','')
         urlbase = image.get('urlbase', ' ')
         copyright = image.get('copyright', ' ')
         copyrightlink = image.get('copyrightlink', ' ')
