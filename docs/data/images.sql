@@ -5446,5 +5446,6 @@ begin
 
     where enddate = new.enddate;
 
-end;
+end
+;
 COMMIT;

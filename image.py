@@ -186,6 +186,15 @@ def get_images(begin_date, end_date):
         description   text         not null default ' ',                          /* 描述      */
         updatetime    timestamp    not null default (datetime('now', '+8 hour'))  /* 修改时间   */
     );
+
+
+    create trigger update_timestamp before update on wallpaper for each row
+    begin
+        update wallpaper 
+        set updatetime = datetime('now', '+8 hour')
+        where enddate = new.enddate;
+    end;
+
     '''
     cursor.execute('select startdate,fullstartdate,enddate,url,urlbase,copyright,copyrightlink,title,quiz,hsh \
                       from wallpaper where enddate between ? and ?  order by enddate desc',(begin_date, end_date))
