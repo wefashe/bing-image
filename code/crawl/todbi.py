@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import utils.date as date
 
-# https://www.todaybing.com 网站爬虫
+# https://www.todaybing.com 网站爬虫  该爬虫无效，爬不到有效的数据
 
 fc = Factory.create()
 

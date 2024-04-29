@@ -6,6 +6,19 @@ import sqlite3
 def get_sqllite_cursor(path=r'docs/data/images.db'):
     connection = sqlite3.connect(path)
     cursor = connection.cursor()
+    '''
+        create table if not exists bing_image                                         /* 必应美图表 */
+        (
+            date          varchar(8)   not null default ' ' primary key,              /* 日期      */
+            title         varchar(150) not null default ' ',                          /* 标题      */
+            url           varchar(200) not null default ' ',                          /* 图片地址   */
+            keyword       varchar(100) not null default ' ',                          /* 关键词     */
+            copyright     varchar(150) not null default ' ',                          /* 版权      */
+            quickfact     varchar(200) not null default ' ',                          /* 速览      */
+            description   text         not null default ' ',                          /* 描述      */
+            updatetime    timestamp    not null default (datetime('now', '+8 hour'))  /* 修改时间   */
+        );
+    '''
     # 新增表
     cursor.execute('''
         create table if not exists wallpaper -- 壁纸表
@@ -51,25 +64,16 @@ def update_image_list(images):
         return 0
     image_list = []
     for image in images:
-        startdate = image['startdate']
-        if not startdate: startdate = ' '
-        fullstartdate = image['fullstartdate']
-        if not fullstartdate: fullstartdate = ' '
-        enddate = image['enddate']
-        url = image['url']
-        if not url: url = ' '
-        urlbase = image['urlbase']
-        if not urlbase: urlbase = ' '
-        copyright = image['copyright']
-        if not copyright: copyright = ' '
-        copyrightlink = image['copyrightlink']
-        if not copyrightlink: copyrightlink = ' '
-        title = image['title']
-        if not title: title = ' '
-        quiz = image['quiz']
-        if not quiz: quiz = ' '
-        hsh = image['hsh']
-        if not hsh: hsh = ' '
+        startdate = image.get('startdate', ' ')
+        fullstartdate = image.get('fullstartdate', ' ')
+        enddate = image.get('enddate', ' ')
+        url = image.get('url', ' ')
+        urlbase = image.get('urlbase', ' ')
+        copyright = image.get('copyright', ' ')
+        copyrightlink = image.get('copyrightlink', ' ')
+        title = image.get('title', ' ')
+        quiz = image.get('quiz', ' ')
+        hsh = image.get('hsh', ' ')
         image_list.append((startdate, fullstartdate, enddate, url, urlbase, copyright, copyrightlink, title, quiz, hsh,
                            startdate, fullstartdate, enddate, url, urlbase, copyright, copyrightlink, title, quiz, hsh))
     connection, cursor = get_sqllite_cursor()

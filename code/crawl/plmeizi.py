@@ -5,9 +5,14 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from faker import Factory
-fc = Factory.create()
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import utils.date as date
 
 # https://plmeizi.com 网站爬虫
+
+fc = Factory.create()
 
 def get_image_listByPage(pageIndex=1):
     '''
@@ -29,9 +34,11 @@ def get_image_listByPage(pageIndex=1):
     # print(list.prettify())
     list = []
     for tag in tags:
-        list.append({'date': tag.div.time.string,
+        url = tag.img['data-src']
+        url = url[url.rfind('/OHR.') + 1:]
+        list.append({'date': date.str_format(tag.div.time.string,'%Y-%m-%d'),
                      'title': tag.div.span.string,
-                     'url': tag.img['data-src'],
+                     'url': '/th?id=' + url + '&rf=LaDigue_1920x1080.jpg',
                      'copyright': tag.img['alt']
                     })
     return list

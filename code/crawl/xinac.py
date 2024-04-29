@@ -5,9 +5,14 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from faker import Factory
-fc = Factory.create()
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import utils.date as date
 
 # https://bing.xinac.net 网站爬虫
+
+fc = Factory.create()
 
 def get_image_listByPage(pageIndex=1):
     '''
@@ -30,9 +35,10 @@ def get_image_listByPage(pageIndex=1):
     list = []
     for tag in tags:
         a_tag = tag.find('a',class_='show')
-        list.append({'date': tag.find('span',class_='u-time').string,
+        
+        list.append({'date': date.str_format(tag.find('span',class_='u-time').string, '%b %d, %Y'),
                      'title': tag.select('.title h2 a')[0].string,
-                     'url': a_tag['href'],
+                     'url': a_tag['href'].replace('https://cn.bing.com','').replace('&pid=hp',''),
                      'copyright': a_tag['title']
                     })
     return list

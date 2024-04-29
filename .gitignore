@@ -160,5 +160,5 @@ cython_debug/
 #.idea/
 
 #  排除test文件夹内除.gitkeep文件外的文件
-test/
+test/*
 !test/.gitkeep
