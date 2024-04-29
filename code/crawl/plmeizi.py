@@ -35,7 +35,6 @@ def get_image_listByPage(pageIndex=1):
     list = []
     for tag in tags:
         url = tag.img['data-src']
-        url = 'https://plmeizi.com/resize/list_pic/bing/2024/MontBlancGlacier_ZH-CN2918240023_1920x1080.jpg'
         index = url.rfind('/OHR.')
         if index == -1:
            index = url.rfind('/')
