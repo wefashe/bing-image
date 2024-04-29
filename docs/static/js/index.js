@@ -106,9 +106,9 @@ function isNearBottom() {
   // 获取页面高度
   var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
   // 获取滚动高度
-  var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
+  var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
   // 获取可视区域高度 这个不会变
-  var clientHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  var clientHeight = window.innerHeight || document.documentElement.clientHeight;
   // 判断是否到屏幕下半部分
   return scrollHeight - scrollTop - clientHeight < clientHeight / 2
 }
