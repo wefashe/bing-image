@@ -1,4 +1,4 @@
-name: crawl image action
+name: image update action
 # on 触发条件
 on:
   # 定时触发
@@ -50,7 +50,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com; fi       
-          python image.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
+          python code/main.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
       # 提交文件
       - name: commit and push
         run: |
