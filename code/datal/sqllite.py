@@ -46,6 +46,52 @@ def get_sqllite_cursor(path=r'docs/data/images.db'):
     connection.commit()
     return connection, cursor
 
+def update_image_list(images):
+    if len(images) == 0:
+        return 0
+    image_list = []
+    for image in images:
+        startdate = image['startdate']
+        if not startdate: startdate = ' '
+        fullstartdate = image['fullstartdate']
+        if not fullstartdate: fullstartdate = ' '
+        enddate = image['enddate']
+        url = image['url']
+        if not url: url = ' '
+        urlbase = image['urlbase']
+        if not urlbase: urlbase = ' '
+        copyright = image['copyright']
+        if not copyright: copyright = ' '
+        copyrightlink = image['copyrightlink']
+        if not copyrightlink: copyrightlink = ' '
+        title = image['title']
+        if not title: title = ' '
+        quiz = image['quiz']
+        if not quiz: quiz = ' '
+        hsh = image['hsh']
+        if not hsh: hsh = ' '
+        image_list.append((startdate, fullstartdate, enddate, url, urlbase, copyright, copyrightlink, title, quiz, hsh,
+                           startdate, fullstartdate, enddate, url, urlbase, copyright, copyrightlink, title, quiz, hsh))
+    connection, cursor = get_sqllite_cursor()
+    try:
+        # 执行批量操作
+        cursor.executemany('''
+            insert into wallpaper (startdate, fullstartdate, enddate, url, urlbase, copyright, copyrightlink, title, quiz, hsh) 
+            values( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+            on conflict (enddate)
+            do update set startdate=?, fullstartdate=?, enddate=?, url=?, urlbase=?, copyright=?, copyrightlink=?, title=?, quiz=?, hsh=?
+                           ''', image_list)
+        # 提交事务
+        connection.commit()
+        return cursor.rowcount
+    except sqlite3.Error as e:
+        # 发生错误，回滚事务
+        connection.rollback()
+        print("SQLite error:", e)
+        return 0
+    finally:
+        close_sqllite_cursor(connection, cursor)
+
 def close_sqllite_cursor(connection, cursor):
     cursor.close()
     connection.close()
