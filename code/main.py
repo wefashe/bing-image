@@ -6,7 +6,7 @@ import crawl.plmeizi as plmei
 import crawl.todbi as todbi
 import crawl.wilii as wilii
 import crawl.xinac as xinac
-import sqllite.db as db
+import datal.sqllite as sqllite
 import utils.date as date
 
 '''
