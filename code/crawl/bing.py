@@ -37,7 +37,7 @@ def get_image_listByDays(days):
     resp.encoding = resp.apparent_encoding
     first_list = resp.json()
     if second_days == 0:
-        return first_list
+        return first_list['images']
     headers = {
       'User-Agent': fc.user_agent(),
       'Referer': 'https://cn.bing.com'
@@ -46,8 +46,7 @@ def get_image_listByDays(days):
     resp = requests.get(url=url, headers=headers)
     resp.encoding = resp.apparent_encoding
     second_list = resp.json()
-    first_list['images'] = first_list['images'] + second_list['images'][1:]
-    return first_list
+    return first_list['images'] + second_list['images'][1:]
 
 def get_image_coverstory(date='20240101'):
     if date_utils.str_to_date(date) > date_utils.date_now():
