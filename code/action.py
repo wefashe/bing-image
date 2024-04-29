@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import re
 import sys
 import crawl.bing as bing
 import crawl.plmeizi as plmei
