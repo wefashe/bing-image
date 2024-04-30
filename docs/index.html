@@ -14,26 +14,26 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="msvalidate.01" content="D054E626588F5D8BD7C374BE96855957" />
     <meta name="keywords" content="必应壁纸,bing wallpaper,每日一图, 每日必应壁纸" />
-    <link rel="icon" type="image/vnd.microsoft.icon" href="static/img/favicon-2.ico" />
+    <link rel="icon" type="image/vnd.microsoft.icon" href="static/img/favicon-3.ico" />
     <link rel="preconnect" href="./" />
     <link rel="dns-prefetch" href="./" />
     <!-- 安卓平台 chrome -->
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="static/img/favicon-2.ico">
+    <link rel="icon" sizes="192x192" href="static/img/favicon-3.ico">
     <!-- ios平台 safari -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="必应壁纸 - 每日一图" />
-    <link rel="apple-touch-icon-precomposed" href="static/img/favicon-2.ico">
-    <link rel="apple-touch-icon" sizes="57x57" href="static/img/favicon-2.ico" />
-    <link rel="apple-touch-icon" sizes="60x60" href="static/img/favicon-2.ico" />
-    <link rel="apple-touch-icon" sizes="72x72" href="static/img/favicon-2.ico" />
-    <link rel="apple-touch-icon" sizes="76x76" href="static/img/favicon-2.ico" />
-    <link rel="apple-touch-icon" sizes="120x120" href="static/img/favicon-2.ico" />
-    <link rel="apple-touch-icon" sizes="144x144" href="static/img/favicon-2.ico" />
-    <link rel="apple-touch-icon" sizes="152x152" href="static/img/favicon-2.ico" />
+    <link rel="apple-touch-icon-precomposed" href="static/img/favicon-3.ico">
+    <link rel="apple-touch-icon" sizes="57x57" href="static/img/favicon-3.ico" />
+    <link rel="apple-touch-icon" sizes="60x60" href="static/img/favicon-3.ico" />
+    <link rel="apple-touch-icon" sizes="72x72" href="static/img/favicon-3.ico" />
+    <link rel="apple-touch-icon" sizes="76x76" href="static/img/favicon-3.ico" />
+    <link rel="apple-touch-icon" sizes="120x120" href="static/img/favicon-3.ico" />
+    <link rel="apple-touch-icon" sizes="144x144" href="static/img/favicon-3.ico" />
+    <link rel="apple-touch-icon" sizes="152x152" href="static/img/favicon-3.ico" />
     <!-- win8以上 平台 磁贴 -->
-    <meta name="msapplication-TileImage" content="static/img/favicon-2.ico">
+    <meta name="msapplication-TileImage" content="static/img/favicon-3.ico">
     <meta name="msapplication-TileColor" content="#0e90d2">
     <link rel="preload" type="font/woff2" href="static/fonts/fontawesome-webfont.woff2?v=4.7.0" as="font" crossorigin />
     <link rel="preload" href="static/js/sql-wasm.wasm" as="fetch" crossorigin />
@@ -43,7 +43,8 @@
     <link rel="stylesheet" type="text/css" href="static/css/index.css" />
 </head>
 
-<body>
+<body class="me-theme-light"
+    onload="document.body.className = window.sessionStorage.getItem('themeClass') || 'me-theme-light';">
     <!-- !ME FULL LOAD -->
     <div id="me-full-load" class="me-full-load">
         <div class="me-load-mask w3-modal">
@@ -58,12 +59,17 @@
         <div class="w3-bar w3-auto">
             <div class="w3-bar-item">
                 <a href="./" target="_self">
-                    <img src="static/img/favicon-1.ico" style="vertical-align:middle;" />
+                    <img class="w3-image" src="static/img/favicon-3.ico" style="vertical-align:middle;" width="32"
+                        height="32" />
                 </a>
                 <span class="w3-xlarge" style="vertical-align:middle;">必应壁纸 每日一图</span>
             </div>
             <div class="w3-bar-item w3-right w3-xlarge">
-                <i class="fa fa-sun-o" onclick="this.classList.toggle('fa-moon-o');this.classList.toggle('fa-sun-o');"
+                <i class="fa fa-sun-o w3-large" onclick="this.classList.toggle('fa-moon-o');
+                    this.classList.toggle('fa-sun-o');
+                    document.body.classList.toggle('me-theme-dark');
+                    document.body.classList.toggle('me-theme-light');
+                    window.sessionStorage.setItem('themeClass', document.body.className);"
                     style="vertical-align:middle;"></i>
                 <a href="https://github.com/wefashe/bing-image" target="_blank" title="GitHub">
                     <i class="fa fa-github" style="vertical-align:middle;"></i>
@@ -133,7 +139,7 @@
 
 </body>
 <script type="text/javascript" src="static/js/sql-wasm.js"></script>
-<script async type="text/javascript" src="static/js/protect.js"></script>
+<!-- <script async type="text/javascript" src="static/js/protect.js"></script> -->
 <script async type="text/javascript" src="static/js/index.js"></script>
 
 </html>

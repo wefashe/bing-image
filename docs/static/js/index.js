@@ -590,6 +590,3 @@ document.addEventListener("keydown", function (event) {
 //   console.log('我的宽度是: ', this.naturalWidth);
 //   console.log('我的高度是: ', this.naturalHeight);
 // });
-
-
-

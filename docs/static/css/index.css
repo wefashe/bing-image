@@ -1,15 +1,44 @@
+/* 定义根作用域下的变量 */
+:root {
+    --theme-color: black;
+    --theme-background: white;
+    --color-scheme: light;
+}
+
+/* 更改dark类名下变量的取值 */
+.me-theme-dark {
+    --theme-color: white;
+    --theme-background: black;
+    --color-scheme: dark;
+}
+
+/* 更改pink类名下变量的取值 */
+.me-theme-light {
+    --theme-color: black;
+    --theme-background: white;
+    color-scheme: --light;
+}
+
 html {
     /* 滚动条出现造成页面晃动的问题 */
     overflow-y: scroll;
+}
+
+body {
+    transition: all .5s;
+    /* 使用变量 */
+    color: var(--theme-color, white);
+    background: var(--theme-background, black);
+    color-scheme: var(--color-scheme, light);
 }
 
 a {
     text-decoration: none;
 }
 
-.me-menu {
+/* .me-menu {
     background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
-}
+} */
 
 .me-card {
     /* 图片上面两个角圆角  */
@@ -24,7 +53,7 @@ a {
     top: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
+    /* background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea); */
 }
 
 .me-list-img:after {
