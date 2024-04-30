@@ -1,8 +1,19 @@
-/* 定义根作用域下的变量 */
-:root {
-    --theme-color: black;
-    --theme-background: white;
-    --color-scheme: light;
+/* Light mode */
+@media (prefers-color-scheme: light) {
+    :root {
+        --theme-color: black;
+        --theme-background: white;
+        --color-scheme: light;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --theme-color: white;
+        --theme-background: black;
+        --color-scheme: dark;
+    }
 }
 
 /* 更改dark类名下变量的取值 */
@@ -16,7 +27,7 @@
 .me-theme-light {
     --theme-color: black;
     --theme-background: white;
-    color-scheme: --light;
+    --color-scheme: light;
 }
 
 html {
@@ -27,8 +38,8 @@ html {
 body {
     transition: all .5s;
     /* 使用变量 */
-    color: var(--theme-color, white);
-    background: var(--theme-background, black);
+    color: var(--theme-color, black);
+    background: var(--theme-background, white);
     color-scheme: var(--color-scheme, light);
 }
 

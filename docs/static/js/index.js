@@ -590,3 +590,36 @@ document.addEventListener("keydown", function (event) {
 //   console.log('我的宽度是: ', this.naturalWidth);
 //   console.log('我的高度是: ', this.naturalHeight);
 // });
+
+const color = getComputedStyle(document.documentElement).getPropertyValue('--theme-background')
+const dark = localStorage.getItem('dark')
+if (dark == '1' || (!dark && color == 'black')) {
+  if (dark == '1') {
+    document.body.className = 'me-theme-dark';
+  }
+  document.getElementById('me-theme-btn').classList.remove('fa-moon-o');
+  document.getElementById('me-theme-btn').classList.add('fa-sun-o');
+};
+if (dark == '0' || (!dark && color == 'light')) {
+  if (dark == '0') {
+    document.body.className = 'me-theme-light';
+  }
+  document.getElementById('me-theme-btn').classList.remove('fa-sun-o');
+  document.getElementById('me-theme-btn').classList.add('fa-moon-o');
+};
+document.getElementById('me-theme-btn').onclick = function () {
+  const color = getComputedStyle(document.documentElement).getPropertyValue('--theme-background')
+  const dark = localStorage.getItem('dark')
+  if (dark == '1' || color == 'black') {
+    document.body.className = 'me-theme-light';
+    document.getElementById('me-theme-btn').classList.remove('fa-sun-o');
+    document.getElementById('me-theme-btn').classList.add('fa-moon-o');
+    localStorage.setItem('dark', '0');
+  }
+  if (dark == '0' || color == 'light') {
+    document.body.className = 'me-theme-dark';
+    document.getElementById('me-theme-btn').classList.remove('fa-moon-o');
+    document.getElementById('me-theme-btn').classList.add('fa-sun-o');
+    localStorage.setItem('dark', '1');
+  }
+}
