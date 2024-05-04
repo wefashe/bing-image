@@ -54,12 +54,16 @@ a {
 .me-background {
     color: var(--theme-color, black);
     background: var(--theme-background, white);
-    transition: background-color 0.5s ease, color 0.5s ease;
+    opacity: 1;
+    transition: all .5s;
 }
 
-/* .me-menu {
-    background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea);
-} */
+.me-menu:not(.me-background):hover {
+    color: var(--theme-color, black);
+    background: var(--theme-background, white);
+    opacity: 1;
+    transition: all .5s;
+}
 
 .me-card {
     /* 图片上面两个角圆角  */
