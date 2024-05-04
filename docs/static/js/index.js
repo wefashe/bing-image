@@ -230,20 +230,31 @@ function loadData(db) {
 
 dbFileGet(function (session) {
   hideElementById('me-full-load', true);
-  hideElementById('me-bottom-load', true);
+  hideElementById('me-bottom-load', false);
   loadData(session)
   lazyload()
   window.addEventListener('scroll', () => {
     // 浏览器滚动触发
-    if (isNearBottom()) {
-      hideElementById('me-bottom-load', false);
-      loadData(session)
+    if (pageIndex <= 2) {
+      if (isNearBottom()) {
+        hideElementById('me-bottom-loading', false);
+        loadData(session)
+        hideElementById('me-bottom-loading', true);
+      }
+    } else {
+      hideElementById('me-bottom-load-btn', false);
+      document.querySelector('#me-bottom-load-btn').onclick = (event) => {
+        this.onclick = null
+        hideElementById('me-bottom-load-btn', true);
+        hideElementById('me-bottom-loading', false);
+        loadData(session)
+        throttle(lazyload, 200)();
+        hideElementById('me-bottom-loading', true);
+      }
     }
     throttle(lazyload, 200)();
   });
 });
-
-
 
 document.querySelector('#image-list').onclick = (event) => {
   const target = event.target

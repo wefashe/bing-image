@@ -64,10 +64,12 @@
                 <span class="w3-xlarge" style="vertical-align:middle;">必应壁纸 每日一图</span>
             </div>
             <div class="w3-bar-item w3-right w3-xlarge">
-                <i id="me-theme-btn" class="fa fa-moon-o w3-large" style="vertical-align:middle;"></i>
+                <i id="me-theme-btn" class="fa fa-fw fa-moon-o w3-large" style="vertical-align:middle;"></i>
                 <a href="https://github.com/wefashe/bing-image" target="_blank" title="GitHub">
-                    <i class="fa fa-github" style="vertical-align:middle;"></i>
+                    <i class="fa fa-fw fa-github" style="vertical-align:middle;"></i>
                 </a>
+                <a href="mailto:wefashe@qq.com?subject=必应壁纸反馈建议"><i class="fa fa-envelope-o fa-fw"
+                        style="vertical-align:middle;"></i></a>
             </div>
         </div>
     </div>
@@ -125,10 +127,21 @@
     </div>
 
     <!-- !ME BOTTOM LOAD -->
-    <div id="me-bottom-load" class="me-bottom-load w3-hide">
-        <div class="w3-center">
+    <div id="me-bottom-load" class="me-bottom-load w3-center w3-padding w3-margin-top w3-hide">
+        <div id="me-bottom-loading" class="me-bottom-loading w3-hide">
             <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
         </div>
+        <div id="me-bottom-load-btn" class="me-bottom-load-btn w3-hide">
+            <input type="button" class="w3-button w3-round w3-border w3-small" value="加载更多">
+        </div>
+    </div>
+
+    <div class="me-copyright w3-center w3-padding">
+        <p class="copyright">
+            Copyright ©2020 -
+            <script>document.write(new Date().getFullYear());</script>
+            <a href="./">必应壁纸</a>
+        </p>
     </div>
 
 </body>
