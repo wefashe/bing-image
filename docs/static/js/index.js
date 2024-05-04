@@ -176,6 +176,12 @@ function loadData(db) {
       ['default', '往年今日'],
     ])
 
+    if (isToday && days == 0) {
+      document.querySelectorAll('.me-today-show').forEach(function (e) {
+        e.style.backgroundImage = "url(" + viewImg + ")";
+      });
+    }
+
     var copyrightlink = row.copyrightlink;
     try {
       var keyCode = new URL(row.copyrightlink).searchParams.get("q");
