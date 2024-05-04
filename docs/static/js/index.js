@@ -591,50 +591,87 @@ document.addEventListener("keydown", function (event) {
 //   console.log('我的高度是: ', this.naturalHeight);
 // });
 
-const color = getComputedStyle(document.documentElement).getPropertyValue('--theme-background')
-const dark = localStorage.getItem('dark')
-if (dark == '1' || (!dark && color == 'black')) {
-  if (dark == '1') {
-    document.body.className = 'me-theme-dark';
-  }
-  document.getElementById('me-theme-btn').classList.remove('fa-moon-o');
-  document.getElementById('me-theme-btn').classList.add('fa-sun-o');
-};
-if (dark == '0' || (!dark && color == 'light')) {
-  if (dark == '0') {
-    document.body.className = 'me-theme-light';
-  }
-  document.getElementById('me-theme-btn').classList.remove('fa-sun-o');
-  document.getElementById('me-theme-btn').classList.add('fa-moon-o');
-};
-document.getElementById('me-theme-btn').onclick = function () {
-  var dark = localStorage.getItem('dark')
+function checkDark() {
+  const dark = localStorage.getItem('dark')
   if (dark) {
-    if (dark == '0') {
-      document.body.className = 'me-theme-dark';
-      document.getElementById('me-theme-btn').classList.remove('fa-moon-o');
-      document.getElementById('me-theme-btn').classList.add('fa-sun-o');
-      localStorage.setItem('dark', '1');
-    }
     if (dark == '1') {
-      document.body.className = 'me-theme-light';
-      document.getElementById('me-theme-btn').classList.remove('fa-sun-o');
-      document.getElementById('me-theme-btn').classList.add('fa-moon-o');
-      localStorage.setItem('dark', '0');
+      // //存在暗色模式标识符，且标识符值为1
+      document.documentElement.setAttribute('data-theme', 'dark')
+      document.getElementById('me-theme-btn').classList.remove('fa-moon-o')
+      document.getElementById('me-theme-btn').classList.add('fa-sun-o');
     }
   } else {
-    const color = getComputedStyle(document.documentElement).getPropertyValue('--theme-background')
-    if (color == 'white') {
-      document.body.className = 'me-theme-dark';
-      document.getElementById('me-theme-btn').classList.remove('fa-moon-o');
+    // 不存在暗色模式标识符情况下，是否需要启用暗色模式
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // 媒体查询，用户系统是否启动暗色模式
+      document.documentElement.setAttribute('data-theme', 'dark')
+      document.getElementById('me-theme-btn').classList.remove('fa-moon-o')
       document.getElementById('me-theme-btn').classList.add('fa-sun-o');
-      localStorage.setItem('dark', '1');
-    }
-    if (color == 'black') {
-      document.body.className = 'me-theme-light';
-      document.getElementById('me-theme-btn').classList.remove('fa-sun-o');
+    } else if (matchMedia('(prefers-color-scheme: light)').matches) {
+      // 媒体查询，用户系统是否启动亮色模式
+      document.documentElement.removeAttribute('data-theme')
+      document.getElementById('me-theme-btn').classList.remove('fa-sun-o')
       document.getElementById('me-theme-btn').classList.add('fa-moon-o');
-      localStorage.setItem('dark', '0');
+    } else if (new Date().getHours() >= 21 || new Date().getHours() < 7) {
+      // 媒体查询不支持或未指定，使用时间判断，是不是到点了
+      document.documentElement.setAttribute('data-theme', 'dark')
+      document.getElementById('me-theme-btn').classList.remove('fa-moon-o')
+      document.getElementById('me-theme-btn').classList.add('fa-sun-o');
     }
   }
 }
+checkDark();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+  checkDark();
+});
+
+
+function swithDark() {
+  const dark = localStorage.getItem('dark')
+  if (dark) {
+    if (dark == '1') {
+      document.documentElement.removeAttribute('data-theme')
+      localStorage.setItem('dark', '0');
+      document.getElementById('me-theme-btn').classList.remove('fa-sun-o')
+      document.getElementById('me-theme-btn').classList.add('fa-moon-o');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark')
+      localStorage.setItem('dark', '1');
+      document.getElementById('me-theme-btn').classList.remove('fa-moon-o')
+      document.getElementById('me-theme-btn').classList.add('fa-sun-o');
+    }
+  } else {
+    if (document.documentElement.hasAttribute('data-theme')) {
+      document.documentElement.removeAttribute('data-theme')
+      localStorage.setItem('dark', '0');
+      document.getElementById('me-theme-btn').classList.remove('fa-sun-o')
+      document.getElementById('me-theme-btn').classList.add('fa-moon-o');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark')
+      localStorage.setItem('dark', '1');
+      document.getElementById('me-theme-btn').classList.remove('fa-moon-o')
+      document.getElementById('me-theme-btn').classList.add('fa-sun-o');
+    }
+  }
+}
+
+
+
+
+
+
+
+document.getElementById('me-theme-btn').onclick = function () {
+  swithDark()
+};
+
+
+
+
+
+
+
+
+
+
+// 
