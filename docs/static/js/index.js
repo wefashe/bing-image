@@ -176,12 +176,6 @@ function loadData(db) {
       ['default', '往年今日'],
     ])
 
-    if (isToday && days == 0) {
-      document.querySelectorAll('.me-today-show').forEach(function (e) {
-        e.style.backgroundImage = "url(" + viewImg + ")";
-      });
-    }
-
     var copyrightlink = row.copyrightlink;
     try {
       var keyCode = new URL(row.copyrightlink).searchParams.get("q");
@@ -189,6 +183,21 @@ function loadData(db) {
       copyrightlink = bing_api_prefix + `/search?q=${keyCode}&filters=HpDate:%22${row.startdate}_1600%22`
     } catch (err) {
       copyrightlink = '';
+    }
+
+    var title = row.title;
+    var copyright = row.copyright;
+    if (copyright) {
+      title = copyright.substring(0, copyright.indexOf('，', 0)) || copyright;
+      if (title.indexOf(' ', 0) > 0) {
+        title = title.substring(0, title.indexOf(' ', 0))
+      }
+    }
+
+    if (isToday && days == 0) {
+      document.querySelectorAll('.me-today-show').forEach(function (e) {
+        e.style.backgroundImage = "url(" + viewImg + ")";
+      });
     }
 
     // 渐进式图片
@@ -205,9 +214,9 @@ function loadData(db) {
                         <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(days) || tags.get('default') : '必应美图'}
                     </div>
                 </div>
-                <div class="w3-row w3-padding-small me-img-title" title="${row.title}">
+                <div class="w3-row w3-padding-small me-img-title" title="${title}">
                     <a href="${copyrightlink}" target="_blank" ${copyrightlink ? '' : 'onclick="return false" class="me-cursor-default"'}>
-                        ${row.title}
+                        ${title}
                     </a>
                 </div>
                 <div class="w3-row w3-padding-small w3-small me-meta">
