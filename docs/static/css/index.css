@@ -6,13 +6,14 @@
 }
 
 /* 黑色主题 */
-html[data-theme='dark'] {
-    --theme-color: white;
-    --theme-background: black;
+[data-theme='dark'] {
+    /* 色相、饱和度、亮度 */
+    --theme-color: hsl(228, 5%, 80%);
+    --theme-background: hsl(228, 5%, 15%);
     --theme-mode: dark;
 }
 
-html[data-theme='dark'] img {
+[data-theme='dark'] img {
     /* 在深色模式下图片的亮度比原来低点，对比度比原来高点，
     这样子图片的显示效果会柔和一点且用户看起来舒服点 */
     filter: brightness(0.8) contrast(1.2);
