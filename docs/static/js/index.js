@@ -240,6 +240,17 @@ dbFileGet(function (session) {
   loadData(session)
   lazyload()
   window.addEventListener('scroll', () => {
+    var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
+    var menu = document.getElementById('me-menu')
+    if (scrollTop > 5) {
+      if (!menu.classList.contains('me-background')) {
+        menu.classList.add('me-background')
+      }
+    } else {
+      if (menu.classList.contains('me-background')) {
+        menu.classList.remove('me-background')
+      }
+    }
     // 浏览器滚动触发
     if (pageIndex <= 2) {
       if (isNearBottom()) {
