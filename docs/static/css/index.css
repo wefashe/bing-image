@@ -23,6 +23,8 @@ html {
     /* 滚动条出现造成页面晃动的问题 */
     overflow-y: scroll;
     color-scheme: var(--theme-mode, light);
+    /* 使body高度最小为屏幕高度 */
+    height: 100%;
 }
 
 .me-gray {
@@ -39,6 +41,8 @@ body {
     color: var(--theme-color, black);
     background: var(--theme-background, white);
     transition: background-color 0.5s ease, color 0.5s ease;
+    /* 使body高度最小为屏幕高度 */
+    min-height: 100%;
 }
 
 a {
