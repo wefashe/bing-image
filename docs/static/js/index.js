@@ -665,13 +665,19 @@ document.getElementById('me-theme-btn').onclick = function () {
   swithDark()
 };
 
+// 悼念日网站变灰
+function mourningDay(dates) {
+  const today = chinaDate();
+  const month = today.getMonth() + 1;
+  const date = today.getDate();
+  for (var i = 0; i < dates.length; i++) {
+    if (month + '-' + date == dates[i]) {
+      document.documentElement.classList.add('me-gray')
+      break;
+    }
+  }
+}
 
-
-
-
-
-
-
-
-
-// 
+mourningDay([
+  '4-4', '12-13'
+])

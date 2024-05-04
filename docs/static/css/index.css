@@ -25,6 +25,16 @@ html {
     color-scheme: var(--theme-mode, light);
 }
 
+.me-gray {
+    /* 全站悼念模式 */
+    -webkit-filter: grayscale(1);
+    /* Old Chrome、Old Safari、Old Opera*/
+    filter: grayscale(1);
+    /* 现代浏览器标准 */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
+    /* IE */
+}
+
 body {
     color: var(--theme-color, black);
     background: var(--theme-background, white);
