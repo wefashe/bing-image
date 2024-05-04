@@ -2,13 +2,14 @@
 :root {
     --theme-color: black;
     --theme-background: white;
-    color-scheme: light dark;
+    --theme-mode: light;
 }
 
 /* 黑色主题 */
 html[data-theme='dark'] {
     --theme-color: white;
     --theme-background: black;
+    --theme-mode: dark;
 }
 
 html[data-theme='dark'] img {
@@ -20,6 +21,7 @@ html[data-theme='dark'] img {
 html {
     /* 滚动条出现造成页面晃动的问题 */
     overflow-y: scroll;
+    color-scheme: var(--theme-mode, light);
 }
 
 body {
