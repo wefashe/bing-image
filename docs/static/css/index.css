@@ -177,12 +177,6 @@ img.me-img-error::after {
     cursor: pointer;
 }
 
-.me-cursor-pointer:hover {
-    /* 鼠标滑过效果 */
-    color: black;
-    font-weight: bold;
-}
-
 .me-cursor-not-allowed {
     /* 光标呈现为红色的圈加一个斜杠，表示禁止的意思 */
     cursor: not-allowed;
