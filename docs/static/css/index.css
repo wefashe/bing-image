@@ -51,18 +51,19 @@ a {
     text-decoration: none;
 }
 
+.me-menu {
+    opacity: 0.3;
+    transition: opacity 1s ease-out, background-color 0.5s ease;
+}
+
 .me-background {
-    color: var(--theme-color, black);
     background: var(--theme-background, white);
-    opacity: 1;
-    transition: all .5s;
+    opacity: 0.9;
 }
 
 .me-menu:not(.me-background):hover {
-    color: var(--theme-color, black);
     background: var(--theme-background, white);
-    opacity: 1;
-    transition: all .5s;
+    opacity: 0.9;
 }
 
 .me-card {
