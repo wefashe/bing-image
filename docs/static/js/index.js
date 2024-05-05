@@ -67,7 +67,7 @@
  * 2、图标字体文件加载耗时
  * 3、Github Actions优化，是否可以直接部署
  */
-
+"use strict";
 // 前缀
 const bing_api_prefix = 'https://cn.bing.com';
 // 分页
