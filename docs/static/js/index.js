@@ -270,7 +270,7 @@ dbFileGet(function (session) {
     } else {
       hideElementById('me-bottom-load-btn', false);
       document.querySelector('#me-bottom-load-btn .w3-button').onclick = (event) => {
-        this.onclick = null
+        // this.onclick = null
         hideElementById('me-bottom-load-btn', true);
         hideElementById('me-bottom-loading', false);
         loadData(session)
