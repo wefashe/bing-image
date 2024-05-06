@@ -154,8 +154,9 @@ function loadData(db) {
     // 渐进大图
     const bigImg = bing_api_prefix + `${uhdUrl}&w=384&h=216`;
 
-    const viewCount = Math.floor(Math.random() * (100 - 1000) + 1000);
-    const downCount = Math.floor(Math.random() * (100 - viewCount) + 1000);
+    // Math.floor(Math.random()*(max-min+1))+min  生成 [ min, max ] 范围内的随机整数（大于等于min，小于等于max）
+    const downCount = Math.floor(Math.random() * (1000 - 100 + 1) + 100);
+    const viewCount = Math.floor(Math.random() * (1000 - downCount + 1) + downCount);
 
     // 20210101转为2021-01-01
     const date8 = row.enddate;
@@ -203,7 +204,7 @@ function loadData(db) {
     // 渐进式图片
     content += `
     <div class="w3-col l3 m4 s6 w3-margin-top">
-        <div class="w3-card w3-hover-shadow w3-round-large me-card" data-view=${viewImg}>
+        <div class="w3-card w3-hover-shadow w3-round-large me-card">
             <div class="me-list-img w3-center">
                 <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
                 <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
@@ -222,8 +223,8 @@ function loadData(db) {
                 <div class="w3-row w3-padding-small w3-small me-meta">
                     <div class="w3-left w3-show-inline-block"><i class="fa fa-clock-o"></i> ${dateShow}</div>
                     <div class="w3-right w3-show-inline-block w3-row-padding">
-                        <div class="w3-show-inline-block"><i class="fa fa-eye me-cursor-pointer"></i> <span>${viewCount}</span></div>
-                        <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer"></i> <span>${downCount}</span></div>
+                        <div class="w3-show-inline-block"><i class="fa fa-eye"></i> <span>${viewCount}</span></div>
+                        <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer" data-view=${viewImg}></i> <span>${downCount}</span></div>
                     </div>
                 </div>
             </div>
@@ -289,10 +290,7 @@ document.querySelector('#image-list').onclick = (event) => {
     preview(target)
   }
   if (target.classList.contains('fa-download')) {
-    download(target, target.parentNode.parentNode.parentNode.parentNode.getAttribute('data-view'), true);
-  }
-  if (target.classList.contains('fa-eye')) {
-    download(target, target.parentNode.parentNode.parentNode.parentNode.getAttribute('data-view'), false);
+    download(target, target.getAttribute('data-view'), true);
   }
 }
 
@@ -397,7 +395,7 @@ function download(element, url, download) {
       const tag = document.createElement('a');
       tag.href = imageUrl;
       if (download) {
-        tag.download = url.substring(url.lastIndexOf('id=') + 3, url.length) || ""
+        tag.download = url.substring(url.indexOf('=') + 1, url.indexOf('&')) || ""
       } else {
         tag.target = '_blank';
         // 堵住钓鱼安全漏洞
