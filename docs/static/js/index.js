@@ -280,6 +280,7 @@ dbFileGet(function (session) {
     }
     throttle(lazyload, 200)();
   });
+  // window.addEventListener('load', lazyload, false);或document.addEventListener('DOMContentLoaded', lazyload);
 });
 
 document.querySelector('#image-list').onclick = (event) => {
@@ -311,13 +312,14 @@ document.querySelector('#image-list').onclick = (event) => {
 // 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
   document.querySelectorAll('img[data-big]').forEach(function (img) {
-    if (isViewArea(img)) {
+    if (isViewArea(img) && img.complete) {
       var image = new Image();
       image.onload = function () {
         image.onload = null;
         img.onload = function () {
           img.onload = null;
           img.removeAttribute('data-big');
+          img.classList.remove('me-lazy');
         }
         img.src = image.src;
       }
