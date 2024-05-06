@@ -453,10 +453,10 @@ function chinaDate(timeString) {
 function changeDate(date, days) {
   var date_str = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
   var date_obj = chinaDate(date_str.replace(/-/g, "/"));
+  date_obj = new Date(date_obj.setDate(date_obj.getDate() + days));
   var year = date_obj.getFullYear();
   var month = date_obj.getMonth() + 1;
-  days = days || 0
-  var day = date_obj.getDate() + days;
+  var day = date_obj.getDate();
   return year + month.toString().padStart(2, '0') + day.toString().padStart(2, '0')
 }
 
@@ -472,6 +472,9 @@ function showImg(date) {
   }
   if (!imgShowObj) {
     const img_obj = document.querySelectorAll(`#image-list img[data-date= '${date}']`)[0];
+    if (!img_obj) {
+      return
+    }
     imgShowObj = new Image();
     imgShowObj.onload = function () {
       imgShowObj.classList.remove('w3-hide');
