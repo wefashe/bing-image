@@ -223,6 +223,15 @@ img.me-img-error::after {
     cursor: zoom-out;
 }
 
+.me-cursor-grab {
+    /* 光标手抓手势，伸手状态 */
+    cursor: grab;
+}
+
+.me-cursor-grabbing {
+    /* 光标手抓手势，抓取状态 */
+    cursor: grabbing;
+}
 
 .me-view-mask {
     /* 遮罩层 */
@@ -234,4 +243,12 @@ img.me-img-error::after {
 
 .me-big-img-view {
     background-size: cover;
+}
+
+.me-big-img-show:hover {
+    cursor: grab;
+}
+
+.me-big-img-show:active {
+    cursor: grabbing;
 }

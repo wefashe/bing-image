@@ -480,7 +480,7 @@ function showImg(date) {
     imgShowObj.classList.add('w3-hide');
     imgShowObj.setAttribute('data-date', date);
     imgShowObj.classList.add('w3-image');
-    imgShowObj.classList.add('w3-animate-opacity');
+    // imgShowObj.classList.add('w3-animate-opacity');
     bigImgView.appendChild(imgShowObj)
   } else {
     imgShowObj.classList.remove('w3-hide');
@@ -515,8 +515,8 @@ function preview(img) {
   const sizeFunc = function () {
     sizeIcon.classList.toggle("fa-search-plus");
     sizeIcon.classList.toggle("fa-search-minus");
-    bigImgView.classList.toggle("me-cursor-zoom-in");
-    bigImgView.classList.toggle("me-cursor-zoom-out");
+    // bigImgView.classList.toggle("me-cursor-zoom-in");
+    // bigImgView.classList.toggle("me-cursor-zoom-out");
     bigImgView.classList.toggle("w3-threequarter");
     bigImgView.classList.toggle("w3-col");
   };
@@ -524,12 +524,12 @@ function preview(img) {
   const closeBtn = document.getElementById('me-view-close-btn')
   const clickFunc = function () {
     view.classList.add('w3-hide');
-    sizeIcon.classList.add("fa-search-plus");
-    sizeIcon.classList.remove("fa-search-minus");
-    bigImgView.classList.add("me-cursor-zoom-in");
-    bigImgView.classList.remove("me-cursor-zoom-out");
-    bigImgView.classList.add("w3-threequarter");
-    bigImgView.classList.remove("w3-col");
+    // sizeIcon.classList.add("fa-search-plus");
+    // sizeIcon.classList.remove("fa-search-minus");
+    // bigImgView.classList.add("me-cursor-zoom-in");
+    // bigImgView.classList.remove("me-cursor-zoom-out");
+    // bigImgView.classList.add("w3-threequarter");
+    // bigImgView.classList.remove("w3-col");
     closeBtn.removeEventListener('click', clickFunc);
     sizeBtn.removeEventListener('click', sizeFunc)
     bigImgView.removeEventListener('click', sizeFunc)
@@ -538,7 +538,7 @@ function preview(img) {
 
   closeBtn.addEventListener("click", clickFunc);
   sizeBtn.addEventListener("click", sizeFunc);
-  bigImgView.addEventListener("click", sizeFunc);
+  // bigImgView.addEventListener("click", sizeFunc);
   // view.addEventListener("mousewheel", wheelFunc);
 
   // const touchFunc = function (event) {
@@ -556,6 +556,11 @@ function preview(img) {
 
   // }
   // document.addEventListener('touchstart', touchFunc, false);
+
+  // bigImgView.ondragstart = function (e) {
+  //   this.classList.remove('me-cursor-grab')
+  //   this.classList.add('me-cursor-grabbing');
+  // }
 
   const date = img.getAttribute('data-date')
   showImg(date)
