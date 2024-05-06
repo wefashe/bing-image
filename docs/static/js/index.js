@@ -543,6 +543,22 @@ function preview(img) {
   bigImgView.addEventListener("click", sizeFunc);
   // view.addEventListener("mousewheel", wheelFunc);
 
+  // const touchFunc = function (event) {
+  //   // 禁止滚动
+  //   event.preventDefault();
+  //   var touch = event.targetTouches[0];
+  //   const x = touch.pageX, y = touch.pageY;
+  //   if (Math.abs(x) > Math.abs(y)) {
+  //     // 水平滑
+  //   } else {
+  //     // 竖直滑
+  //   }
+  //   const start = new Date();
+  //   const isScrolling = Math.abs(x) < Math.abs(y) ? 1 : 0;
+
+  // }
+  // document.addEventListener('touchstart', touchFunc, false);
+
   const date = img.getAttribute('data-date')
   showImg(date)
 }
