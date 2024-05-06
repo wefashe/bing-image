@@ -116,11 +116,11 @@ function isNearBottom() {
 // 判断一个元素是否在可视区域, 有3种方式
 function isViewArea(element) {
   // 浏览器视口的高度
-  const viewPortHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  const viewPortHeight = document.body.clientHeight || document.documentElement.clientHeight || window.innerHeight;
   // 滚动轴滚动的距离
   const offsetTop = element.offsetTop
   // 图片的头部距离浏览器顶部的高度
-  var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
+  var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
   // 第一种 offsetTop、scrollTop
   const top = offsetTop - scrollTop
   // const top = element.getBoundingClientRect().top
@@ -249,7 +249,7 @@ dbFileGet(function (session) {
   loadData(session)
   lazyload()
   window.addEventListener('scroll', () => {
-    var scrollTop = window.screenY || document.documentElement.scrollTop || document.body.scrollTop;
+    var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
     var menu = document.getElementById('me-menu')
     if (scrollTop > 5) {
       if (!menu.classList.contains('me-background')) {
@@ -297,14 +297,14 @@ document.querySelector('#image-list').onclick = (event) => {
 
 
 // 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
-function preloader(id) {
-  if (!id) return;
-  var image_obj = document.querySelectorAll(`.me - img img[data - date= '${id}']`)[0];
-  var dataSrc = image_obj.getAttribute('data-src');
-  if (!dataSrc) return;
-  var big_image = new Image();
-  big_image.src = dataSrc;
-}
+// function preloader(id) {
+//   if (!id) return;
+//   var image_obj = document.querySelectorAll(`.me - img img[data - date= '${id}']`)[0];
+//   var dataSrc = image_obj.getAttribute('data-src');
+//   if (!dataSrc) return;
+//   var big_image = new Image();
+//   big_image.src = dataSrc;
+// }
 
 
 
