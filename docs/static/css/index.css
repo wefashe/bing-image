@@ -132,9 +132,9 @@ a {
     filter: blur(3px);
 }
 
-.me-list-img>img:not(.me-lazy) {
+.me-img-complete {
     filter: blur(0);
-    transition: all 1s;
+    transition: all .5s;
 }
 
 .me-meta {

@@ -195,9 +195,15 @@ function loadData(db) {
       }
     }
 
-    if (isToday && days == 0) {
+    if (content.length == 0) {
       document.querySelectorAll('.me-today-show').forEach(function (e) {
-        e.style.backgroundImage = "url(" + viewImg + ")";
+        var img = new Image();
+        img.onload = function () {
+          img.onload = null;
+          e.classList.add('me-img-complete');
+        };
+        img.src = viewImg;
+        e.style.backgroundImage = "url(" + viewImg + "), url(" + bigImg + "), url(" + insImg + ")";
       });
     }
 
@@ -305,23 +311,32 @@ document.querySelector('#image-list').onclick = (event) => {
 //   big_image.src = dataSrc;
 // }
 
-
+function imgBigShow(img) {
+  var image = new Image();
+  image.onload = function () {
+    image.onload = null;
+    img.onload = function () {
+      img.onload = null;
+      img.removeAttribute('data-big');
+      img.classList.add('me-img-complete');
+    }
+    img.src = image.src;
+  }
+  image.src = img.getAttribute('data-big');
+}
 
 // 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
 function lazyload() {
   document.querySelectorAll('img[data-big]').forEach(function (img) {
-    if (isViewArea(img) && img.complete) {
-      var image = new Image();
-      image.onload = function () {
-        image.onload = null;
+    if (isViewArea(img)) {
+      if (img.complete) {
+        imgBigShow(img)
+      } else {
         img.onload = function () {
           img.onload = null;
-          img.removeAttribute('data-big');
-          img.classList.remove('me-lazy');
+          imgBigShow(img)
         }
-        img.src = image.src;
       }
-      image.src = img.getAttribute('data-big');
     }
   });
 }
