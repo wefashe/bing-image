@@ -71,7 +71,7 @@
 // 前缀
 const bing_api_prefix = 'https://cn.bing.com';
 // 分页
-let pageIndex = 1, pageSize = 24
+let pageIndex = 1, pageSize = 24, year = null, month = null;
 
 // 读取文件
 function dbFileGet(callback) {
@@ -130,10 +130,10 @@ function isViewArea(element) {
 }
 
 function loadData(db) {
-  var stmt = db.prepare("select * from wallpaper w order by enddate desc limit $pageSize offset ($pageIndex - 1) * $pageSize");
-
-  // select distinct substring(enddate,0,5) year from wallpaper order by enddate desc
-  // select * from wallpaper where substring(enddate, 1, 4) = '2024' and substring(enddate, 5, 2) = '03' order by enddate desc
+  var stmt = db.prepare(`select * from wallpaper w where 1 = 1
+  ${year ? ' and substring(enddate, 1, 4) = "' + year + '" ' : ' '}
+   ${month ? ' and substring(enddate, 5, 2) = "' + month + '" ' : ' '}
+  order by enddate desc limit $pageSize offset($pageIndex - 1) * $pageSize`);
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
   while (stmt.step()) {
@@ -237,21 +237,68 @@ function loadData(db) {
         </div >
     </div > `;
   }
+  if (content.length == 0) {
+    if (pageIndex == 1) {
+      document.getElementById('image-list').innerHTML = '';
+      content = '<div class="w3-center">没有图片了</div>';
+      hideElementById('me-bottom-load', true);
+    }
+  } else {
+    hideElementById('me-bottom-load', false);
+  }
   const imageList = document.getElementById('image-list');
   // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
   imageList.appendChild(document.createRange().createContextualFragment(content));
   pageIndex++;
-  if (content.length == 0) {
-    pageIndex = 1;
-  }
-  const childNodes = imageList.childNodes;
-  if (childNodes.length < pageSize) {
-    // 少于pageSize 时，自动重复补全
-    loadData(db)
-  }
+  // if (content.length == 0) {
+  //   pageIndex = 1;
+  // }
+  // const childNodes = imageList.childNodes;
+  // if (childNodes.length < pageSize) {
+  //   // 少于pageSize 时，自动重复补全
+  //   loadData(db)
+  // }
 }
 
 dbFileGet(function (session) {
+  const years = session.exec("select distinct substring(enddate,0,5) year from wallpaper order by enddate desc");
+  if (years.length > 0) {
+    const values = years[0]['values'];
+    if (values.length > 0) {
+      var content = '';
+      for (let year of values) {
+        content += `<div class="w3-bar-item w3-button w3-round w3-small" >${year[0]}</div>`;
+      }
+      const yearList = document.getElementById('me-year-list');
+      yearList.appendChild(document.createRange().createContextualFragment(content));
+    }
+  }
+  document.querySelector('#me-filter').onclick = (event) => {
+    const target = event.target
+    if (target.classList.contains('w3-red')) {
+      return
+    }
+    if (target.classList.contains('w3-button')) {
+      var childrenNodes = target.parentNode.children;
+      for (let node of childrenNodes) {
+        node.classList.remove('w3-red');
+      }
+      target.classList.add('w3-red');
+      year = document.querySelector('#me-year-list > .w3-red')?.innerText;
+      if (year == '全部') {
+        year = null;
+      }
+      month = document.querySelector('#me-month-list > .w3-red')?.innerText;
+      if (month == '全部') {
+        month = null;
+      }
+      document.getElementById('image-list').innerHTML = '';
+      pageIndex = 1;
+      loadData(session)
+    }
+  }
+
+
   hideElementById('me-full-load', true);
   hideElementById('me-bottom-load', false);
   loadData(session)
@@ -271,7 +318,7 @@ dbFileGet(function (session) {
     }
     // 浏览器滚动触发
     if (pageIndex <= 2) {
-      if (isNearBottom()) {
+      if (isNearBottom() && !(pageIndex == 1 && year && month)) {
         hideElementById('me-bottom-loading', false);
         loadData(session)
         hideElementById('me-bottom-loading', true);
