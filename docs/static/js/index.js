@@ -282,8 +282,10 @@ dbFileGet(function (session) {
       var childrenNodes = target.parentNode.children;
       for (let node of childrenNodes) {
         node.classList.remove('w3-red');
+        node.classList.remove('w3-hover-red');
       }
       target.classList.add('w3-red');
+      target.classList.add('w3-hover-red');
       year = document.querySelector('#me-year-list > .w3-red')?.innerText;
       if (year == '全部') {
         year = null;
@@ -294,10 +296,10 @@ dbFileGet(function (session) {
       }
       document.getElementById('image-list').innerHTML = '';
       pageIndex = 1;
-      loadData(session)
+      loadData(session);
+      lazyload();
     }
   }
-
 
   hideElementById('me-full-load', true);
   hideElementById('me-bottom-load', false);
