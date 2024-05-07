@@ -238,7 +238,8 @@ function loadData(db) {
     </div > `;
   }
   const imageList = document.getElementById('image-list');
-  imageList.innerHTML += content;
+  // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
+  imageList.appendChild(document.createRange().createContextualFragment(content));
   pageIndex++;
   if (content.length == 0) {
     pageIndex = 1;
