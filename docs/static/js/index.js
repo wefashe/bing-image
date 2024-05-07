@@ -326,7 +326,8 @@ dbFileGet(function (session) {
         lazyload();
       }
     }
-    document.getElementById('me-filter').classList.toggle('w3-hide')
+    filter.classList.toggle('w3-hide')
+    this.classList.toggle('w3-text-red')
   }
 
   hideElementById('me-full-load', true);
