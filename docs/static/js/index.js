@@ -196,15 +196,15 @@ function loadData(db) {
     }
 
     if (pageIndex == 1 && content.length == 0) {
-      document.querySelectorAll('.me-today-show').forEach(function (e) {
-        var img = new Image();
-        img.onload = function () {
-          img.onload = null;
-          e.classList.add('me-img-complete');
-        };
-        img.src = viewImg;
-        e.style.backgroundImage = "url(" + viewImg + "), url(" + bigImg + "), url(" + insImg + ")";
-      });
+      const todayShow = document.getElementById('me-today-show');
+      var img = new Image();
+      img.onload = function () {
+        img.onload = null;
+        todayShow.classList.add('me-img-complete');
+      };
+      img.src = viewImg;
+      todayShow.style.backgroundImage = "url(" + viewImg + "), url(" + bigImg + "), url(" + insImg + ")";
+      document.getElementById('me-today-show');
     }
 
     // 渐进式图片
@@ -256,9 +256,10 @@ dbFileGet(function (session) {
   loadData(session)
   lazyload()
   window.addEventListener('scroll', () => {
+    const height = document.getElementById('me-today-show').clientHeight;
     var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
     var menu = document.getElementById('me-menu')
-    if (scrollTop > 5) {
+    if (scrollTop > height / 2) {
       if (!menu.classList.contains('me-background')) {
         menu.classList.add('me-background')
       }
