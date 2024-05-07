@@ -300,6 +300,34 @@ dbFileGet(function (session) {
       lazyload();
     }
   }
+  document.getElementById('me-history-btn').onclick = function () {
+    const filter = document.getElementById('me-filter');
+    var allcount = 0;
+    if (!filter.classList.contains('w3-hide')) {
+      filter.querySelectorAll('.w3-button').forEach(function (node) {
+        if (node.innerText == '全部') {
+          if (node.classList.contains('w3-red')) {
+            allcount += 1;
+          } else {
+            node.classList.add('w3-red');
+            node.classList.add('w3-hover-red');
+          }
+        } else {
+          node.classList.remove('w3-red');
+          node.classList.remove('w3-hover-red');
+        }
+      });
+      if (allcount != 2) {
+        document.getElementById('image-list').innerHTML = '';
+        year = null;
+        month = null;
+        pageIndex = 1;
+        loadData(session);
+        lazyload();
+      }
+    }
+    document.getElementById('me-filter').classList.toggle('w3-hide')
+  }
 
   hideElementById('me-full-load', true);
   hideElementById('me-bottom-load', false);
