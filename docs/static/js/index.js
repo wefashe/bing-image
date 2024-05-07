@@ -195,7 +195,7 @@ function loadData(db) {
       }
     }
 
-    if (content.length == 0) {
+    if (pageIndex == 1 && content.length == 0) {
       document.querySelectorAll('.me-today-show').forEach(function (e) {
         var img = new Image();
         img.onload = function () {
