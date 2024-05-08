@@ -303,8 +303,11 @@ dbFileGet(function (session) {
   document.getElementById('me-history-btn').onclick = function () {
     const filter = document.getElementById('me-filter');
     var allcount = 0;
-    if (!filter.classList.contains('w3-hide')) {
-      filter.querySelectorAll('.w3-button').forEach(function (node) {
+    const dateObj = chinaDate();
+    const year_str = dateObj.getFullYear().toString();
+    const month_str = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    filter.querySelectorAll('.w3-button').forEach(function (node) {
+      if (!filter.classList.contains('w3-hide')) {
         if (node.innerText == '全部') {
           if (node.classList.contains('w3-red')) {
             allcount += 1;
@@ -316,15 +319,32 @@ dbFileGet(function (session) {
           node.classList.remove('w3-red');
           node.classList.remove('w3-hover-red');
         }
-      });
-      if (allcount != 2) {
-        document.getElementById('image-list').innerHTML = '';
+      } else {
+        if (node.innerText == year_str || node.innerText == month_str) {
+          if (node.classList.contains('w3-red')) {
+            allcount += 1;
+          } else {
+            node.classList.add('w3-red');
+            node.classList.add('w3-hover-red');
+          }
+        } else {
+          node.classList.remove('w3-red');
+          node.classList.remove('w3-hover-red');
+        }
+      }
+    });
+    if (allcount != 2) {
+      if (!filter.classList.contains('w3-hide')) {
         year = null;
         month = null;
-        pageIndex = 1;
-        loadData(session);
-        lazyload();
+      } else {
+        year = year_str;
+        month = month_str;
       }
+      document.getElementById('image-list').innerHTML = '';
+      pageIndex = 1;
+      loadData(session);
+      lazyload();
     }
     filter.classList.toggle('w3-hide')
     this.classList.toggle('w3-text-red')
