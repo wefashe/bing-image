@@ -346,8 +346,9 @@ dbFileGet(function (session) {
       loadData(session);
       lazyload();
     }
-    filter.classList.toggle('w3-hide')
-    this.classList.toggle('w3-text-red')
+    filter.classList.toggle('w3-hide');
+    this.classList.toggle('w3-text-red');
+    localStorage.setItem('filter', filter.classList.contains('w3-hide') ? '0' : '1');
   }
 
   hideElementById('me-full-load', true);
@@ -831,12 +832,6 @@ function swithDark() {
   }
 }
 
-
-
-
-
-
-
 document.getElementById('me-theme-btn').onclick = function () {
   swithDark()
 };
@@ -857,3 +852,8 @@ function mourningDay(dates) {
 mourningDay([
   '4-4', '12-13'
 ])
+
+const filter = localStorage.getItem('filter')
+if (filter && filter == 1) {
+  document.getElementById('me-filter').classList.remove('w3-hide');
+} 
