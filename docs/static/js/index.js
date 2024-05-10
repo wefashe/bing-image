@@ -358,6 +358,7 @@ dbFileGet(function (session) {
   if (filter && filter == 1) {
     const filter = document.getElementById('me-filter');
     filter.classList.remove('w3-hide');
+    document.getElementById('me-history-btn').classList.toggle('w3-text-red');
     var allcount = 0;
     const dateObj = chinaDate();
     const year_str = dateObj.getFullYear().toString();
