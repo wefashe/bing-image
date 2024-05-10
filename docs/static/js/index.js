@@ -353,8 +353,40 @@ dbFileGet(function (session) {
 
   hideElementById('me-full-load', true);
   hideElementById('me-bottom-load', false);
-  loadData(session)
-  lazyload()
+
+  const filter = localStorage.getItem('filter')
+  if (filter && filter == 1) {
+    const filter = document.getElementById('me-filter');
+    filter.classList.remove('w3-hide');
+    var allcount = 0;
+    const dateObj = chinaDate();
+    const year_str = dateObj.getFullYear().toString();
+    const month_str = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    filter.querySelectorAll('.w3-button').forEach(function (node) {
+      if (node.innerText == year_str || node.innerText == month_str) {
+        if (node.classList.contains('w3-red')) {
+          allcount += 1;
+        } else {
+          node.classList.add('w3-red');
+          node.classList.add('w3-hover-red');
+        }
+      } else {
+        node.classList.remove('w3-red');
+        node.classList.remove('w3-hover-red');
+      }
+    });
+    if (allcount != 2) {
+      year = year_str;
+      month = month_str;
+      document.getElementById('image-list').innerHTML = '';
+      pageIndex = 1;
+      loadData(session);
+      lazyload();
+    }
+  } else {
+    loadData(session)
+    lazyload()
+  }
   window.addEventListener('scroll', () => {
     const height = document.getElementById('me-today-show').clientHeight;
     var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
@@ -852,8 +884,3 @@ function mourningDay(dates) {
 mourningDay([
   '4-4', '12-13'
 ])
-
-const filter = localStorage.getItem('filter')
-if (filter && filter == 1) {
-  document.getElementById('me-filter').classList.remove('w3-hide');
-} 
