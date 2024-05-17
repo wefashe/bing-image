@@ -66,12 +66,10 @@ def get_image_coverstory(date='20240101'):
       url =f'https://cn.bing.com/search?q=1&filters=HpDate:"{date_utils.str_date_add(date, -1)}_1600"'
       resp = requests.get(url=url, headers=headers)
       resp.encoding = resp.apparent_encoding
-      resp = requests.get(url=url, headers=headers)
-      resp.encoding = resp.apparent_encoding
       soup = BeautifulSoup(resp.text, 'html.parser')
       # 格式化显示输出
       print(soup.prettify())
-      tags = soup.select('#encycloCanvas.encycloCanvas_Medium')
+      tags = soup.select('#ency_desc_full')
       print(tags)
 
 def get_today_image():
