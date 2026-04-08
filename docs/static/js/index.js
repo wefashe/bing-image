@@ -413,6 +413,17 @@ dbFileGet(function (session) {
     loadData(session)
     lazyload()
   }
+  // 加载更多按钮只绑定一次
+  const loadMoreBtn = document.querySelector('#me-bottom-load-btn .w3-button');
+  if (loadMoreBtn) {
+    loadMoreBtn.onclick = function () {
+      hideElementById('me-bottom-load-btn', true);
+      hideElementById('me-bottom-loading', false);
+      loadData(session)
+      lazyload()
+      hideElementById('me-bottom-loading', true);
+    }
+  }
   // 节流函数只创建一次，避免每次滚动都新建实例
   const throttledScroll = throttle(function () {
     const height = document.getElementById('me-today-show').clientHeight;
@@ -435,31 +446,14 @@ dbFileGet(function (session) {
         hideElementById('me-bottom-loading', true);
       }
     }
-  }, 200);
-  // 加载更多按钮只绑定一次
-  const loadMoreBtn = document.querySelector('#me-bottom-load-btn .w3-button');
-  if (loadMoreBtn) {
-    loadMoreBtn.onclick = function () {
-      hideElementById('me-bottom-load-btn', true);
-      hideElementById('me-bottom-loading', false);
-      loadData(session)
-      lazyload()
-      hideElementById('me-bottom-loading', true);
-    }
-  }
-  window.addEventListener('scroll', function () {
-    throttledScroll();
     // 加载更多按钮显示逻辑
     if (pageIndex > 2) {
       hideElementById('me-bottom-load-btn', false);
     }
-  });
-  // 图片懒加载节流
-  const throttledLazyload = throttle(lazyload, 200);
-  window.addEventListener('scroll', function () {
-    throttledLazyload();
-  });
-  // window.addEventListener('load', lazyload, false);或document.addEventListener('DOMContentLoaded', lazyload);
+    // 懒加载也合并到同一个滚动监听
+    lazyload();
+  }, 200);
+  window.addEventListener('scroll', throttledScroll);
 });
 
 document.querySelector('#image-list').onclick = (event) => {
@@ -540,25 +534,26 @@ function lazyload() {
   }
 }
 
-// 防抖节流
-function throttle(func, wait, immediate) {
+// 节流：固定间隔内最多执行一次
+function throttle(func, wait) {
   let last = 0, timer = null;
   return function (...args) {
     const now = Date.now();
     const context = this;
-    if (now - last < wait && !immediate) {
-      // 防抖 用于控制函数触发的频率
-      // 两次触发函数的时间小于延迟时间，走防抖逻辑
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-        last = now;
-        func.apply(context, args);
-      }, wait);
-    } else {
-      // 节流 触发必须间隔一段时间
-      // 函数两次触发事件已经大于延迟，必须要给用户一个反馈，走节流逻辑
+    const remaining = wait - (now - last);
+    if (remaining <= 0) {
+      // 间隔已过，立即执行
+      if (timer) { clearTimeout(timer); timer = null; }
       last = now;
       func.apply(context, args);
+    } else {
+      // 间隔未过，确保最后一次触发也能执行（尾随调用）
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        last = Date.now();
+        func.apply(context, args);
+        timer = null;
+      }, remaining);
     }
   };
 }
@@ -628,7 +623,7 @@ function download(element, url, download) {
       setTimeout(function () {
         document.body.removeChild(tag);
         tag.remove();
-        urlCreator.revokeObjectURL(blob);
+        urlCreator.revokeObjectURL(imageUrl);
         // 卡片上的下载计数（预览下载时跳过）
         if (element.nextElementSibling && element.nextElementSibling.classList.contains('me-download-count')) {
           const val = element.nextElementSibling.innerText || '0';
@@ -715,7 +710,7 @@ function showImg(date) {
   // 查数据库获取该日期的图片信息
   let rowData = null;
   if (dbSession) {
-    const stmt = dbSession.prepare("select * from wallpaper where enddate = ? limit 1");
+    const stmt = dbSession.prepare("select enddate, startdate, url, urlbase, copyright, copyrightlink, title from wallpaper where enddate = ? limit 1");
     stmt.bind([date]);
     if (stmt.step()) {
       rowData = stmt.getAsObject();
@@ -727,7 +722,7 @@ function showImg(date) {
   if (!rowData && dbSession && currentPreviewDirection !== 0) {
     const dir = currentPreviewDirection > 0 ? 'asc' : 'desc';
     const op = currentPreviewDirection > 0 ? '>' : '<';
-    const nearStmt = dbSession.prepare(`select * from wallpaper where enddate ${op} ? order by enddate ${dir} limit 1`);
+    const nearStmt = dbSession.prepare(`select enddate, startdate, url, urlbase, copyright, copyrightlink, title from wallpaper where enddate ${op} ? order by enddate ${dir} limit 1`);
     nearStmt.bind([date]);
     if (nearStmt.step()) {
       rowData = nearStmt.getAsObject();
@@ -771,6 +766,8 @@ function showImg(date) {
     if (imgs.length >= 10) {
       for (var i = 0; i < imgs.length - 5; i++) {
         if (imgs[i].classList.contains('w3-hide')) {
+          imgs[i].onload = null;
+          imgs[i].onerror = null;
           imgs[i].remove();
         }
       }
@@ -785,6 +782,12 @@ function showImg(date) {
     const newImg = new Image();
     newImg.onload = function () {
       newImg.classList.remove('w3-hide');
+      newImg.onload = null;
+    }
+    newImg.onerror = function () {
+      newImg.classList.remove('w3-hide');
+      newImg.classList.add('me-img-error');
+      newImg.onerror = null;
     }
     newImg.src = viewUrl;
     newImg.classList.add('w3-hide');
@@ -855,6 +858,9 @@ function preview(img) {
   };
   const clickFunc = function () {
     view.classList.add('w3-hide');
+    // 清理预览缓存图片的事件引用，防止内存泄漏
+    var cachedImgs = bigImgView.querySelectorAll('img[data-date]');
+    cachedImgs.forEach(function (img) { img.onload = null; img.onerror = null; });
     // 恢复页面滚动
     document.documentElement.classList.remove('me-no-scroll');
     document.body.classList.remove('me-no-scroll');
