@@ -862,7 +862,10 @@ function preview(img) {
 
   // 预览时键盘左右切换图片
   const previewKeyHandler = function (e) {
-    if (e.code === 'ArrowLeft') {
+    if (e.code === 'Escape') {
+      e.preventDefault();
+      clickFunc();
+    } else if (e.code === 'ArrowLeft') {
       e.preventDefault();
       plusImg(1);
     } else if (e.code === 'ArrowRight') {
