@@ -647,30 +647,30 @@ function showImg(date) {
 function preview(img) {
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
+  // 锁定页面滚动，记录并保持滚动位置
+  document.body.classList.add('me-no-scroll');
+  const scrollY = window.scrollY;
+  document.body.style.top = `-${scrollY}px`;
+
   const wheelFunc = function (e) {
-    console.log(e.wheelDelta);
     e.preventDefault();
+    e.stopPropagation();
     let n = 0;
     if (e.wheelDelta > 0) {
       n = 1;
     } else if (e.wheelDelta < 0) {
       n = -1;
-    } else {
-      n = 0;
     }
-    if (n == 0) {
-      return false;
-    }
+    if (n == 0) return;
     plusImg(n);
   };
+
   const sizeBtn = document.getElementById('me-view-size-btn');
   const sizeIcon = sizeBtn.getElementsByTagName('i')[0];
   const bigImgView = document.getElementById('me-big-img-show');
   const sizeFunc = function () {
     sizeIcon.classList.toggle("fa-search-plus");
     sizeIcon.classList.toggle("fa-search-minus");
-    // bigImgView.classList.toggle("me-cursor-zoom-in");
-    // bigImgView.classList.toggle("me-cursor-zoom-out");
     bigImgView.classList.toggle("w3-threequarter");
     bigImgView.classList.toggle("w3-col");
   };
@@ -678,43 +678,34 @@ function preview(img) {
   const closeBtn = document.getElementById('me-view-close-btn')
   const clickFunc = function () {
     view.classList.add('w3-hide');
-    // sizeIcon.classList.add("fa-search-plus");
-    // sizeIcon.classList.remove("fa-search-minus");
-    // bigImgView.classList.add("me-cursor-zoom-in");
-    // bigImgView.classList.remove("me-cursor-zoom-out");
-    // bigImgView.classList.add("w3-threequarter");
-    // bigImgView.classList.remove("w3-col");
+    // 恢复页面滚动
+    document.body.classList.remove('me-no-scroll');
+    document.body.style.top = '';
+    window.scrollTo(0, scrollY);
     closeBtn.removeEventListener('click', clickFunc);
-    sizeBtn.removeEventListener('click', sizeFunc)
-    bigImgView.removeEventListener('click', sizeFunc)
-    // view.removeEventListener("onmousewheel", wheelFunc);
+    sizeBtn.removeEventListener('click', sizeFunc);
+    bigImgView.removeEventListener('click', sizeFunc);
+    view.removeEventListener('wheel', wheelFunc);
+    document.removeEventListener('keydown', previewKeyHandler);
+  };
+
+  // 预览时键盘左右切换图片
+  const previewKeyHandler = function (e) {
+    if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      plusImg(1);
+    } else if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      plusImg(-1);
+    }
   };
 
   closeBtn.addEventListener("click", clickFunc);
   sizeBtn.addEventListener("click", sizeFunc);
-  // bigImgView.addEventListener("click", sizeFunc);
-  // view.addEventListener("mousewheel", wheelFunc);
-
-  // const touchFunc = function (event) {
-  //   // 禁止滚动
-  //   event.preventDefault();
-  //   var touch = event.targetTouches[0];
-  //   const x = touch.pageX, y = touch.pageY;
-  //   if (Math.abs(x) > Math.abs(y)) {
-  //     // 水平滑
-  //   } else {
-  //     // 竖直滑
-  //   }
-  //   const start = new Date();
-  //   const isScrolling = Math.abs(x) < Math.abs(y) ? 1 : 0;
-
-  // }
-  // document.addEventListener('touchstart', touchFunc, false);
-
-  // bigImgView.ondragstart = function (e) {
-  //   this.classList.remove('me-cursor-grab')
-  //   this.classList.add('me-cursor-grabbing');
-  // }
+  bigImgView.addEventListener("click", sizeFunc);
+  // 监听滚轮事件，阻止冒泡并切换图片
+  view.addEventListener('wheel', wheelFunc, { passive: false });
+  document.addEventListener('keydown', previewKeyHandler);
 
   const date = img.getAttribute('data-date')
   showImg(date)

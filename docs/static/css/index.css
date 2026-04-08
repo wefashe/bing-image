@@ -224,6 +224,11 @@ img.me-img-error {
     overflow: hidden;
 }
 
+/* 预览打开时锁定页面滚动 */
+body.me-no-scroll {
+    overflow: hidden !important;
+}
+
 .me-big-img-view {
     background-size: cover;
 }
