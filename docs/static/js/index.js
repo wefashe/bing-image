@@ -844,6 +844,15 @@ function preview(img) {
   };
   const clickFunc = function () {
     view.classList.add('w3-hide');
+    // 重置预览为正常模式
+    if (!bigImgView.classList.contains('w3-threequarter')) {
+      bigImgView.classList.add('w3-threequarter');
+      bigImgView.classList.remove('w3-col');
+    }
+    if (!sizeIcon.classList.contains('fa-search-plus')) {
+      sizeIcon.classList.add('fa-search-plus');
+      sizeIcon.classList.remove('fa-search-minus');
+    }
     // 清理预览缓存图片的事件引用，防止内存泄漏
     var cachedImgs = bigImgView.querySelectorAll('img[data-date]');
     cachedImgs.forEach(function (img) { img.onload = null; img.onerror = null; });
