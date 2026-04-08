@@ -214,9 +214,13 @@ img.me-img-error {
 .me-view-mask {
     /* 遮罩层 */
     display: inline-block;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: var(--theme-background, white);
     z-index: 9999;
     overflow: hidden;
+}
+
+.me-view-mask .w3-text-white {
+    color: var(--theme-color, black) !important;
 }
 
 /* 预览打开时锁定页面滚动 */

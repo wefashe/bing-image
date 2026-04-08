@@ -761,14 +761,19 @@ function showImg(date) {
     const viewUrl = bing_api_prefix + uhdUrl;
 
     const newImg = new Image();
+    // 显示加载动画
+    const lodding = bigImgView.querySelector('.me-lodding');
+    if (lodding) lodding.classList.remove('w3-hide');
     newImg.onload = function () {
       newImg.classList.remove('w3-hide');
       newImg.onload = null;
+      if (lodding) lodding.classList.add('w3-hide');
     }
     newImg.onerror = function () {
       newImg.classList.remove('w3-hide');
       newImg.classList.add('me-img-error');
       newImg.onerror = null;
+      if (lodding) lodding.classList.add('w3-hide');
     }
     newImg.src = viewUrl;
     newImg.classList.add('w3-hide');
