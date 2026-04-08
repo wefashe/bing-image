@@ -447,6 +447,12 @@ dbFileGet(function (session) {
         menu.classList.remove('me-background')
       }
     }
+    // 首页信息栏随滚动渐隐，图片上半部分遮住时刚好完全消失
+    var todayInfo = document.getElementById('me-today-info');
+    if (todayInfo && !todayInfo.classList.contains('w3-hide')) {
+      var ratio = Math.min(1, scrollTop / (height / 2));
+      todayInfo.style.opacity = 1 - ratio;
+    }
     // 浏览器滚动触发（数据全部加载完后跳过）
     if (!allDataLoaded && pageIndex <= 2) {
       if (isNearBottom() && !(pageIndex == 1 && year && month)) {
