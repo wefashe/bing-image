@@ -130,9 +130,11 @@ function isViewArea(element) {
 }
 
 function loadData(db) {
+  var yearParam = year ? year.replace(/[^\d]/g, '') : null;
+  var monthParam = month ? month.replace(/[^\d]/g, '') : null;
   var stmt = db.prepare(`select * from wallpaper w where 1 = 1
-  ${year ? ' and substring(enddate, 1, 4) = "' + year + '" ' : ' '}
-   ${month ? ' and substring(enddate, 5, 2) = "' + month + '" ' : ' '}
+  ${yearParam ? ' and substring(enddate, 1, 4) = "' + yearParam + '" ' : ' '}
+   ${monthParam ? ' and substring(enddate, 5, 2) = "' + monthParam + '" ' : ' '}
   order by enddate desc limit $pageSize offset($pageIndex - 1) * $pageSize`);
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
@@ -163,13 +165,13 @@ function loadData(db) {
     const dateShow = date8.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
     // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
     const dateObj = chinaDate(dateShow.replace(/-/g, "/"));
-    const year = dateObj.getFullYear();
-    const month = dateObj.getMonth();
-    const day = dateObj.getDate();
+    const imgYear = dateObj.getFullYear();
+    const imgMonth = dateObj.getMonth();
+    const imgDay = dateObj.getDate();
 
     const today = chinaDate();
-    const isToday = month == today.getMonth() && day == today.getDate();
-    const days = today.getFullYear() - year
+    const isToday = imgMonth == today.getMonth() && imgDay == today.getDate();
+    const days = today.getFullYear() - imgYear
     const tags = new Map([
       [0, '必应今日'],
       [1, '去年今日'],
@@ -602,7 +604,7 @@ function chinaDate(timeString) {
 function changeDate(date, days) {
   var date_str = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
   var date_obj = chinaDate(date_str.replace(/-/g, "/"));
-  date_obj = new Date(date_obj.setDate(date_obj.getDate() + days));
+  date_obj.setDate(date_obj.getDate() + days);
   var year = date_obj.getFullYear();
   var month = date_obj.getMonth() + 1;
   var day = date_obj.getDate();
@@ -612,7 +614,7 @@ function changeDate(date, days) {
 function showImg(date) {
   let imgShowObj = null;
   const bigImgView = document.getElementById('me-big-img-show');
-  const bigImgs = bigImgView.getElementsByTagName("img");;
+  const bigImgs = bigImgView.getElementsByTagName("img");
   for (let img_obj of bigImgs) {
     img_obj.classList.add('w3-hide');
     if (img_obj.getAttribute('data-date') == date) {
@@ -646,8 +648,8 @@ function preview(img) {
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
   const wheelFunc = function (e) {
-    console.log(e.wheelDelta)
-    e.preventDefault;
+    console.log(e.wheelDelta);
+    e.preventDefault();
     let n = 0;
     if (e.wheelDelta > 0) {
       n = 1;
@@ -721,7 +723,7 @@ function preview(img) {
 function plusImg(n) {
   let imgShowObj = null;
   const bigImgView = document.getElementById('me-big-img-show');
-  const bigImgs = bigImgView.getElementsByTagName("img");;
+  const bigImgs = bigImgView.getElementsByTagName("img");
   for (let img_obj of bigImgs) {
     if (!img_obj.classList.contains('w3-hide')) {
       imgShowObj = img_obj;
@@ -729,7 +731,9 @@ function plusImg(n) {
   }
 
   const slideDate = changeDate(imgShowObj.getAttribute('data-date'), n);
-  showImg(slideDate)
+  if (slideDate) {
+    showImg(slideDate)
+  }
 }
 
 function currentImg(date) {
@@ -822,7 +826,7 @@ function checkDark() {
       document.documentElement.removeAttribute('data-theme')
       document.getElementById('me-theme-btn').classList.remove('fa-sun-o')
       document.getElementById('me-theme-btn').classList.add('fa-moon-o');
-    } else if (new Date().getHours() >= 21 || new Date().getHours() < 7) {
+    } else if (chinaDate().getHours() >= 21 || chinaDate().getHours() < 7) {
       // 媒体查询不支持或未指定，使用时间判断，是不是到点了
       document.documentElement.setAttribute('data-theme', 'dark')
       document.getElementById('me-theme-btn').classList.remove('fa-moon-o')

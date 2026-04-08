@@ -54,9 +54,11 @@ document.ondragstart = function (e) {
   return false;
 }
 
-// 禁止鼠标拖动
+// 禁止鼠标拖动选中
 document.onselect = function (e) {
-  document.selection.empty();
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges();
+  }
   return false;
 }
 
