@@ -19,6 +19,20 @@
     filter: brightness(0.8) contrast(1.2);
 }
 
+/* 天气暗黑模式颜色反转 */
+#me-weather {
+    transition: filter 0.5s ease;
+}
+
+[data-theme='dark'] #me-weather {
+    filter: invert(0.85);
+    transition: filter 0.5s ease, opacity 1s ease-out;
+}
+
+[data-theme='dark'] .me-menu:not(.me-background):not(:hover) #me-weather {
+    opacity: 0;
+}
+
 html {
     /* 滚动条出现造成页面晃动的问题 */
     overflow-y: scroll;
