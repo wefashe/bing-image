@@ -234,7 +234,7 @@ function loadData(db) {
                     <div class="w3-left w3-show-inline-block"><i class="fa fa-clock-o"></i> ${dateShow}</div>
                     <div class="w3-right w3-show-inline-block w3-row-padding">
                         <div class="w3-show-inline-block"><i class="fa fa-eye"></i> <span>${viewCount}</span></div>
-                        <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer" data-view=${viewImg}></i> <span>${downCount}</span></div>
+                        <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer" data-view=${viewImg}></i> <span class="me-download-count">${downCount}</span></div>
                     </div>
                 </div>
             </div>
@@ -569,8 +569,11 @@ function download(element, url, download) {
         document.body.removeChild(tag);
         tag.remove();
         urlCreator.revokeObjectURL(blob);
-        const val = element.nextElementSibling.innerText || '0';
-        element.nextElementSibling.innerText = parseInt(val.trim()) + 1
+        // 卡片上的下载计数（预览下载时跳过）
+        if (element.nextElementSibling && element.nextElementSibling.classList.contains('me-download-count')) {
+          const val = element.nextElementSibling.innerText || '0';
+          element.nextElementSibling.innerText = parseInt(val.trim()) + 1
+        }
       }, 100);
     } else {
       element.classList.remove('me-cursor-pointer');
@@ -617,6 +620,8 @@ function changeDate(date, days) {
 // 记录当前预览显示的日期
 let currentPreviewDate = null;
 let currentPreviewDirection = 1; // 1=上一张(时间更早), -1=下一张(时间更新)
+// 当前预览图片的UHD下载地址
+let currentPreviewDownloadUrl = null;
 
 // 数据库日期边界缓存
 let dbMinDate = null;
@@ -677,6 +682,13 @@ function showImg(date) {
     showToast(currentPreviewDirection > 0 ? '没有更早的壁纸了' : '没有更新的壁纸了');
     return;
   }
+
+  // 构造UHD最高清下载地址
+  const dlIndex = rowData.url.indexOf('&');
+  let dlUrl = dlIndex != -1 ? rowData.url.substring(0, dlIndex) : rowData.url;
+  dlUrl += "&rf=LaDigue_UHD.jpg";
+  const dlUhdUrl = dlUrl.replace(dlUrl.substring(dlUrl.lastIndexOf('_') + 1, dlUrl.lastIndexOf('.')), 'UHD');
+  currentPreviewDownloadUrl = bing_api_prefix + dlUhdUrl;
 
   // 隐藏所有已显示的图
   for (let img_obj of bigImgs) {
@@ -766,6 +778,12 @@ function preview(img) {
   };
 
   const closeBtn = document.getElementById('me-view-close-btn')
+  const downloadBtn = document.getElementById('me-view-download-btn')
+  const downloadFunc = function () {
+    if (currentPreviewDownloadUrl) {
+      download(downloadBtn, currentPreviewDownloadUrl, true);
+    }
+  };
   const clickFunc = function () {
     view.classList.add('w3-hide');
     // 恢复页面滚动
@@ -776,6 +794,7 @@ function preview(img) {
     closeBtn.removeEventListener('click', clickFunc);
     sizeBtn.removeEventListener('click', sizeFunc);
     bigImgView.removeEventListener('click', sizeFunc);
+    downloadBtn.removeEventListener('click', downloadFunc);
     view.removeEventListener('wheel', wheelFunc);
     document.removeEventListener('keydown', previewKeyHandler);
   };
@@ -794,6 +813,7 @@ function preview(img) {
   closeBtn.addEventListener("click", clickFunc);
   sizeBtn.addEventListener("click", sizeFunc);
   bigImgView.addEventListener("click", sizeFunc);
+  downloadBtn.addEventListener("click", downloadFunc);
   // 监听滚轮事件，阻止冒泡并切换图片
   view.addEventListener('wheel', wheelFunc, { passive: false });
   document.addEventListener('keydown', previewKeyHandler);
