@@ -191,7 +191,7 @@ function loadData(db) {
     const imgDay = dateObj.getDate();
 
     const today = chinaDate();
-    const isToday = imgYear == today.getFullYear() && imgMonth == today.getMonth() && imgDay == today.getDate();
+    const isToday = imgMonth == today.getMonth() && imgDay == today.getDate();
     const days = today.getFullYear() - imgYear
     const tags = new Map([
       [0, '必应今日'],
