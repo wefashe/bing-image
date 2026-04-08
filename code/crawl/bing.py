@@ -16,6 +16,26 @@ import utils.date as date_utils
 # https://cn.bing.com/cnhp/life?currentDate=20180704
 fc = Factory.create()
 
+def _request_with_retry(url, headers, max_retries=3):
+    '''
+    带重试的请求
+    '''
+    import time
+    last_err = None
+    for i in range(max_retries):
+        try:
+            resp = requests.get(url=url, headers=headers, timeout=10)
+            resp.encoding = resp.apparent_encoding
+            if resp.status_code == 200 and resp.text.strip():
+                return resp
+            print(f'请求失败: status={resp.status_code}, body_len={len(resp.text)}, 第{i+1}次重试...')
+        except Exception as e:
+            last_err = e
+            print(f'请求异常: {e}, 第{i+1}次重试...')
+        if i < max_retries - 1:
+            time.sleep(2 * (i + 1))
+    raise Exception(f'请求失败，已重试{max_retries}次: {url}, {last_err}')
+
 def get_image_listByDays(days):
     '''
       按天数获取列表
@@ -33,8 +53,7 @@ def get_image_listByDays(days):
       'Referer': 'https://cn.bing.com'
     }
     url = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n={first_days}&mkt=zh-CN'
-    resp = requests.get(url=url, headers=headers)
-    resp.encoding = resp.apparent_encoding
+    resp = _request_with_retry(url, headers)
     first_list = resp.json()
     if second_days == 0:
         return first_list['images']
@@ -43,8 +62,7 @@ def get_image_listByDays(days):
       'Referer': 'https://cn.bing.com'
     }
     url = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=7&n={second_days + 1}&mkt=zh-CN'
-    resp = requests.get(url=url, headers=headers)
-    resp.encoding = resp.apparent_encoding
+    resp = _request_with_retry(url, headers)
     second_list = resp.json()
     return first_list['images'] + second_list['images'][1:]
 
