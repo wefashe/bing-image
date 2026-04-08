@@ -227,6 +227,14 @@ function loadData(db) {
       };
       img.src = viewImg;
       todayShow.style.backgroundImage = "url(" + viewImg + "), url(" + bigImg + "), url(" + insImg + ")";
+      // 更新首页信息栏
+      const todayInfo = document.getElementById('me-today-info');
+      if (todayInfo) {
+        todayInfo.querySelector('.me-view-info-title').textContent = row.title || '';
+        todayInfo.querySelector('.me-view-info-date').textContent = dateShow;
+        todayInfo.querySelector('.me-view-info-copyright').textContent = row.copyright || '';
+        todayInfo.classList.remove('w3-hide');
+      }
       document.getElementById('me-today-show');
     }
 
@@ -731,6 +739,10 @@ function showImg(date) {
     img_obj.classList.add('w3-hide');
   }
 
+  // 切换图片时先隐藏信息栏，等图片加载完再显示
+  const viewInfo = document.getElementById('me-view-info');
+  if (viewInfo) viewInfo.classList.add('w3-hide');
+
   // 检查是否已缓存该图
   let existInBig = null;
   for (let img_obj of bigImgs) {
@@ -741,6 +753,14 @@ function showImg(date) {
 
   if (existInBig && existInBig.parentNode === bigImgView) {
     existInBig.classList.remove('w3-hide');
+    // 缓存图片立即显示信息栏
+    if (viewInfo && rowData) {
+      const dateShow = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+      viewInfo.querySelector('.me-view-info-title').textContent = rowData.title || '';
+      viewInfo.querySelector('.me-view-info-date').textContent = dateShow;
+      viewInfo.querySelector('.me-view-info-copyright').textContent = rowData.copyright || '';
+      viewInfo.classList.remove('w3-hide');
+    }
   } else {
     // 限制预览缓存图片数量，防止内存泄漏
     var imgs = bigImgView.querySelectorAll('img[data-date]');
@@ -768,6 +788,14 @@ function showImg(date) {
       newImg.classList.remove('w3-hide');
       newImg.onload = null;
       if (lodding) lodding.classList.add('w3-hide');
+      // 图片加载完成后显示信息栏
+      if (viewInfo && rowData) {
+        const dateShow = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+        viewInfo.querySelector('.me-view-info-title').textContent = rowData.title || '';
+        viewInfo.querySelector('.me-view-info-date').textContent = dateShow;
+        viewInfo.querySelector('.me-view-info-copyright').textContent = rowData.copyright || '';
+        viewInfo.classList.remove('w3-hide');
+      }
     }
     newImg.onerror = function () {
       newImg.classList.remove('w3-hide');
@@ -844,6 +872,9 @@ function preview(img) {
   };
   const clickFunc = function () {
     view.classList.add('w3-hide');
+    // 隐藏信息栏
+    const viewInfo = document.getElementById('me-view-info');
+    if (viewInfo) viewInfo.classList.add('w3-hide');
     // 重置预览为正常模式
     if (!bigImgView.classList.contains('w3-threequarter')) {
       bigImgView.classList.add('w3-threequarter');
