@@ -76,6 +76,7 @@
 const bing_api_prefix = 'https://cn.bing.com';
 // 分页
 let pageIndex = 1, pageSize = 24, year = null, month = null;
+let allDataLoaded = false;
 // 全局数据库实例，供预览功能查询
 let dbSession = null;
 
@@ -138,9 +139,14 @@ function isViewArea(element) {
 function loadData(db) {
   var yearParam = year ? year.replace(/[^\d]/g, '') : null;
   var monthParam = month ? month.replace(/[^\d]/g, '') : null;
-  var stmt = db.prepare(`select * from wallpaper w where 1 = 1
-  ${yearParam ? ' and substring(enddate, 1, 4) = "' + yearParam + '" ' : ' '}
-   ${monthParam ? ' and substring(enddate, 5, 2) = "' + monthParam + '" ' : ' '}
+  // 用范围查询替代 substring 函数，确保索引生效
+  var conditions = '';
+  if (yearParam && monthParam) {
+    conditions = ' and enddate >= "' + yearParam + monthParam + '01" and enddate < "' + yearParam + monthParam + '32"';
+  } else if (yearParam) {
+    conditions = ' and enddate >= "' + yearParam + '0101" and enddate < "' + (parseInt(yearParam) + 1) + '0101"';
+  }
+  var stmt = db.prepare(`select enddate, startdate, url, urlbase, copyright, copyrightlink, title from wallpaper w where 1 = 1 ${conditions}
   order by enddate desc limit $pageSize offset($pageIndex - 1) * $pageSize`);
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
@@ -249,10 +255,14 @@ function loadData(db) {
     if (pageIndex == 1) {
       document.getElementById('image-list').innerHTML = '';
       content = '<div class="w3-center">没有图片了</div>';
-      hideElementById('me-bottom-load', true);
     }
+    hideElementById('me-bottom-load', true);
+    allDataLoaded = true;
   } else {
     hideElementById('me-bottom-load', false);
+  }
+  if (content.length == 0) {
+    return;
   }
   const imageList = document.getElementById('image-list');
   // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
@@ -270,7 +280,9 @@ function loadData(db) {
 
 dbFileGet(function (session) {
   dbSession = session;
-  const years = session.exec("select distinct substring(enddate,0,5) year from wallpaper order by enddate desc");
+  // 初始化懒加载观察器
+  initLazyObserver();
+  const years = session.exec("select distinct substr(enddate,1,4) year from wallpaper order by enddate desc");
   if (years.length > 0) {
     const values = years[0]['values'];
     if (values.length > 0) {
@@ -305,6 +317,7 @@ dbFileGet(function (session) {
       }
       document.getElementById('image-list').innerHTML = '';
       pageIndex = 1;
+      allDataLoaded = false;
       loadData(session);
       lazyload();
     }
@@ -352,6 +365,7 @@ dbFileGet(function (session) {
       }
       document.getElementById('image-list').innerHTML = '';
       pageIndex = 1;
+      allDataLoaded = false;
       loadData(session);
       lazyload();
     }
@@ -390,14 +404,17 @@ dbFileGet(function (session) {
       month = month_str;
       document.getElementById('image-list').innerHTML = '';
       pageIndex = 1;
+      allDataLoaded = false;
       loadData(session);
       lazyload();
     }
   } else {
+    allDataLoaded = false;
     loadData(session)
     lazyload()
   }
-  window.addEventListener('scroll', () => {
+  // 节流函数只创建一次，避免每次滚动都新建实例
+  const throttledScroll = throttle(function () {
     const height = document.getElementById('me-today-show').clientHeight;
     var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
     var menu = document.getElementById('me-menu')
@@ -410,25 +427,37 @@ dbFileGet(function (session) {
         menu.classList.remove('me-background')
       }
     }
-    // 浏览器滚动触发
-    if (pageIndex <= 2) {
+    // 浏览器滚动触发（数据全部加载完后跳过）
+    if (!allDataLoaded && pageIndex <= 2) {
       if (isNearBottom() && !(pageIndex == 1 && year && month)) {
         hideElementById('me-bottom-loading', false);
         loadData(session)
         hideElementById('me-bottom-loading', true);
       }
-    } else {
-      hideElementById('me-bottom-load-btn', false);
-      document.querySelector('#me-bottom-load-btn .w3-button').onclick = (event) => {
-        // this.onclick = null
-        hideElementById('me-bottom-load-btn', true);
-        hideElementById('me-bottom-loading', false);
-        loadData(session)
-        lazyload()
-        hideElementById('me-bottom-loading', true);
-      }
     }
-    throttle(lazyload, 200)();
+  }, 200);
+  // 加载更多按钮只绑定一次
+  const loadMoreBtn = document.querySelector('#me-bottom-load-btn .w3-button');
+  if (loadMoreBtn) {
+    loadMoreBtn.onclick = function () {
+      hideElementById('me-bottom-load-btn', true);
+      hideElementById('me-bottom-loading', false);
+      loadData(session)
+      lazyload()
+      hideElementById('me-bottom-loading', true);
+    }
+  }
+  window.addEventListener('scroll', function () {
+    throttledScroll();
+    // 加载更多按钮显示逻辑
+    if (pageIndex > 2) {
+      hideElementById('me-bottom-load-btn', false);
+    }
+  });
+  // 图片懒加载节流
+  const throttledLazyload = throttle(lazyload, 200);
+  window.addEventListener('scroll', function () {
+    throttledLazyload();
   });
   // window.addEventListener('load', lazyload, false);或document.addEventListener('DOMContentLoaded', lazyload);
 });
@@ -468,20 +497,47 @@ function imgBigShow(img) {
   image.src = img.getAttribute('data-big');
 }
 
-// 图片懒加载 可视区域判断是否加载完成，加载完成后自动替换
-function lazyload() {
-  document.querySelectorAll('img[data-big]').forEach(function (img) {
-    if (isViewArea(img)) {
-      if (img.complete) {
-        imgBigShow(img)
-      } else {
-        img.onload = function () {
-          img.onload = null;
-          imgBigShow(img)
+// IntersectionObserver 懒加载
+let lazyObserver = null;
+function initLazyObserver() {
+  if (lazyObserver || !('IntersectionObserver' in window)) return;
+  lazyObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        lazyObserver.unobserve(img);
+        if (img.complete) {
+          imgBigShow(img);
+        } else {
+          img.onload = function () {
+            img.onload = null;
+            imgBigShow(img);
+          }
         }
       }
-    }
-  });
+    });
+  }, { rootMargin: '200px 0px' });
+}
+
+// 图片懒加载：注册观察或回退到手动检测
+function lazyload() {
+  var lazyImgs = document.querySelectorAll('img[data-big]');
+  if (lazyObserver) {
+    lazyImgs.forEach(function (img) { lazyObserver.observe(img); });
+  } else {
+    lazyImgs.forEach(function (img) {
+      if (isViewArea(img)) {
+        if (img.complete) {
+          imgBigShow(img)
+        } else {
+          img.onload = function () {
+            img.onload = null;
+            imgBigShow(img)
+          }
+        }
+      }
+    });
+  }
 }
 
 // 防抖节流
@@ -710,6 +766,15 @@ function showImg(date) {
   if (existInBig && existInBig.parentNode === bigImgView) {
     existInBig.classList.remove('w3-hide');
   } else {
+    // 限制预览缓存图片数量，防止内存泄漏
+    var imgs = bigImgView.querySelectorAll('img[data-date]');
+    if (imgs.length >= 10) {
+      for (var i = 0; i < imgs.length - 5; i++) {
+        if (imgs[i].classList.contains('w3-hide')) {
+          imgs[i].remove();
+        }
+      }
+    }
     // 从数据库数据构造图片URL
     const index = rowData.url.indexOf('&');
     let url = index != -1 ? rowData.url.substring(0, index) : rowData.url;
