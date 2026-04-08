@@ -89,8 +89,17 @@ function dbFileGet(callback) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', "data/images.db", true);
     xhr.responseType = 'arraybuffer';
-    xhr.onload = e => {
-      callback(new SQL.Database(new Uint8Array(xhr.response)));
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        callback(new SQL.Database(new Uint8Array(xhr.response)));
+      } else {
+        hideElementById('me-full-load', true);
+        showToast('数据库加载失败，请刷新页面重试');
+      }
+    };
+    xhr.onerror = function () {
+      hideElementById('me-full-load', true);
+      showToast('网络错误，请刷新页面重试');
     };
     xhr.send();
   });
@@ -142,7 +151,7 @@ function loadData(db) {
   // 用范围查询替代 substring 函数，确保索引生效
   var conditions = '';
   if (yearParam && monthParam) {
-    conditions = ' and enddate >= "' + yearParam + monthParam + '01" and enddate < "' + yearParam + monthParam + '32"';
+    conditions = ' and enddate >= "' + yearParam + monthParam + '01" and enddate <= "' + yearParam + monthParam + '31"';
   } else if (yearParam) {
     conditions = ' and enddate >= "' + yearParam + '0101" and enddate < "' + (parseInt(yearParam) + 1) + '0101"';
   }
@@ -182,7 +191,7 @@ function loadData(db) {
     const imgDay = dateObj.getDate();
 
     const today = chinaDate();
-    const isToday = imgMonth == today.getMonth() && imgDay == today.getDate();
+    const isToday = imgYear == today.getFullYear() && imgMonth == today.getMonth() && imgDay == today.getDate();
     const days = today.getFullYear() - imgYear
     const tags = new Map([
       [0, '必应今日'],
@@ -268,14 +277,6 @@ function loadData(db) {
   // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
   imageList.appendChild(document.createRange().createContextualFragment(content));
   pageIndex++;
-  // if (content.length == 0) {
-  //   pageIndex = 1;
-  // }
-  // const childNodes = imageList.childNodes;
-  // if (childNodes.length < pageSize) {
-  //   // 少于pageSize 时，自动重复补全
-  //   loadData(db)
-  // }
 }
 
 dbFileGet(function (session) {
@@ -377,16 +378,16 @@ dbFileGet(function (session) {
   hideElementById('me-full-load', true);
   hideElementById('me-bottom-load', false);
 
-  const filter = localStorage.getItem('filter')
-  if (filter && filter == 1) {
-    const filter = document.getElementById('me-filter');
-    filter.classList.remove('w3-hide');
+  const savedFilter = localStorage.getItem('filter')
+  if (savedFilter === '1') {
+    const filterEl = document.getElementById('me-filter');
+    filterEl.classList.remove('w3-hide');
     document.getElementById('me-history-btn').classList.toggle('w3-text-red');
     var allcount = 0;
     const dateObj = chinaDate();
     const year_str = dateObj.getFullYear().toString();
     const month_str = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    filter.querySelectorAll('.w3-button').forEach(function (node) {
+    filterEl.querySelectorAll('.w3-button').forEach(function (node) {
       if (node.innerText == year_str || node.innerText == month_str) {
         if (node.classList.contains('w3-red')) {
           allcount += 1;
@@ -466,17 +467,6 @@ document.querySelector('#image-list').onclick = (event) => {
   }
 }
 
-
-// 图片预加载 小图片加载完成后自动替换，大图片懒加载替换
-// function preloader(id) {
-//   if (!id) return;
-//   var image_obj = document.querySelectorAll(`.me - img img[data - date= '${id}']`)[0];
-//   var dataSrc = image_obj.getAttribute('data-src');
-//   if (!dataSrc) return;
-//   var big_image = new Image();
-//   big_image.src = dataSrc;
-// }
-
 function imgBigShow(img) {
   var image = new Image();
   image.onload = function () {
@@ -487,6 +477,12 @@ function imgBigShow(img) {
       img.classList.add('me-img-complete');
     }
     img.src = image.src;
+  }
+  image.onerror = function () {
+    image.onerror = null;
+    // 大图加载失败，移除标记让错误处理接管
+    img.removeAttribute('data-big');
+    img.classList.add('me-img-complete');
   }
   image.src = img.getAttribute('data-big');
 }
@@ -591,13 +587,6 @@ function download(element, url, download) {
   xhr.onload = function () {
     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
       var blob = this.response;
-      // 文本下载
-      // const blob = new Blob(['你好123'], { type: 'text/plain' });
-      // var blob = new Blob([this.response], { type: 'image/png' });
-      // if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-      //   // 兼容IE/Edge
-      //   window.navigator.msSaveOrOpenBlob(blob, fileName)
-      // }
       var urlCreator = window.URL || window.webkitURL;
       // 将Blob转化为同源的url
       const imageUrl = urlCreator.createObjectURL(blob);
@@ -607,15 +596,7 @@ function download(element, url, download) {
         tag.download = url.substring(url.indexOf('=') + 1, url.indexOf('&')) || ""
       } else {
         tag.target = '_blank';
-        // 堵住钓鱼安全漏洞
         tag.rel = 'noopener noreferrer nofollow';
-        // 禁用右键和拖拽
-        // tag.oncontextmenu = function () {
-        //   return false;
-        // };
-        // tag.ondragstart = function () {
-        //   return false;
-        // }
       }
       tag.style.display = 'none';
       document.body.appendChild(tag);
@@ -882,6 +863,10 @@ function preview(img) {
     } else if (e.code === 'ArrowRight') {
       e.preventDefault();
       plusImg(-1);
+    } else if (e.code === 'ArrowUp') {
+      e.preventDefault();
+    } else if (e.code === 'Space') {
+      e.preventDefault();
     }
   };
 
@@ -907,6 +892,7 @@ function plusImg(n) {
       imgShowObj = img_obj;
     }
   }
+  if (!imgShowObj) return;
 
   const slideDate = changeDate(imgShowObj.getAttribute('data-date'), n);
   if (slideDate) {
@@ -915,40 +901,17 @@ function plusImg(n) {
   }
 }
 
-function currentImg(date) {
-  var i;
-  var bigImgs = document.getElementsByClassName("me-big-img");
-  for (i = 0; i < bigImgs.length; i++) {
-    bigImgs[i].style.display = "none";
-  }
-  var insImgs = document.getElementsByClassName("me-ins-img");
-  for (i = 0; i < insImgs.length; i++) {
-    insImgs[i].className = insImgs[i].className.replace(" w3-opacity-off", "");
-  }
-  bigImgs.querySelectorAll(`img[data - date= '${date}']`)[0].style.display = "block";
-  insImgs.querySelectorAll(`img[data - date= '${date}']`)[0].className += " w3-opacity-off";
-  slideDate = date;
-}
 
 
 // 图片全屏
 function keydownHandler(event) {
-  // 按空格键
   if (event.code == 'Space') {
     event.preventDefault();
     toggleFullScreen();
   }
-  // document.removeEventListener("keydown",keydownHandler,false);
 }
 // 监听按键
 document.addEventListener('keydown', keydownHandler);
-
-
-function fullscreenchangeHandler(event) {
-  // document.removeEventListener("fullscreenchange",fullscreenchangeHandler,fal  se);
-}
-// 监听全屏
-document.addEventListener('fullscreenchange', fullscreenchangeHandler);
 
 
 function toggleFullScreen() {
@@ -978,17 +941,10 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-// 获取真实图片长宽
-// myImage.addEventListener('onload', function () {
-//   console.log('我的宽度是: ', this.naturalWidth);
-//   console.log('我的高度是: ', this.naturalHeight);
-// });
-
 function checkDark() {
   const dark = localStorage.getItem('dark')
   if (dark) {
-    if (dark == '1') {
-      // //存在暗色模式标识符，且标识符值为1
+    if (dark === '1') {
       document.documentElement.setAttribute('data-theme', 'dark')
       document.getElementById('me-theme-btn').classList.remove('fa-moon-o')
       document.getElementById('me-theme-btn').classList.add('fa-sun-o');
@@ -1022,7 +978,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (ev
 function swithDark() {
   const dark = localStorage.getItem('dark')
   if (dark) {
-    if (dark == '1') {
+    if (dark === '1') {
       document.documentElement.removeAttribute('data-theme')
       localStorage.setItem('dark', '0');
       document.getElementById('me-theme-btn').classList.remove('fa-sun-o')
@@ -1068,3 +1024,10 @@ function mourningDay(dates) {
 mourningDay([
   '4-4', '12-13'
 ])
+
+// 设置版权年份
+var copyrightYear = document.getElementById('me-copyright-year');
+if (copyrightYear) {
+  copyrightYear.innerHTML = 'Copyright &copy; 2021-' + new Date().getFullYear() +
+    ' by <a href="https://github.com/wefashe/bing-image" target="_blank" style="cursor: auto;">wefashe</a>. All Rights Reserved.';
+}
