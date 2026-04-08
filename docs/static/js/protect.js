@@ -1,7 +1,4 @@
-修改：
-
-CSS 新增 html.me - no - scroll { overflow - y: hidden!important; }
-JS 在预览打开 / 关闭时同步对 document.documentElement（即 < html >）添加 / 移除 me - no - scroll 类// 禁止调试
+// 禁止调试
   (() => {
     function block() {
       if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {

@@ -272,10 +272,7 @@ dbFileGet(function (session) {
     if (values.length > 0) {
       var content = '';
       for (let year of values) {
-        修改：
-
-CSS 新增 html.me - no - scroll { overflow - y: hidden!important; }
-JS 在预览打开 / 关闭时同步对 document.documentElement（即 < html >）添加 / 移除 me - no - scroll 类        content += `<div class="w3-bar-item w3-button w3-round w3-small" >${year[0]}</div>`;
+        content += `<div class="w3-bar-item w3-button w3-round w3-small" >${year[0]}</div>`;
       }
       const yearList = document.getElementById('me-year-list');
       yearList.appendChild(document.createRange().createContextualFragment(content));
