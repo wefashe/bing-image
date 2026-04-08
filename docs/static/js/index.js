@@ -802,9 +802,9 @@ function preview(img) {
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
   // 锁定页面滚动，记录并保持滚动位置
+  const scrollY = window.scrollY;
   document.documentElement.classList.add('me-no-scroll');
   document.body.classList.add('me-no-scroll');
-  const scrollY = window.scrollY;
   document.body.style.top = `-${scrollY}px`;
 
   const wheelFunc = function (e) {
