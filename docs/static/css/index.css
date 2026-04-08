@@ -229,6 +229,10 @@ body.me-no-scroll {
     overflow: hidden !important;
 }
 
+html.me-no-scroll {
+    overflow-y: hidden !important;
+}
+
 /* 提示气泡 */
 .me-toast {
     position: fixed;

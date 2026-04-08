@@ -272,7 +272,10 @@ dbFileGet(function (session) {
     if (values.length > 0) {
       var content = '';
       for (let year of values) {
-        content += `<div class="w3-bar-item w3-button w3-round w3-small" >${year[0]}</div>`;
+        修改：
+
+CSS 新增 html.me - no - scroll { overflow - y: hidden!important; }
+JS 在预览打开 / 关闭时同步对 document.documentElement（即 < html >）添加 / 移除 me - no - scroll 类        content += `<div class="w3-bar-item w3-button w3-round w3-small" >${year[0]}</div>`;
       }
       const yearList = document.getElementById('me-year-list');
       yearList.appendChild(document.createRange().createContextualFragment(content));
@@ -737,6 +740,7 @@ function preview(img) {
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
   // 锁定页面滚动，记录并保持滚动位置
+  document.documentElement.classList.add('me-no-scroll');
   document.body.classList.add('me-no-scroll');
   const scrollY = window.scrollY;
   document.body.style.top = `-${scrollY}px`;
@@ -768,6 +772,7 @@ function preview(img) {
   const clickFunc = function () {
     view.classList.add('w3-hide');
     // 恢复页面滚动
+    document.documentElement.classList.remove('me-no-scroll');
     document.body.classList.remove('me-no-scroll');
     document.body.style.top = '';
     window.scrollTo(0, scrollY);
