@@ -229,6 +229,28 @@ body.me-no-scroll {
     overflow: hidden !important;
 }
 
+/* 提示气泡 */
+.me-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.me-toast.me-toast-show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
 .me-big-img-view {
     background-size: cover;
 }

@@ -72,6 +72,8 @@
 const bing_api_prefix = 'https://cn.bing.com';
 // 分页
 let pageIndex = 1, pageSize = 24, year = null, month = null;
+// 全局数据库实例，供预览功能查询
+let dbSession = null;
 
 // 读取文件
 function dbFileGet(callback) {
@@ -263,6 +265,7 @@ function loadData(db) {
 }
 
 dbFileGet(function (session) {
+  dbSession = session;
   const years = session.exec("select distinct substring(enddate,0,5) year from wallpaper order by enddate desc");
   if (years.length > 0) {
     const values = years[0]['values'];
@@ -602,44 +605,130 @@ function chinaDate(timeString) {
 }
 
 function changeDate(date, days) {
-  var date_str = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
-  var date_obj = chinaDate(date_str.replace(/-/g, "/"));
-  date_obj.setDate(date_obj.getDate() + days);
-  var year = date_obj.getFullYear();
-  var month = date_obj.getMonth() + 1;
-  var day = date_obj.getDate();
-  return year + month.toString().padStart(2, '0') + day.toString().padStart(2, '0')
+  // 纯日期加减，无需时区转换
+  var y = parseInt(date.substring(0, 4));
+  var m = parseInt(date.substring(4, 6));
+  var d = parseInt(date.substring(6, 8));
+  var dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() + days);
+  return dt.getFullYear() + (dt.getMonth() + 1).toString().padStart(2, '0') + dt.getDate().toString().padStart(2, '0');
+}
+
+// 记录当前预览显示的日期
+let currentPreviewDate = null;
+let currentPreviewDirection = 1; // 1=上一张(时间更早), -1=下一张(时间更新)
+
+// 数据库日期边界缓存
+let dbMinDate = null;
+let dbMaxDate = null;
+
+function getDbBounds() {
+  if (!dbSession) return;
+  if (dbMinDate && dbMaxDate) return;
+  const result = dbSession.exec("select min(enddate), max(enddate) from wallpaper");
+  if (result.length > 0 && result[0].values.length > 0) {
+    dbMinDate = result[0].values[0][0];
+    dbMaxDate = result[0].values[0][1];
+  }
 }
 
 function showImg(date) {
-  let imgShowObj = null;
   const bigImgView = document.getElementById('me-big-img-show');
   const bigImgs = bigImgView.getElementsByTagName("img");
-  for (let img_obj of bigImgs) {
-    img_obj.classList.add('w3-hide');
-    if (img_obj.getAttribute('data-date') == date) {
-      imgShowObj = img_obj;
-    }
+
+  // 通过数据库判断目标日期是否存在壁纸
+  getDbBounds();
+  if (dbMinDate && date < dbMinDate) {
+    showToast('没有更早的壁纸了');
+    return;
   }
-  if (!imgShowObj) {
-    const img_obj = document.querySelectorAll(`#image-list img[data-date= '${date}']`)[0];
-    if (!img_obj) {
-      return
-    }
-    imgShowObj = new Image();
-    imgShowObj.onload = function () {
-      imgShowObj.classList.remove('w3-hide');
-    }
-    imgShowObj.src = img_obj.src.substring(0, img_obj.src.indexOf('&'));
-    imgShowObj.classList.add('w3-hide');
-    imgShowObj.setAttribute('data-date', date);
-    imgShowObj.classList.add('w3-image');
-    // imgShowObj.classList.add('w3-animate-opacity');
-    bigImgView.appendChild(imgShowObj)
-  } else {
-    imgShowObj.classList.remove('w3-hide');
+  if (dbMaxDate && date > dbMaxDate) {
+    showToast('没有更新的壁纸了');
+    return;
   }
 
+  // 查数据库获取该日期的图片信息
+  let rowData = null;
+  if (dbSession) {
+    const stmt = dbSession.prepare("select * from wallpaper where enddate = ? limit 1");
+    stmt.bind([date]);
+    if (stmt.step()) {
+      rowData = stmt.getAsObject();
+    }
+    stmt.free();
+  }
+
+  // 如果目标日期没有壁纸，向同方向查找最近的有数据的日期
+  if (!rowData && dbSession && currentPreviewDirection !== 0) {
+    const dir = currentPreviewDirection > 0 ? 'asc' : 'desc';
+    const op = currentPreviewDirection > 0 ? '>' : '<';
+    const nearStmt = dbSession.prepare(`select * from wallpaper where enddate ${op} ? order by enddate ${dir} limit 1`);
+    nearStmt.bind([date]);
+    if (nearStmt.step()) {
+      rowData = nearStmt.getAsObject();
+    }
+    nearStmt.free();
+    if (rowData) {
+      date = rowData.enddate;
+    }
+  }
+
+  if (!rowData) {
+    showToast(currentPreviewDirection > 0 ? '没有更早的壁纸了' : '没有更新的壁纸了');
+    return;
+  }
+
+  // 隐藏所有已显示的图
+  for (let img_obj of bigImgs) {
+    img_obj.classList.add('w3-hide');
+  }
+
+  // 检查是否已缓存该图
+  let existInBig = null;
+  for (let img_obj of bigImgs) {
+    if (img_obj.getAttribute('data-date') == date) {
+      existInBig = img_obj;
+    }
+  }
+
+  if (existInBig && existInBig.parentNode === bigImgView) {
+    existInBig.classList.remove('w3-hide');
+  } else {
+    // 从数据库数据构造图片URL
+    const index = rowData.url.indexOf('&');
+    let url = index != -1 ? rowData.url.substring(0, index) : rowData.url;
+    url += "&rf=LaDigue_1920x1080.jpg";
+    const uhdUrl = url.replace(url.substring(url.lastIndexOf('_') + 1, url.lastIndexOf('.')), '1920x1080');
+    const viewUrl = bing_api_prefix + uhdUrl;
+
+    const newImg = new Image();
+    newImg.onload = function () {
+      newImg.classList.remove('w3-hide');
+    }
+    newImg.src = viewUrl;
+    newImg.classList.add('w3-hide');
+    newImg.setAttribute('data-date', date);
+    newImg.classList.add('w3-image');
+    bigImgView.appendChild(newImg);
+  }
+  currentPreviewDate = date;
+}
+
+// 轻量提示
+function showToast(msg) {
+  let toast = document.getElementById('me-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'me-toast';
+    toast.className = 'me-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('me-toast-show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove('me-toast-show');
+  }, 1500);
 }
 
 // 图片预览功能
@@ -708,6 +797,7 @@ function preview(img) {
   document.addEventListener('keydown', previewKeyHandler);
 
   const date = img.getAttribute('data-date')
+  currentPreviewDate = date;
   showImg(date)
 }
 
@@ -723,6 +813,7 @@ function plusImg(n) {
 
   const slideDate = changeDate(imgShowObj.getAttribute('data-date'), n);
   if (slideDate) {
+    currentPreviewDirection = n;
     showImg(slideDate)
   }
 }
