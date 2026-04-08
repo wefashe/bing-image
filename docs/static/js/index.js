@@ -66,6 +66,10 @@
  * 1、db文件加载耗时
  * 2、图标字体文件加载耗时
  * 3、Github Actions优化，是否可以直接部署
+ * 
+ * 获取故事有两个接口：
+ * 旧接口 cn.bing.com/cnhp/coverstory?d=YYYYMMDD（2014-2019）
+ * 新接口 cn.bing.com/search?q=1&filters=HpDate:"YYYYMMDD_1600"（2019后，解析 HTML）
  */
 "use strict";
 // 前缀
