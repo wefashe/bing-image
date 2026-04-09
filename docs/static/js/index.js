@@ -82,6 +82,9 @@ let allDataLoaded = false;
 let dbSession = null;
 // 故事数据
 let storiesData = {};
+// 刷新后恢复滚动位置
+let scrollRestored = false;
+const SCROLL_RESTORE_KEY = 'bing_image_scroll_restore';
 
 // 读取 stories.json
 function loadStories(callback) {
@@ -344,7 +347,44 @@ function loadData(db) {
   // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
   imageList.appendChild(document.createRange().createContextualFragment(content));
   pageIndex++;
+  // 刷新后恢复滚动位置
+  restoreScrollPosition();
 }
+
+// 保存滚动状态到 sessionStorage，刷新后可恢复
+function saveScrollState() {
+  try {
+    const state = {
+      scrollTop: window.scrollY || document.documentElement.scrollTop,
+      pageIndex: pageIndex,
+      year: year,
+      month: month
+    };
+    sessionStorage.setItem(SCROLL_RESTORE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+// 恢复滚动位置
+function restoreScrollPosition() {
+  if (scrollRestored) return;
+  try {
+    const raw = sessionStorage.getItem(SCROLL_RESTORE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    if (!state || !state.scrollTop || state.scrollTop <= 0) return;
+    // 只在 pageIndex 追赶到保存的页码之后才恢复滚动
+    if (state.pageIndex && pageIndex > state.pageIndex) {
+      window.scrollTo(0, state.scrollTop);
+      scrollRestored = true;
+      sessionStorage.removeItem(SCROLL_RESTORE_KEY);
+    }
+  } catch (e) {
+    sessionStorage.removeItem(SCROLL_RESTORE_KEY);
+  }
+}
+
+// 页面离开前保存滚动状态
+window.addEventListener('beforeunload', saveScrollState);
 
 loadStories(function () {
   dbFileGet(function (session) {
@@ -446,6 +486,13 @@ loadStories(function () {
   hideElementById('me-full-load', true);
   hideElementById('me-bottom-load', false);
 
+  // 恢复刷新前的滚动状态
+  let restoreState = null;
+  try {
+    const raw = sessionStorage.getItem(SCROLL_RESTORE_KEY);
+    if (raw) restoreState = JSON.parse(raw);
+  } catch (e) {}
+
   const savedFilter = localStorage.getItem('filter')
   if (savedFilter === '1') {
     const filterEl = document.getElementById('me-filter');
@@ -474,13 +521,33 @@ loadStories(function () {
       document.getElementById('image-list').innerHTML = '';
       pageIndex = 1;
       allDataLoaded = false;
-      loadData(session);
-      lazyload();
+      // 如果有刷新恢复状态，快速加载到之前的页码
+      if (restoreState && restoreState.pageIndex > 1 && restoreState.year === year_str && restoreState.month === month_str) {
+        for (var p = 1; p < restoreState.pageIndex; p++) {
+          loadData(session);
+        }
+        lazyload();
+      } else {
+        loadData(session);
+        lazyload();
+      }
     }
   } else {
     allDataLoaded = false;
-    loadData(session)
-    lazyload()
+    // 如果有刷新恢复状态，快速加载到之前的页码
+    if (restoreState && restoreState.pageIndex > 1) {
+      // 恢复筛选条件
+      year = restoreState.year || null;
+      month = restoreState.month || null;
+      // 循环加载数据直到追赶到保存的页码
+      for (var p = 1; p < restoreState.pageIndex; p++) {
+        loadData(session);
+      }
+      lazyload();
+    } else {
+      loadData(session);
+      lazyload();
+    }
   }
   // 加载更多按钮只绑定一次
   const loadMoreBtn = document.querySelector('#me-bottom-load-btn .w3-button');
