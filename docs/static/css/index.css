@@ -178,7 +178,7 @@ img.me-img-error {
 
 .me-load-mask {
     /* 遮罩层 */
-    background-color: var(--theme-background, white);
+    background-color: var(--theme-background, white) !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -187,6 +187,7 @@ img.me-img-error {
     position: fixed;
     top: 0;
     left: 0;
+    padding-top: 0 !important;
 }
 
 .me-load-content {
@@ -245,7 +246,8 @@ img.me-img-error {
 
 .me-load-hint {
     font-size: 13px;
-    color: #999;
+    color: var(--theme-color, black);
+    opacity: 0.5;
     animation: me-load-fade 2s ease-in-out infinite;
 }
 
