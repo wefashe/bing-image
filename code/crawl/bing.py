@@ -8,6 +8,7 @@ from faker import Factory
 from bs4 import BeautifulSoup
 import sys
 from datetime import datetime, timedelta
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import utils.date as date_utils
 
@@ -16,11 +17,13 @@ import utils.date as date_utils
 # https://cn.bing.com/cnhp/life?currentDate=20180704
 fc = Factory.create()
 
+
 def _request_with_retry(url, headers, max_retries=3):
-    '''
+    """
     带重试的请求
-    '''
+    """
     import time
+
     last_err = None
     for i in range(max_retries):
         try:
@@ -28,19 +31,22 @@ def _request_with_retry(url, headers, max_retries=3):
             resp.encoding = resp.apparent_encoding
             if resp.status_code == 200 and resp.text.strip():
                 return resp
-            print(f'请求失败: status={resp.status_code}, body_len={len(resp.text)}, 第{i+1}次重试...')
+            print(
+                f"请求失败: status={resp.status_code}, body_len={len(resp.text)}, 第{i + 1}次重试..."
+            )
         except Exception as e:
             last_err = e
-            print(f'请求异常: {e}, 第{i+1}次重试...')
+            print(f"请求异常: {e}, 第{i + 1}次重试...")
         if i < max_retries - 1:
             time.sleep(2 * (i + 1))
-    raise Exception(f'请求失败，已重试{max_retries}次: {url}, {last_err}')
+    raise Exception(f"请求失败，已重试{max_retries}次: {url}, {last_err}")
+
 
 def get_image_listByDays(days):
-    '''
-      按天数获取列表
-      days 获取前几天的列表, 等于1为今天, 最大15天,必须大于0
-    '''
+    """
+    按天数获取列表
+    days 获取前几天的列表, 等于1为今天, 最大15天,必须大于0
+    """
     if days > 15:
         days = 15
     first_days = days
@@ -48,80 +54,71 @@ def get_image_listByDays(days):
     if days > 8:
         first_days = 8
         second_days = days - 8
-    headers = {
-      'User-Agent': fc.user_agent(),
-      'Referer': 'https://cn.bing.com'
-    }
-    url = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n={first_days}&mkt=zh-CN'
+    headers = {"User-Agent": fc.user_agent(), "Referer": "https://cn.bing.com"}
+    url = f"https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n={first_days}&mkt=zh-CN"
     resp = _request_with_retry(url, headers)
     first_list = resp.json()
     if second_days == 0:
-        return first_list['images']
-    headers = {
-      'User-Agent': fc.user_agent(),
-      'Referer': 'https://cn.bing.com'
-    }
-    url = f'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=7&n={second_days + 1}&mkt=zh-CN'
+        return first_list["images"]
+    headers = {"User-Agent": fc.user_agent(), "Referer": "https://cn.bing.com"}
+    url = f"https://cn.bing.com/HPImageArchive.aspx?format=js&idx=7&n={second_days + 1}&mkt=zh-CN"
     resp = _request_with_retry(url, headers)
     second_list = resp.json()
-    return first_list['images'] + second_list['images'][1:]
+    return first_list["images"] + second_list["images"][1:]
 
-def get_image_coverstory(date='20240101'):
+
+def get_image_coverstory(date="20240101"):
     if date_utils.str_to_date(date) > date_utils.date_now():
         date = date_utils.date_to_str(date_utils.date_now())
-    headers = {
-      'User-Agent': fc.user_agent(),
-      'Referer': 'https://cn.bing.com'
-    }
-    if '20140501' <= date and date <='20190228':
-      # https://cn.bing.com/cnhp/coverstory?d=20181212
-      url =f'https://cn.bing.com/cnhp/coverstory?d={date}'
-      resp = requests.get(url=url, headers=headers)
-      resp.encoding = resp.apparent_encoding
-      return resp.json()
+    headers = {"User-Agent": fc.user_agent(), "Referer": "https://cn.bing.com"}
+    if "20140501" <= date and date <= "20190228":
+        # https://cn.bing.com/cnhp/coverstory?d=20181212
+        url = f"https://cn.bing.com/cnhp/coverstory?d={date}"
+        resp = requests.get(url=url, headers=headers)
+        resp.encoding = resp.apparent_encoding
+        return resp.json()
     else:
-      # https://cn.bing.com/search?q=1&filters=HpDate:"20240425_1600"  
-      url =f'https://cn.bing.com/search?q=1&filters=HpDate:"{date_utils.str_date_add(date, -1)}_1600"'
-      resp = requests.get(url=url, headers=headers)
-      resp.encoding = resp.apparent_encoding
-      soup = BeautifulSoup(resp.text, 'html.parser')
-      # 格式化显示输出
-      print(soup.prettify())
-      tags = soup.select('#ency_desc_full')
-      print(tags)
+        # https://cn.bing.com/search?q=1&filters=HpDate:"20240425_1600"
+        url = f'https://cn.bing.com/search?q=1&filters=HpDate:"{date_utils.str_date_add(date, -1)}_1600"'
+        resp = requests.get(url=url, headers=headers)
+        resp.encoding = resp.apparent_encoding
+        soup = BeautifulSoup(resp.text, "html.parser")
+        # 格式化显示输出
+        print(soup.prettify())
+        tags = soup.select("#ency_desc_full")
+        print(tags)
+
 
 def get_today_image():
-    '''
-      获取当天的信息
-    '''
-    headers = {
-      'User-Agent': fc.user_agent(),
-      'Referer': 'https://cn.bing.com'
-    }
-    url = 'https://cn.bing.com'
+    """
+    获取当天的信息
+    """
+    headers = {"User-Agent": fc.user_agent(), "Referer": "https://cn.bing.com"}
+    url = "https://cn.bing.com"
     res = requests.get(url, headers=headers)
     res.encoding = res.apparent_encoding
     ret = re.search("var _model =(\{.*?\});", res.text)
     if not ret:
         return
     data = json.loads(ret.group(1))
-    media_Content = data['MediaContents'][0]
-    image_content = media_Content['ImageContent']
+    media_Content = data["MediaContents"][0]
+    image_content = media_Content["ImageContent"]
     return {
-        'date': media_Content['FullDateString'], 
-        'title': image_content['Headline'],
-        'url': image_content['Image']['Wallpaper'],
-        'Copyright': image_content['Title']+' ('+image_content['Copyright']+')',
-        'quickfact': image_content['QuickFact']['MainText'],
-        'description': image_content['Description'],
-        'copyrightlink': image_content['BackstageUrl'],
-        'quiz': image_content['TriviaUrl'],
+        "date": media_Content["FullDateString"],
+        "title": image_content["Headline"],
+        "url": image_content["Image"]["Wallpaper"],
+        "Copyright": image_content["Title"] + " (" + image_content["Copyright"] + ")",
+        "quickfact": image_content["QuickFact"]["MainText"],
+        "description": image_content["Description"],
+        "copyrightlink": image_content["BackstageUrl"],
+        "quiz": image_content["TriviaUrl"],
     }
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     list = get_image_listByDays(3)
     print(json.dumps(list, ensure_ascii=False, indent=2))
-    coverstory = get_image_coverstory('20170426')
+    coverstory = get_image_coverstory("20170426")
     print(json.dumps(coverstory, ensure_ascii=False, indent=2))
     detail = get_today_image()
     print(json.dumps(detail, ensure_ascii=False, indent=2))
