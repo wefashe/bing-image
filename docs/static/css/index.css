@@ -419,30 +419,30 @@ html.me-no-scroll {
 
 .me-view-info-inner {
     position: relative;
-    max-width: 83.33%;
+    max-width: 85.71%;
     pointer-events: auto;
 }
 
 .me-view-info-title {
     font-size: 18px;
     font-weight: 500;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    line-height: 1.6;
+    margin-bottom: 6px;
     color: #fff;
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
     letter-spacing: 0.8px;
 }
 
 .me-view-info-meta {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 0 20px;
     align-items: center;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     letter-spacing: 0.3px;
 }
 
