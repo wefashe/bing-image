@@ -85,18 +85,8 @@ a {
 }
 
 .me-card {
-    border-radius: 8px;
+    /* 图片上面两个角圆角  */
     overflow: hidden;
-    -webkit-transition: box-shadow .3s ease;
-    transition: box-shadow .3s ease;
-}
-
-.me-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-[data-theme='dark'] .me-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .me-list-img {
@@ -104,7 +94,10 @@ a {
     overflow: hidden;
     /* 图片未加载时高度填充*/
     position: relative;
+    top: 0;
+    left: 0;
     width: 100%;
+    /* background: linear-gradient(to right, #ffecea, #c4e7f7, #ffecea, #c4e7f7, #ffecea); */
 }
 
 .me-list-img:after {
@@ -116,8 +109,10 @@ a {
 
 .me-list-img img {
     /* 缩小还原 */
-    -webkit-transition: transform .444s ease-in-out, filter .444s ease-in-out;
-    transition: transform .444s ease-in-out, filter .444s ease-in-out;
+    -webkit-transition: all .444s ease-in-out;
+    -o-transition: all .444s ease-in-out;
+    transition: all .444s ease-in-out;
+    /* 图片未加载时高度填充*/
     position: absolute;
     top: 0;
     left: 0;
@@ -128,6 +123,9 @@ a {
 .me-list-img:hover img {
     /*悬停放放大*/
     transform: scale(1.05);
+    -webkit-transition: all .444s ease-in-out;
+    -o-transition: all .444s ease-in-out;
+    transition: all .444s ease-in-out;
     -webkit-filter: brightness(80%);
     filter: brightness(80%);
 }
@@ -403,6 +401,7 @@ html.me-no-scroll {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.05) 85%, transparent 100%);
+    border-radius: 0;
     z-index: -1;
 }
 
@@ -525,13 +524,4 @@ html.me-no-scroll {
     .me-big-img-show .me-view-info-inner {
         max-width: none;
     }
-}
-
-.me-copyright {
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    padding: 20px 16px;
-}
-
-[data-theme='dark'] .me-copyright {
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }

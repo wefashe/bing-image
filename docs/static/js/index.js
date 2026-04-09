@@ -217,18 +217,6 @@ function loadData(db) {
   order by enddate desc limit $pageSize offset($pageIndex - 1) * $pageSize`);
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
-  // 循环外缓存不变的值，避免重复创建
-  const today = chinaDate();
-  const todayMonth = today.getMonth();
-  const todayDay = today.getDate();
-  const todayYear = today.getFullYear();
-  const dateReg = /^(\d{4})(\d{2})(\d{2})$/;
-  const tags = new Map([
-    [0, '必应今日'],
-    [1, '去年今日'],
-    [2, '前年今日'],
-    ['default', '往年今日'],
-  ]);
   while (stmt.step()) {
     const row = stmt.getAsObject();
     // 切换超清图片
@@ -253,15 +241,22 @@ function loadData(db) {
 
     // 20210101转为2021-01-01
     const date8 = row.enddate;
-    const dateShow = date8.replace(dateReg, "$1-$2-$3");
+    const dateShow = date8.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
     // 2021-01-01转为2021/01/01，2021/01/01字符串格式进行转换兼容性更好
     const dateObj = chinaDate(dateShow.replace(/-/g, "/"));
     const imgYear = dateObj.getFullYear();
     const imgMonth = dateObj.getMonth();
     const imgDay = dateObj.getDate();
 
-    const isToday = imgMonth == todayMonth && imgDay == todayDay;
-    const days = todayYear - imgYear;
+    const today = chinaDate();
+    const isToday = imgMonth == today.getMonth() && imgDay == today.getDate();
+    const days = today.getFullYear() - imgYear
+    const tags = new Map([
+      [0, '必应今日'],
+      [1, '去年今日'],
+      [2, '前年今日'],
+      ['default', '往年今日'],
+    ])
 
     var copyrightlink = row.copyrightlink;
     try {
@@ -699,6 +694,15 @@ function download(element, url, download) {
       element.onclick = null;
     }
   }
+  // 监听下载进度
+  xhr.addEventListener('progress', function (e) {
+    let percent = Math.trunc(e.loaded / e.total * 100);
+    // todo
+  });
+  // 错误处理
+  xhr.addEventListener('error', function (e) {
+    // todo
+  });
   xhr.send()
 }
 
