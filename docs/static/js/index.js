@@ -1101,7 +1101,13 @@ function preview(img) {
   document.body.classList.add('me-no-scroll');
   document.body.style.top = `-${scrollY}px`;
 
+  const bigImgView = document.getElementById('me-big-img-show');
+
   const wheelFunc = function (e) {
+    if (bigImgView.classList.contains('w3-col')) {
+      // 最大化状态下禁用滚轮切换
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
     let n = 0;
@@ -1116,7 +1122,6 @@ function preview(img) {
 
   const sizeBtn = document.getElementById('me-view-size-btn');
   const sizeIcon = sizeBtn.getElementsByTagName('i')[0];
-  const bigImgView = document.getElementById('me-big-img-show');
   const sizeFunc = function () {
     sizeIcon.classList.toggle("fa-search-plus");
     sizeIcon.classList.toggle("fa-search-minus");
