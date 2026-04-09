@@ -389,12 +389,17 @@ html.me-no-scroll {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 100px 40px 32px;
+    padding: 80px 40px 32px;
     color: #fff;
     z-index: 10;
     pointer-events: none;
     text-align: left;
     background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.08) 70%, transparent 100%);
+}
+
+.me-view-info-inner {
+    max-width: 83.33%;
+    pointer-events: auto;
 }
 
 .me-view-info-title {
@@ -451,20 +456,21 @@ html.me-no-scroll {
     color: rgba(255, 255, 255, 0.7);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     word-break: break-word;
-    max-height: 130px;
-    overflow: hidden;
     white-space: pre-wrap;
+    text-indent: 2em;
 }
 
 .me-view-story-desc {
     color: rgba(255, 255, 255, 0.5);
     font-style: italic;
     letter-spacing: 0.2px;
+    text-indent: 2em;
 }
 
 .me-view-story-intro {
     margin-top: 4px;
     color: rgba(255, 255, 255, 0.78);
+    text-indent: 0;
 }
 
 .me-big-img-show.w3-col .me-view-info {
@@ -487,5 +493,14 @@ html.me-no-scroll {
         background-size: cover;
         background-position: center;
         height: 60vh;
+    }
+
+    .me-view-info {
+        padding: 50px 20px 20px;
+    }
+
+    .me-view-info-inner,
+    .me-big-img-show .me-view-info-inner {
+        max-width: none;
     }
 }
