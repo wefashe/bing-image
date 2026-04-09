@@ -114,7 +114,17 @@ function showStory(infoEl, date) {
   if (!storyEl) return;
   const story = getStory(date);
   if (story) {
-    storyEl.textContent = story;
+    const parts = story.split('\n');
+    const desc = parts[0] || '';
+    const intro = parts.slice(1).map(line => line.trim()).filter(line => line).join('\n');
+    let html = '';
+    if (desc) {
+      html += '<div class="me-view-story-desc">' + desc.trim() + '</div>';
+    }
+    if (intro) {
+      html += '<div class="me-view-story-intro">' + intro.split('\n').map(line => '\u3000\u3000' + line).join('\n') + '</div>';
+    }
+    storyEl.innerHTML = html;
     storyEl.classList.remove('w3-hide');
   } else {
     storyEl.classList.add('w3-hide');
