@@ -1166,6 +1166,9 @@ function preview(img) {
     if (e.code === 'Escape') {
       e.preventDefault();
       clickFunc();
+    } else if (bigImgView.classList.contains('w3-col')) {
+      // 最大化状态下禁用切换快捷键
+      return;
     } else if (e.code === 'ArrowLeft') {
       e.preventDefault();
       plusImg(1);

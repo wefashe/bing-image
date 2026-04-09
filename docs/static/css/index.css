@@ -361,6 +361,15 @@ html.me-no-scroll {
     justify-content: center;
 }
 
+.me-big-img-btn button {
+    z-index: 20;
+}
+
+/* 最大化预览时隐藏左右切换按钮 */
+.me-big-img-view:has(> #me-big-img-show.w3-col) > .me-big-img-btn {
+    display: none;
+}
+
 .me-big-img-view > .w3-display-middle {
     position: relative;
     top: auto;
@@ -368,11 +377,18 @@ html.me-no-scroll {
     transform: none;
     float: none;
     width: 75%;
+    border: none;
+    outline: none;
 }
 
 .me-big-img-view > .w3-col {
     width: 100%;
     float: none;
+}
+
+.me-big-img-show {
+    border: none;
+    outline: none;
 }
 
 .me-big-img-show:hover {
