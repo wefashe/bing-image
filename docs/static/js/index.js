@@ -308,7 +308,7 @@ function loadData(db) {
         <div class="w3-card w3-hover-shadow w3-round-large me-card">
             <div class="me-list-img w3-center">
                 <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-title="${escapeHtml(row.copyright)}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
+                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-title="${escapeHtml(row.copyright)}" alt="${escapeHtml(title)} (${dateShow})" style="width:100%;max-width:100%">
             </div>
             <div class="w3-auto">
                 <div class="w3-row w3-padding-small w3-tiny" >

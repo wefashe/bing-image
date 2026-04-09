@@ -30,8 +30,8 @@
     <meta name="googlebot" content="index, follow" />
     <link rel="canonical" href="https://wefashe.github.io/bing-image/" />
     <link rel="icon" type="image/vnd.microsoft.icon" href="static/img/favicon-3.ico" />
-    <link rel="preconnect" href="./" />
-    <link rel="dns-prefetch" href="./" />
+    <link rel="preconnect" href="https://cn.bing.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cn.bing.com" />
     <!-- 安卓平台 chrome -->
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="icon" sizes="192x192" href="static/img/favicon-3.ico">
@@ -100,7 +100,7 @@
             font-weight: 600;
             margin: 0 0 8px;
             letter-spacing: 2px;
-            color: var(--theme-color, black)
+            color: #333
         }
 
         .me-noscript .me-noscript-divider {
@@ -114,7 +114,7 @@
         .me-noscript p {
             font-size: 14px;
             line-height: 2;
-            color: var(--theme-color, black);
+            color: #333;
             opacity: .55;
             margin: 0
         }
@@ -130,15 +130,6 @@
 
         body {
             background: #fff !important
-        }
-
-        .me-noscript h1,
-        .me-noscript p {
-            color: #333
-        }
-
-        .me-noscript .me-noscript-link {
-            color: #0e90d2
         }
     </style>
 </noscript>
@@ -156,12 +147,7 @@
             "@type": "Person",
             "name": "wefashe"
         },
-        "inLanguage": "zh-CN",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://wefashe.github.io/bing-image/?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
+        "inLanguage": "zh-CN"
     }
     </script>
     <!-- !ME FULL LOAD -->
@@ -323,10 +309,10 @@
 
     <noscript>
         <div class="me-noscript">
-            <img src="static/img/favicon-3.ico" alt="logo" />
+            <img src="static/img/favicon-3.ico" alt="必应壁纸" />
             <h1>必应壁纸 每日一图</h1>
             <div class="me-noscript-divider"></div>
-            <p>请启用 JavaScript 以浏览完整壁纸列表和使用图片预览功能。</p>
+            <p>请启用 JavaScript 以浏览完整壁纸列表和使用图片预览功能</p>
         </div>
     </noscript>
 
