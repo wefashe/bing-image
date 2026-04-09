@@ -143,11 +143,11 @@ a {
 
 .me-lazy {
     filter: blur(3px);
+    transition: filter .8s cubic-bezier(0.4, 0, 1, 1);
 }
 
 .me-img-complete {
     filter: blur(0);
-    transition: filter .5s;
 }
 
 .me-meta {
