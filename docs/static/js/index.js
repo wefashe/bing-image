@@ -393,8 +393,6 @@ function updatePageSEO(title, dateShow, copyright, imageUrl) {
   const safeTitle = (title || '').replace(/[<>"']/g, '');
   const safeCopyright = (copyright || '').replace(/[<>"']/g, '');
   const safeDate = dateShow || '';
-  // 更新页面标题
-  document.title = safeTitle + ' - 必应壁纸每日一图 (' + safeDate + ')';
   // 更新 meta description
   setMetaContent('description', safeCopyright + ' | ' + safeDate + '。每日自动更新高清必应桌面壁纸，支持按年月筛选浏览历史必应壁纸，免费下载。');
   // 更新 Open Graph 标签
@@ -402,10 +400,6 @@ function updatePageSEO(title, dateShow, copyright, imageUrl) {
   setMetaContent('og:description', safeCopyright + ' | ' + safeDate);
   setMetaContent('og:image', imageUrl || '');
   setMetaContent('og:url', 'https://wefashe.github.io/bing-image/');
-  // 更新 Twitter Card 标签
-  setMetaContent('twitter:title', safeTitle + ' - 必应壁纸每日一图');
-  setMetaContent('twitter:description', safeCopyright + ' | ' + safeDate);
-  setMetaContent('twitter:image', imageUrl || '');
 }
 
 function setMetaContent(name, content) {
