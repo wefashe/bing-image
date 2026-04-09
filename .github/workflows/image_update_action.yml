@@ -66,6 +66,9 @@ jobs:
         if: steps.crawl2.outcome == 'failure'
         run: python code/action.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
         continue-on-error: true
+      # 生成 sitemap.xml
+      - name: generate sitemap
+        run: python code/generate_sitemap.py
       # 提交文件
       - name: commit and push
         id: commit
