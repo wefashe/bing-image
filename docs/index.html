@@ -58,14 +58,90 @@
     <link rel="stylesheet" type="text/css" href="static/css/index.css" />
     <script>
         // 在渲染前立即初始化主题，避免加载动画主题闪烁
-        (function(){
-            var d=localStorage.getItem('dark');
-            if(d&&d==='1'){document.documentElement.setAttribute('data-theme','dark')}
-            else if(!d&&window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.setAttribute('data-theme','dark')}
-            else if(!d){var h=new Date().getHours();if(h>=21||h<7){document.documentElement.setAttribute('data-theme','dark')}}
+        (function () {
+            var d = localStorage.getItem('dark');
+            if (d && d === '1') { document.documentElement.setAttribute('data-theme', 'dark') }
+            else if (!d && window.matchMedia('(prefers-color-scheme:dark)').matches) { document.documentElement.setAttribute('data-theme', 'dark') }
+            else if (!d) { var h = new Date().getHours(); if (h >= 21 || h < 7) { document.documentElement.setAttribute('data-theme', 'dark') } }
         })();
     </script>
 </head>
+
+<noscript>
+    <style>
+        body>*:not(noscript) {
+            display: none !important
+        }
+
+        body {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            min-height: 100vh !important;
+            height: auto !important
+        }
+
+        .me-noscript {
+            text-align: center;
+            padding: 56px 40px;
+            max-width: 560px
+        }
+
+        .me-noscript img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .08)
+        }
+
+        .me-noscript h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 8px;
+            letter-spacing: 2px;
+            color: var(--theme-color, black)
+        }
+
+        .me-noscript .me-noscript-divider {
+            width: 32px;
+            height: 3px;
+            border-radius: 2px;
+            background: #0e90d2;
+            margin: 16px auto
+        }
+
+        .me-noscript p {
+            font-size: 14px;
+            line-height: 2;
+            color: var(--theme-color, black);
+            opacity: .55;
+            margin: 0
+        }
+
+        .me-noscript .me-noscript-link {
+            display: inline-block;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #0e90d2;
+            opacity: .7;
+            word-break: break-all
+        }
+
+        body {
+            background: #fff !important
+        }
+
+        .me-noscript h1,
+        .me-noscript p {
+            color: #333
+        }
+
+        .me-noscript .me-noscript-link {
+            color: #0e90d2
+        }
+    </style>
+</noscript>
 
 <body itemscope itemtype="https://schema.org/WebSite">
     <!-- JSON-LD 结构化数据，帮助搜索引擎理解页面 -->
@@ -114,8 +190,8 @@
                 <h1 class="w3-xlarge" style="vertical-align:middle;margin:0;display:inline;">必应壁纸 每日一图</h1>
             </div>
             <div class="w3-bar-item w3-right w3-xlarge">
-                <iframe id="me-weather" class="w3-hide-small" style="vertical-align:middle;" allowtransparency="true" frameborder="0"
-                    height="25" scrolling="no"
+                <iframe id="me-weather" class="w3-hide-small" style="vertical-align:middle;" allowtransparency="true"
+                    frameborder="0" height="25" scrolling="no"
                     src="//tianqi.2345.com/plugin/widget/index.htm?s=3&z=1&t=0&v=0&d=1&bd=0&k=000000&f=808080&ltf=0080ff&htf=ff8000&q=0&e=0&a=1&c=54511&h=25&align=right"></iframe>
                 <i id="me-history-btn" class="fa fa-history fa-fw w3-large me-cursor-pointer" title="历史必应"></i>
                 <i id="me-theme-btn" class="fa fa-moon-o fa-fw w3-large me-cursor-pointer" title="主题选择"></i>
@@ -244,6 +320,15 @@
             <span id="me-copyright-year"></span>
         </p>
     </footer>
+
+    <noscript>
+        <div class="me-noscript">
+            <img src="static/img/favicon-3.ico" alt="logo" />
+            <h1>必应壁纸 每日一图</h1>
+            <div class="me-noscript-divider"></div>
+            <p>请启用 JavaScript 以浏览完整壁纸列表和使用图片预览功能。</p>
+        </div>
+    </noscript>
 
 </body>
 <script type="text/javascript" src="static/js/sql-wasm.js"></script>
