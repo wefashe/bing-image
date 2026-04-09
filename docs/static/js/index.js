@@ -258,6 +258,7 @@ function loadData(db) {
         title = title.substring(0, title.indexOf(' ', 0))
       }
     }
+    title = title.replace(/^[\s,，]+|[\s,，]+$/g, '');
 
     if (pageIndex == 1 && content.length == 0) {
       const todayShow = document.getElementById('me-today-show');
