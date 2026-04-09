@@ -108,6 +108,13 @@ function getStory(date) {
   return storiesData[date] || '';
 }
 
+// HTML转义，防止XSS
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // 在信息栏中显示/隐藏故事
 function showStory(infoEl, date) {
   const storyEl = infoEl ? infoEl.querySelector('.me-view-info-story') : null;
@@ -119,10 +126,10 @@ function showStory(infoEl, date) {
     const intro = parts.slice(1).map(line => line.trim()).filter(line => line).join('\n');
     let html = '';
     if (desc) {
-      html += '<div class="me-view-story-desc">' + desc.trim() + '</div>';
+      html += '<div class="me-view-story-desc">' + escapeHtml(desc.trim()) + '</div>';
     }
     if (intro) {
-      html += '<div class="me-view-story-intro">' + intro.split('\n').map(line => '\u3000\u3000' + line).join('\n') + '</div>';
+      html += '<div class="me-view-story-intro">' + intro.split('\n').map(line => '\u3000\u3000' + escapeHtml(line)).join('\n') + '</div>';
     }
     storyEl.innerHTML = html;
     storyEl.classList.remove('w3-hide');
@@ -288,7 +295,6 @@ function loadData(db) {
         showStory(todayInfo, date8);
         todayInfo.classList.remove('w3-hide');
       }
-      document.getElementById('me-today-show');
     }
 
     // 渐进式图片
@@ -297,7 +303,7 @@ function loadData(db) {
         <div class="w3-card w3-hover-shadow w3-round-large me-card">
             <div class="me-list-img w3-center">
                 <div class="me-lodding"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
-                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-title="${row.copyright}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
+                <img loading="lazy" decoding="async" data-date="${date8}" class="w3-image me-cursor-pointer me-lazy" src="${insImg}" data-big="${bigImg}" data-title="${escapeHtml(row.copyright)}" alt="${bing_api_prefix}${row.urlbase}" style="width:100%;max-width:100%">
             </div>
             <div class="w3-auto">
                 <div class="w3-row w3-padding-small w3-tiny" >
@@ -305,9 +311,9 @@ function loadData(db) {
                         <i class="fa fa-circle w3-transparent"></i> ${isToday ? tags.get(days) || tags.get('default') : '必应美图'}
                     </div>
                 </div>
-                <div class="w3-row w3-padding-small me-img-title" title="${title}">
-                    <a href="${copyrightlink}" target="_blank" ${copyrightlink ? '' : 'onclick="return false" class="me-cursor-default"'}>
-                        ${title}
+                <div class="w3-row w3-padding-small me-img-title" title="${escapeHtml(title)}">
+                    <a href="${escapeHtml(copyrightlink)}" target="_blank" ${copyrightlink ? '' : 'onclick="return false" class="me-cursor-default"'}>
+                        ${escapeHtml(title)}
                     </a>
                 </div>
                 <div class="w3-row w3-padding-small w3-small me-meta">
