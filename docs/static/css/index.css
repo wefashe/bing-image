@@ -303,6 +303,7 @@ img.me-img-error {
     background-color: var(--theme-background, white);
     z-index: 9999;
     overflow: hidden;
+    padding-top: 0 !important;
 }
 
 .me-view-mask .w3-text-white {
@@ -342,6 +343,25 @@ html.me-no-scroll {
 
 .me-big-img-view {
     background-size: cover;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.me-big-img-view > .w3-display-middle {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    float: none;
+    width: 75%;
+}
+
+.me-big-img-view > .w3-col {
+    width: 100%;
+    float: none;
 }
 
 .me-big-img-show:hover {
@@ -355,32 +375,34 @@ html.me-no-scroll {
 /* 预览信息栏 */
 .me-view-info {
     position: absolute;
-    bottom: 16px;
-    left: 16px;
-    max-width: 400px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px 20px 16px;
     color: #fff;
     z-index: 10;
     pointer-events: none;
     text-align: left;
+    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 50%, transparent 100%);
 }
 
 .me-view-info-title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     line-height: 1.4;
-    margin-bottom: 6px;
-    word-break: break-word;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    margin-bottom: 4px;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .me-view-info-meta {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.75);
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     text-align: left;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .me-view-info-date::before {
@@ -398,19 +420,13 @@ html.me-no-scroll {
 
 .me-view-info-story {
     margin-top: 8px;
-    padding: 8px 10px;
     font-size: 12px;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.85);
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 6px;
-    max-height: 120px;
-    overflow-y: auto;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     word-break: break-word;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-    white-space: pre-wrap;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    max-height: 120px;
+    overflow: hidden;
 }
 
 .me-big-img-show.w3-col .me-view-info {
@@ -421,6 +437,7 @@ html.me-no-scroll {
     background-size: 100% 100%;
     min-height: 90%;
     position: relative;
+    overflow: hidden;
 }
 
 @media (max-width: 600px) {
