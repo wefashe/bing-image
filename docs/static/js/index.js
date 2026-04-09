@@ -482,19 +482,21 @@ loadStories(function () {
     const height = document.getElementById('me-today-show').clientHeight;
     var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
     var menu = document.getElementById('me-menu')
-    if (scrollTop > height / 2) {
-      if (!menu.classList.contains('me-background')) {
-        menu.classList.add('me-background')
-      }
+    // 导航栏随滚动渐显：滚过20%开始渐显，滚过60%完全显示
+    var menuRatio = Math.min(1, Math.max(0, (scrollTop - height * 0.2) / (height * 0.4)));
+    if (menuRatio > 0) {
+      menu.style.opacity = 0.1 + menuRatio * 0.8;
+      menu.style.pointerEvents = 'auto';
+      menu.style.background = 'var(--theme-background, white)';
     } else {
-      if (menu.classList.contains('me-background')) {
-        menu.classList.remove('me-background')
-      }
+      menu.style.opacity = '0';
+      menu.style.pointerEvents = 'none';
+      menu.style.background = '';
     }
-    // 首页信息栏随滚动渐隐，图片上半部分遮住时刚好完全消失
+    // 首页信息栏随滚动渐隐：滚过20%开始渐隐，滚过60%完全消失
     var todayInfo = document.getElementById('me-today-info');
     if (todayInfo && !todayInfo.classList.contains('w3-hide')) {
-      var ratio = Math.min(1, scrollTop / (height / 2));
+      var ratio = Math.min(1, Math.max(0, (scrollTop - height * 0.2) / (height * 0.4)));
       todayInfo.style.opacity = 1 - ratio;
     }
     // 浏览器滚动触发（数据全部加载完后跳过）

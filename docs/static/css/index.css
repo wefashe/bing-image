@@ -39,6 +39,13 @@ html {
     color-scheme: var(--theme-mode, light);
     /* 使body高度最小为屏幕高度 */
     height: 100%;
+    /* 隐藏滚动条但保留滚动功能 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+    display: none;
 }
 
 .me-gray {
@@ -61,18 +68,20 @@ a {
 }
 
 .me-menu {
-    opacity: 0.3;
-    transition: opacity 1s ease-out, background-color 0.5s ease;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, background-color 0.5s ease;
 }
 
-.me-background {
+.me-menu:hover {
     background: var(--theme-background, white);
     opacity: 0.9;
 }
 
-.me-menu:not(.me-background):hover {
+.me-menu.me-background {
     background: var(--theme-background, white);
     opacity: 0.9;
+    pointer-events: auto;
 }
 
 .me-card {
@@ -450,8 +459,10 @@ html.me-no-scroll {
 }
 
 .me-today-show {
-    background-size: 100% 100%;
-    min-height: 90%;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100%;
     position: relative;
     overflow: hidden;
 }
@@ -460,7 +471,8 @@ html.me-no-scroll {
 
     /* 小屏样式 */
     .me-today-show {
-        background-size: 100% 100%;
-        min-height: 35%;
+        background-size: cover;
+        background-position: center;
+        height: 60vh;
     }
 }
