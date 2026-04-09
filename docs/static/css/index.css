@@ -383,6 +383,10 @@ html.me-no-scroll {
     cursor: grabbing;
 }
 
+.me-big-img-show img {
+    border-radius: 8px;
+}
+
 /* 预览信息栏 */
 .me-view-info {
     position: absolute;
