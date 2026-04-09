@@ -387,22 +387,34 @@ html.me-no-scroll {
 }
 
 .me-view-info-title {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     line-height: 1.4;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     color: #fff;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.5px;
 }
 
 .me-view-info-meta {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.6);
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: center;
     text-align: left;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.me-view-info-meta .me-view-info-date,
+.me-view-info-meta .me-view-info-copyright {
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .me-view-info-date::before {
@@ -412,21 +424,22 @@ html.me-no-scroll {
     font-size: 11px;
 }
 
-.me-view-info-copyright {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.me-view-info-copyright::before {
+    content: "\f041";
+    font-family: FontAwesome;
+    margin-right: 4px;
+    font-size: 11px;
 }
 
 .me-view-info-story {
-    margin-top: 8px;
-    font-size: 12px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     word-break: break-word;
     max-height: 120px;
     overflow: hidden;
+    white-space: pre-wrap;
 }
 
 .me-big-img-show.w3-col .me-view-info {
