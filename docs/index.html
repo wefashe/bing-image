@@ -39,6 +39,15 @@
     <link rel="stylesheet" type="text/css" href="static/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="static/css/w3.css" />
     <link rel="stylesheet" type="text/css" href="static/css/index.css" />
+    <script>
+        // 在渲染前立即初始化主题，避免加载动画主题闪烁
+        (function(){
+            var d=localStorage.getItem('dark');
+            if(d&&d==='1'){document.documentElement.setAttribute('data-theme','dark')}
+            else if(!d&&window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.setAttribute('data-theme','dark')}
+            else if(!d){var h=new Date().getHours();if(h>=21||h<7){document.documentElement.setAttribute('data-theme','dark')}}
+        })();
+    </script>
 </head>
 
 <body>
