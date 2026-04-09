@@ -384,7 +384,7 @@ html.me-no-scroll {
 }
 
 .me-big-img-show img {
-    border-radius: 8px;
+    border-radius: 0;
 }
 
 /* 预览信息栏 */
@@ -500,6 +500,102 @@ html.me-no-scroll {
 
 .me-big-img-show.w3-col .me-view-info {
     display: none;
+}
+
+/* 预览切换滑动动画 */
+.me-big-img-show {
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.me-big-img-show > img[data-date] {
+    display: block;
+    margin: 0 auto;
+}
+
+/* 上一张(plusImg(1)): 旧图向右滑出 (脱离文档流，不占高度) */
+.me-img-slide-out-right {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    z-index: 1;
+    animation: meSlideOutRight .38s ease-in-out forwards;
+    pointer-events: none;
+    will-change: transform;
+}
+
+/* 上一张(plusImg(1)): 新图从左滑入 (保持文档流，占高度) */
+.me-img-slide-in-left {
+    position: relative;
+    z-index: 2;
+    animation: meSlideInLeft .38s ease-in-out forwards;
+    will-change: transform;
+}
+
+/* 下一张(plusImg(-1)): 旧图向左滑出 (脱离文档流，不占高度) */
+.me-img-slide-out-left {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    z-index: 1;
+    animation: meSlideOutLeft .38s ease-in-out forwards;
+    pointer-events: none;
+    will-change: transform;
+}
+
+/* 下一张(plusImg(-1)): 新图从右滑入 (保持文档流，占高度) */
+.me-img-slide-in-right {
+    position: relative;
+    z-index: 2;
+    animation: meSlideInRight .38s ease-in-out forwards;
+    will-change: transform;
+}
+
+@keyframes meSlideOutRight {
+    to { transform: translateX(100%); opacity: .3; }
+}
+
+@keyframes meSlideInLeft {
+    from { transform: translateX(-100%); opacity: .3; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes meSlideOutLeft {
+    to { transform: translateX(-100%); opacity: .3; }
+}
+
+@keyframes meSlideInRight {
+    from { transform: translateX(100%); opacity: .3; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* 信息栏跟随壁纸滑动 */
+.me-info-slide-prev {
+    animation: meInfoPrev .38s ease-in-out;
+}
+
+.me-info-slide-next {
+    animation: meInfoNext .38s ease-in-out;
+}
+
+@keyframes meInfoPrev {
+    /* 上一张: 随旧图右出 → 切换内容 → 随新图左入 */
+    0% { transform: translateX(0); opacity: 1; }
+    40% { transform: translateX(60%); opacity: 0; }
+    50% { transform: translateX(-60%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes meInfoNext {
+    /* 下一张: 随旧图左出 → 切换内容 → 随新图右入 */
+    0% { transform: translateX(0); opacity: 1; }
+    40% { transform: translateX(-60%); opacity: 0; }
+    50% { transform: translateX(60%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
 }
 
 .me-today-show {

@@ -828,6 +828,9 @@ let currentPreviewDate = null;
 let currentPreviewDirection = 1; // 1=上一张(时间更早), -1=下一张(时间更新)
 // 当前预览图片的UHD下载地址
 let currentPreviewDownloadUrl = null;
+// 滑动动画锁，防止快速点击
+let isSliding = false;
+const SLIDE_DURATION = 380; // 与CSS动画时长保持一致
 
 // 数据库日期边界缓存
 let dbMinDate = null;
@@ -846,6 +849,7 @@ function getDbBounds() {
 function showImg(date) {
   const bigImgView = document.getElementById('me-big-img-show');
   const bigImgs = bigImgView.getElementsByTagName("img");
+  const viewInfo = document.getElementById('me-view-info');
 
   // 通过数据库判断目标日期是否存在壁纸
   getDbBounds();
@@ -896,14 +900,77 @@ function showImg(date) {
   const dlUhdUrl = dlUrl.replace(dlUrl.substring(dlUrl.lastIndexOf('_') + 1, dlUrl.lastIndexOf('.')), 'UHD');
   currentPreviewDownloadUrl = bing_api_prefix + dlUhdUrl;
 
-  // 隐藏所有已显示的图
+  // 查找当前可见的旧图
+  let oldImg = null;
   for (let img_obj of bigImgs) {
-    img_obj.classList.add('w3-hide');
+    if (!img_obj.classList.contains('w3-hide')) {
+      oldImg = img_obj;
+    }
   }
 
-  // 切换图片时先隐藏信息栏，等图片加载完再显示
-  const viewInfo = document.getElementById('me-view-info');
-  if (viewInfo) viewInfo.classList.add('w3-hide');
+  // 判断是否需要滑动动画
+  const dir = currentPreviewDirection || 0;
+  const shouldSlide = oldImg && dir !== 0 && !isSliding;
+
+  if (isSliding) return;
+
+  // 更新信息栏内容的辅助函数
+  function updateViewInfo(infoEl, data, d) {
+    if (!infoEl || !data) return;
+    const dateShow = d.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+    infoEl.querySelector('.me-view-info-title').textContent = data.title || '';
+    infoEl.querySelector('.me-view-info-date').textContent = dateShow;
+    infoEl.querySelector('.me-view-info-copyright').textContent = data.copyright || '';
+    showStory(infoEl, d);
+    infoEl.classList.remove('w3-hide');
+  }
+
+  // 滑动结束后的清理函数
+  let slideFinished = false;
+  function finishSlide() {
+    if (slideFinished) return;
+    slideFinished = true;
+    // 解锁容器高度，让新图(文档流)接管高度
+    bigImgView.style.height = '';
+    isSliding = false;
+  }
+
+  if (shouldSlide) {
+    isSliding = true;
+    slideFinished = false;
+
+    // 锁定容器高度，防止旧图脱离文档流后容器塌陷闪烁
+    bigImgView.style.height = bigImgView.offsetHeight + 'px';
+
+    // 旧图滑出动画（旧图脱离文档流：position: absolute）
+    const outClass = dir > 0 ? 'me-img-slide-out-right' : 'me-img-slide-out-left';
+    oldImg.classList.add(outClass);
+    oldImg.addEventListener('animationend', function handler() {
+      oldImg.removeEventListener('animationend', handler);
+      oldImg.classList.add('w3-hide');
+      oldImg.classList.remove(outClass);
+    });
+
+    // 信息栏跟随滑动动画
+    const infoAnimClass = dir > 0 ? 'me-info-slide-prev' : 'me-info-slide-next';
+    viewInfo.classList.remove('w3-hide');
+    viewInfo.classList.add(infoAnimClass);
+    // 在动画中间(45%)更新信息栏内容
+    setTimeout(function () {
+      updateViewInfo(viewInfo, rowData, date);
+    }, SLIDE_DURATION * 0.45);
+    viewInfo.addEventListener('animationend', function handler() {
+      viewInfo.removeEventListener('animationend', handler);
+      viewInfo.classList.remove(infoAnimClass);
+      finishSlide();
+    });
+  } else {
+    // 首次打开或无方向：隐藏所有已显示的图
+    for (let img_obj of bigImgs) {
+      img_obj.classList.add('w3-hide');
+    }
+    if (viewInfo) viewInfo.classList.add('w3-hide');
+  }
 
   // 检查是否已缓存该图
   let existInBig = null;
@@ -914,15 +981,19 @@ function showImg(date) {
   }
 
   if (existInBig && existInBig.parentNode === bigImgView) {
-    existInBig.classList.remove('w3-hide');
-    // 缓存图片立即显示信息栏
-    if (viewInfo && rowData) {
-      const dateShow = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
-      viewInfo.querySelector('.me-view-info-title').textContent = rowData.title || '';
-      viewInfo.querySelector('.me-view-info-date').textContent = dateShow;
-      viewInfo.querySelector('.me-view-info-copyright').textContent = rowData.copyright || '';
-      showStory(viewInfo, date);
-      viewInfo.classList.remove('w3-hide');
+    if (shouldSlide) {
+      // 缓存图：立即滑入（新图保持文档流：position: relative）
+      const inClass = dir > 0 ? 'me-img-slide-in-left' : 'me-img-slide-in-right';
+      existInBig.classList.remove('w3-hide');
+      existInBig.classList.add(inClass);
+      existInBig.addEventListener('animationend', function handler() {
+        existInBig.removeEventListener('animationend', handler);
+        existInBig.classList.remove(inClass);
+        finishSlide();
+      });
+    } else {
+      existInBig.classList.remove('w3-hide');
+      updateViewInfo(viewInfo, rowData, date);
     }
   } else {
     // 限制预览缓存图片数量，防止内存泄漏
@@ -948,24 +1019,31 @@ function showImg(date) {
     const lodding = bigImgView.querySelector('.me-lodding');
     if (lodding) lodding.classList.remove('w3-hide');
     newImg.onload = function () {
-      newImg.classList.remove('w3-hide');
       newImg.onload = null;
       if (lodding) lodding.classList.add('w3-hide');
-      // 图片加载完成后显示信息栏
-      if (viewInfo && rowData) {
-        const dateShow = date.replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
-        viewInfo.querySelector('.me-view-info-title').textContent = rowData.title || '';
-        viewInfo.querySelector('.me-view-info-date').textContent = dateShow;
-        viewInfo.querySelector('.me-view-info-copyright').textContent = rowData.copyright || '';
-        showStory(viewInfo, date);
-        viewInfo.classList.remove('w3-hide');
+      if (shouldSlide) {
+        // 新图加载完成后滑入（新图保持文档流：position: relative）
+        const inClass = dir > 0 ? 'me-img-slide-in-left' : 'me-img-slide-in-right';
+        newImg.classList.remove('w3-hide');
+        newImg.classList.add(inClass);
+        newImg.addEventListener('animationend', function handler() {
+          newImg.removeEventListener('animationend', handler);
+          newImg.classList.remove(inClass);
+          finishSlide();
+        });
+      } else {
+        newImg.classList.remove('w3-hide');
+        updateViewInfo(viewInfo, rowData, date);
       }
     }
     newImg.onerror = function () {
-      newImg.classList.remove('w3-hide');
-      newImg.classList.add('me-img-error');
       newImg.onerror = null;
       if (lodding) lodding.classList.add('w3-hide');
+      if (shouldSlide) {
+        finishSlide();
+      }
+      newImg.classList.remove('w3-hide');
+      newImg.classList.add('me-img-error');
     }
     newImg.src = viewUrl;
     newImg.classList.add('w3-hide');
