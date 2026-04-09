@@ -298,6 +298,8 @@ function loadData(db) {
         showStory(todayInfo, date8);
         todayInfo.classList.remove('w3-hide');
       }
+      // 动态更新页面SEO信息，基于今日壁纸数据
+      updatePageSEO(row.title, dateShow, row.copyright, viewImg);
     }
 
     // 渐进式图片
@@ -385,6 +387,34 @@ function restoreScrollPosition() {
 
 // 页面离开前保存滚动状态
 window.addEventListener('beforeunload', saveScrollState);
+
+// 动态更新页面SEO信息（基于今日壁纸数据）
+function updatePageSEO(title, dateShow, copyright, imageUrl) {
+  const safeTitle = (title || '').replace(/[<>"']/g, '');
+  const safeCopyright = (copyright || '').replace(/[<>"']/g, '');
+  const safeDate = dateShow || '';
+  // 更新页面标题
+  document.title = safeTitle + ' - 必应壁纸每日一图 (' + safeDate + ')';
+  // 更新 meta description
+  setMetaContent('description', safeCopyright + ' | ' + safeDate + '。每日自动更新高清必应桌面壁纸，支持按年月筛选浏览历史必应壁纸，免费下载。');
+  // 更新 Open Graph 标签
+  setMetaContent('og:title', safeTitle + ' - 必应壁纸每日一图');
+  setMetaContent('og:description', safeCopyright + ' | ' + safeDate);
+  setMetaContent('og:image', imageUrl || '');
+  setMetaContent('og:url', 'https://wefashe.github.io/bing-image/');
+  // 更新 Twitter Card 标签
+  setMetaContent('twitter:title', safeTitle + ' - 必应壁纸每日一图');
+  setMetaContent('twitter:description', safeCopyright + ' | ' + safeDate);
+  setMetaContent('twitter:image', imageUrl || '');
+}
+
+function setMetaContent(name, content) {
+  // 支持通过 property 或 name 查找 meta 标签
+  var el = document.querySelector('meta[property="' + name + '"]') || document.querySelector('meta[name="' + name + '"]');
+  if (el) {
+    el.setAttribute('content', content);
+  }
+}
 
 loadStories(function () {
   dbFileGet(function (session) {

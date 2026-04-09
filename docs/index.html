@@ -3,15 +3,32 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>必应壁纸 - 每日一图</title>
+    <title>必应壁纸 - 每日一图 | Bing Wallpaper Daily</title>
+    <meta name="description" content="必应壁纸每日一图，高清必应桌面壁纸下载，涵盖自然风光、动物、建筑、艺术等精美壁纸。每日自动更新，支持按年月筛选浏览历史必应壁纸。" />
+    <meta name="keywords" content="必应壁纸,Bing壁纸,每日一图,必应桌面壁纸,高清壁纸,必应美图,Bing wallpaper,bing image,daily wallpaper" />
     <meta name="language" content="zh-CN" />
     <meta name="author" content="wefashe" />
-    <meta name="robots" content="noindex,nofollow" />
     <meta http-equiv="Content-Language" content="zh-cn" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="msvalidate.01" content="D054E626588F5D8BD7C374BE96855957" />
-    <meta name="keywords" content="必应壁纸,bing wallpaper,每日一图, 每日必应壁纸" />
+    <meta name="theme-color" content="#0e90d2" />
+    <!-- Open Graph / 社交分享 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="必应壁纸 - 每日一图" />
+    <meta property="og:description" content="高清必应桌面壁纸下载，涵盖自然风光、动物、建筑、艺术等精美壁纸。每日自动更新，支持按年月筛选浏览历史必应壁纸。" />
+    <meta property="og:url" content="https://wefashe.github.io/bing-image/" />
+    <meta property="og:site_name" content="必应壁纸" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:image" content="https://wefashe.github.io/bing-image/static/img/favicon-3.ico" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="必应壁纸 - 每日一图" />
+    <meta name="twitter:description" content="高清必应桌面壁纸下载，涵盖自然风光、动物、建筑、艺术等精美壁纸。每日自动更新。" />
+    <meta name="twitter:image" content="https://wefashe.github.io/bing-image/static/img/favicon-3.ico" />
+    <!-- 搜索引擎抓取 -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://wefashe.github.io/bing-image/" />
     <link rel="icon" type="image/vnd.microsoft.icon" href="static/img/favicon-3.ico" />
     <link rel="preconnect" href="./" />
     <link rel="dns-prefetch" href="./" />
@@ -50,7 +67,27 @@
     </script>
 </head>
 
-<body>
+<body itemscope itemtype="https://schema.org/WebSite">
+    <!-- JSON-LD 结构化数据，帮助搜索引擎理解页面 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "必应壁纸 - 每日一图",
+        "url": "https://wefashe.github.io/bing-image/",
+        "description": "高清必应桌面壁纸下载，涵盖自然风光、动物、建筑、艺术等精美壁纸。每日自动更新，支持按年月筛选浏览历史必应壁纸。",
+        "author": {
+            "@type": "Person",
+            "name": "wefashe"
+        },
+        "inLanguage": "zh-CN",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://wefashe.github.io/bing-image/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
     <!-- !ME FULL LOAD -->
     <div id="me-full-load" class="me-full-load">
         <div class="me-load-mask w3-modal">
@@ -68,13 +105,13 @@
     </div>
 
     <!-- !ME MENU -->
-    <div id="me-menu" class="me-menu w3-top">
+    <nav id="me-menu" class="me-menu w3-top" aria-label="主导航">
         <div class="w3-bar w3-auto">
             <div class="w3-bar-item">
                 <a href="./" target="_self">
                     <img class="w3-image" src="static/img/favicon-3.ico" width="32" height="32" />
                 </a>
-                <span class="w3-xlarge" style="vertical-align:middle;">必应壁纸 每日一图</span>
+                <h1 class="w3-xlarge" style="vertical-align:middle;margin:0;display:inline;">必应壁纸 每日一图</h1>
             </div>
             <div class="w3-bar-item w3-right w3-xlarge">
                 <iframe id="me-weather" class="w3-hide-small" style="vertical-align:middle;" allowtransparency="true" frameborder="0"
@@ -87,7 +124,7 @@
                 </a>
             </div>
         </div>
-    </div>
+    </nav>
 
     <!-- !ME TODAY SHOW -->
     <div id="me-today-show" class="me-today-show me-lazy">
@@ -129,9 +166,9 @@
     </div>
 
     <!-- !ME LIST -->
-    <div id="me-list" class="me-list w3-section">
+    <main id="me-list" class="me-list w3-section">
         <div id="image-list" class="w3-row-padding w3-auto"></div>
-    </div>
+    </main>
 
     <!-- !ME DETAIL -->
     <div id="me-detail" class="me-detail me-today">
@@ -201,12 +238,12 @@
     </div>
 
     <!-- !ME COPYRIGHT -->
-    <div class="me-copyright w3-center w3-padding">
+    <footer class="me-copyright w3-center w3-padding">
         <p class="w3-small">
             <i class="fa fa-exclamation-circle"></i> 本站所有图片均来源于必应搜索<br>
             <span id="me-copyright-year"></span>
         </p>
-    </div>
+    </footer>
 
 </body>
 <script type="text/javascript" src="static/js/sql-wasm.js"></script>

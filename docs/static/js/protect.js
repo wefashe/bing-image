@@ -1,3 +1,8 @@
+// 搜索引擎爬虫检测，爬虫不执行保护脚本
+const isBot = /bot|crawl|spider|slurp|mediapartners|google|bing|baidu|sogou|duckduckgo|yandex|teoma/i.test(navigator.userAgent);
+if (isBot) {
+  // 爬虫直接退出，不执行任何保护逻辑
+} else {
 // 禁止调试
   (() => {
     function block() {
@@ -67,5 +72,7 @@ document.onselect = function (e) {
   }
   return false;
 }
+
+} // end isBot guard
 
 

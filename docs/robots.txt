@@ -1,5 +1,7 @@
 User-agent: *
-Disallow: 
+Allow: /
 Disallow: /data/
-Sitemap: sitemap.xml
+Crawl-delay: 1
+
+Sitemap: https://wefashe.github.io/bing-image/sitemap.xml
 Host: https://wefashe.github.io/bing-image
