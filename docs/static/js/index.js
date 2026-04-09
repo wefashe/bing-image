@@ -951,25 +951,58 @@ function showImg(date) {
       oldImg.classList.remove(outClass);
     });
 
-    // 信息栏跟随滑动动画
-    const infoAnimClass = dir > 0 ? 'me-info-slide-prev' : 'me-info-slide-next';
+    // 信息栏随旧图一起滑出
+    const infoOutClass = dir > 0 ? 'me-info-slide-out-right' : 'me-info-slide-out-left';
     viewInfo.classList.remove('w3-hide');
-    viewInfo.classList.add(infoAnimClass);
-    // 在动画中间(45%)更新信息栏内容
-    setTimeout(function () {
-      updateViewInfo(viewInfo, rowData, date);
-    }, SLIDE_DURATION * 0.45);
-    viewInfo.addEventListener('animationend', function handler() {
-      viewInfo.removeEventListener('animationend', handler);
-      viewInfo.classList.remove(infoAnimClass);
-      finishSlide();
-    });
+    viewInfo.classList.add(infoOutClass);
   } else {
     // 首次打开或无方向：隐藏所有已显示的图
     for (let img_obj of bigImgs) {
       img_obj.classList.add('w3-hide');
     }
     if (viewInfo) viewInfo.classList.add('w3-hide');
+  }
+
+  // 新图滑入的统一处理函数（缓存图和加载图共用）
+  // 克隆信息栏：原始随旧图滑出，克隆随新图滑入，互不干扰
+  function slideInNewImg(imgEl) {
+    const inClass = dir > 0 ? 'me-img-slide-in-left' : 'me-img-slide-in-right';
+    const infoInClass = dir > 0 ? 'me-info-slide-in-left' : 'me-info-slide-in-right';
+    const infoOutClass = dir > 0 ? 'me-info-slide-out-right' : 'me-info-slide-out-left';
+
+    // 克隆信息栏，用于随新图滑入
+    const infoClone = viewInfo.cloneNode(true);
+    infoClone.removeAttribute('id');
+    infoClone.classList.remove('w3-hide', infoOutClass);
+    updateViewInfo(infoClone, rowData, date);
+    infoClone.classList.add(infoInClass);
+    bigImgView.appendChild(infoClone);
+
+    // 新图滑入
+    imgEl.classList.remove('w3-hide');
+    imgEl.classList.add(inClass);
+
+    // 动画结束后：移除克隆，重置原始信息栏
+    let animCount = 0;
+    function onEnd() {
+      animCount++;
+      if (animCount < 2) return; // 等新图和信息栏克隆都完成
+      infoClone.remove();
+      viewInfo.classList.remove(infoOutClass);
+      viewInfo.style.transform = '';
+      updateViewInfo(viewInfo, rowData, date);
+      finishSlide();
+    }
+    imgEl.addEventListener('animationend', function handler() {
+      imgEl.removeEventListener('animationend', handler);
+      imgEl.classList.remove(inClass);
+      onEnd();
+    });
+    infoClone.addEventListener('animationend', function handler() {
+      infoClone.removeEventListener('animationend', handler);
+      infoClone.classList.remove(infoInClass);
+      onEnd();
+    });
   }
 
   // 检查是否已缓存该图
@@ -982,15 +1015,8 @@ function showImg(date) {
 
   if (existInBig && existInBig.parentNode === bigImgView) {
     if (shouldSlide) {
-      // 缓存图：立即滑入（新图保持文档流：position: relative）
-      const inClass = dir > 0 ? 'me-img-slide-in-left' : 'me-img-slide-in-right';
-      existInBig.classList.remove('w3-hide');
-      existInBig.classList.add(inClass);
-      existInBig.addEventListener('animationend', function handler() {
-        existInBig.removeEventListener('animationend', handler);
-        existInBig.classList.remove(inClass);
-        finishSlide();
-      });
+      // 缓存图：立即与新图一起滑入
+      slideInNewImg(existInBig);
     } else {
       existInBig.classList.remove('w3-hide');
       updateViewInfo(viewInfo, rowData, date);
@@ -1022,15 +1048,8 @@ function showImg(date) {
       newImg.onload = null;
       if (lodding) lodding.classList.add('w3-hide');
       if (shouldSlide) {
-        // 新图加载完成后滑入（新图保持文档流：position: relative）
-        const inClass = dir > 0 ? 'me-img-slide-in-left' : 'me-img-slide-in-right';
-        newImg.classList.remove('w3-hide');
-        newImg.classList.add(inClass);
-        newImg.addEventListener('animationend', function handler() {
-          newImg.removeEventListener('animationend', handler);
-          newImg.classList.remove(inClass);
-          finishSlide();
-        });
+        // 加载图：加载完成后与新图一起滑入
+        slideInNewImg(newImg);
       } else {
         newImg.classList.remove('w3-hide');
         updateViewInfo(viewInfo, rowData, date);

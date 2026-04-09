@@ -573,29 +573,25 @@ html.me-no-scroll {
     to { transform: translateX(0); opacity: 1; }
 }
 
-/* 信息栏跟随壁纸滑动 */
-.me-info-slide-prev {
-    animation: meInfoPrev .38s ease-in-out;
+/* 信息栏跟随壁纸滑动 - 与壁纸使用完全相同的 keyframes */
+.me-info-slide-out-right {
+    animation: meSlideOutRight .38s ease-in-out forwards;
+    will-change: transform;
 }
 
-.me-info-slide-next {
-    animation: meInfoNext .38s ease-in-out;
+.me-info-slide-in-left {
+    animation: meSlideInLeft .38s ease-in-out forwards;
+    will-change: transform;
 }
 
-@keyframes meInfoPrev {
-    /* 上一张: 随旧图右出 → 切换内容 → 随新图左入 */
-    0% { transform: translateX(0); opacity: 1; }
-    40% { transform: translateX(60%); opacity: 0; }
-    50% { transform: translateX(-60%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
+.me-info-slide-out-left {
+    animation: meSlideOutLeft .38s ease-in-out forwards;
+    will-change: transform;
 }
 
-@keyframes meInfoNext {
-    /* 下一张: 随旧图左出 → 切换内容 → 随新图右入 */
-    0% { transform: translateX(0); opacity: 1; }
-    40% { transform: translateX(-60%); opacity: 0; }
-    50% { transform: translateX(60%); opacity: 0; }
-    100% { transform: translateX(0); opacity: 1; }
+.me-info-slide-in-right {
+    animation: meSlideInRight .38s ease-in-out forwards;
+    will-change: transform;
 }
 
 .me-today-show {
