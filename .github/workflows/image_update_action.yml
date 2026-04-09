@@ -45,24 +45,43 @@ jobs:
           python-version: 3.9
           # 缓存pip全局缓存目录
           cache: 'pip'
-      # 爬取壁纸
-      - name: crawl bing image
+      # 安装依赖
+      - name: install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com; fi       
+          if [ -f requirements.txt ]; then pip install -r requirements.txt -i http://pypi.doubanio.com/simple --trusted-host pypi.doubanio.com; fi
+      # 第一次尝试爬取（主方案 + 保底方案）
+      - name: crawl bing image (attempt 1)
+        id: crawl1
+        run: python code/action.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
+        continue-on-error: true
+      # 第二次尝试（等30分钟后重试）
+      - name: wait and retry (attempt 2)
+        id: crawl2
+        if: steps.crawl1.outcome == 'failure'
+        run: |
+          echo "第一次爬取失败，30分钟后重试..."
+          sleep 1800
           python code/action.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
+        continue-on-error: true
+      # 第三次尝试（再等30分钟后重试）
+      - name: wait and retry (attempt 3)
+        if: steps.crawl2.outcome == 'failure'
+        run: |
+          echo "第二次爬取失败，30分钟后最后一次重试..."
+          sleep 1800
+          python code/action.py ${{ github.event.inputs.begin_date }} ${{ github.event.inputs.end_date }}
+        continue-on-error: true
       # 提交文件
       - name: commit and push
+        id: commit
         run: |
           git config --local user.name 'github-actions'
           git config --local user.email 'github-actions@github.com'
           git add .
-          git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
+          git diff --cached --quiet || git commit -m "$(git config user.name) Auto Update At `TZ=UTC-8 date +%Y-%m-%d\ %H:%M:%S`"
           git push
         continue-on-error: true
-      - name: check on failures
-        if: steps.commit.outputs.status == 'failure'
-        run: exit 1
       # deploy:
   #   needs: build
   #   permissions:
