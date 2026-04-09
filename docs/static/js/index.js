@@ -583,11 +583,13 @@ loadStories(function () {
   const loadMoreBtn = document.querySelector('#me-bottom-load-btn .w3-button');
   if (loadMoreBtn) {
     loadMoreBtn.onclick = function () {
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
       hideElementById('me-bottom-load-btn', true);
       hideElementById('me-bottom-loading', false);
       loadData(session)
       lazyload()
       hideElementById('me-bottom-loading', true);
+      window.scrollTo(0, scrollTop);
     }
   }
   // 节流函数只创建一次，避免每次滚动都新建实例
