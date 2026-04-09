@@ -7,6 +7,7 @@ import crawl.plmeizi as plmei
 import crawl.todbi as todbi
 import crawl.wilii as wilii
 import crawl.xinac as xinac
+import crawl.story as story
 import datal.sqllite as sqllite
 import utils.date as date
 
@@ -33,6 +34,13 @@ def daily_update():
         raise Exception(f'{today}日获取到的壁纸数据日期为{image_date}，请检查')
     count = sqllite.update_image_list(images)
     print(f'每日定时更新: {today} 日成功更新了 {count} 条数据')
+
+    # 获取今天的壁纸故事
+    story_result = story.update_today_story()
+    if story_result:
+        print(f'每日定时更新: {today} 日成功更新了壁纸故事')
+    else:
+        print(f'每日定时更新: {today} 日未获取到壁纸故事')
 
 def batch_update(begin_date, end_date):
     '''
