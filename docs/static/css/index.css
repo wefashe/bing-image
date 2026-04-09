@@ -396,6 +396,23 @@ html.me-no-scroll {
     white-space: nowrap;
 }
 
+.me-view-info-story {
+    margin-top: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 6px;
+    max-height: 120px;
+    overflow-y: auto;
+    word-break: break-word;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    white-space: pre-wrap;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
 .me-big-img-show.w3-col .me-view-info {
     display: none;
 }

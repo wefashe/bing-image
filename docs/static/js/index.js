@@ -80,6 +80,46 @@ let pageIndex = 1, pageSize = 24, year = null, month = null;
 let allDataLoaded = false;
 // 全局数据库实例，供预览功能查询
 let dbSession = null;
+// 故事数据
+let storiesData = {};
+
+// 读取 stories.json
+function loadStories(callback) {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', 'data/stories.json', true);
+  xhr.onload = function () {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      try {
+        storiesData = JSON.parse(xhr.responseText);
+      } catch (e) {
+        storiesData = {};
+      }
+    }
+    if (callback) callback();
+  };
+  xhr.onerror = function () {
+    if (callback) callback();
+  };
+  xhr.send();
+}
+
+// 获取指定日期的故事
+function getStory(date) {
+  return storiesData[date] || '';
+}
+
+// 在信息栏中显示/隐藏故事
+function showStory(infoEl, date) {
+  const storyEl = infoEl ? infoEl.querySelector('.me-view-info-story') : null;
+  if (!storyEl) return;
+  const story = getStory(date);
+  if (story) {
+    storyEl.textContent = story;
+    storyEl.classList.remove('w3-hide');
+  } else {
+    storyEl.classList.add('w3-hide');
+  }
+}
 
 // 读取文件
 function dbFileGet(callback) {
@@ -234,6 +274,7 @@ function loadData(db) {
         todayInfo.querySelector('.me-view-info-title').textContent = row.title || '';
         todayInfo.querySelector('.me-view-info-date').textContent = dateShow;
         todayInfo.querySelector('.me-view-info-copyright').textContent = row.copyright || '';
+        showStory(todayInfo, date8);
         todayInfo.classList.remove('w3-hide');
       }
       document.getElementById('me-today-show');
@@ -288,7 +329,8 @@ function loadData(db) {
   pageIndex++;
 }
 
-dbFileGet(function (session) {
+loadStories(function () {
+  dbFileGet(function (session) {
   dbSession = session;
   // 初始化懒加载观察器
   initLazyObserver();
@@ -470,6 +512,7 @@ dbFileGet(function (session) {
     lazyload();
   }, 200);
   window.addEventListener('scroll', throttledScroll);
+  });
 });
 
 document.querySelector('#image-list').onclick = (event) => {
@@ -766,6 +809,7 @@ function showImg(date) {
       viewInfo.querySelector('.me-view-info-title').textContent = rowData.title || '';
       viewInfo.querySelector('.me-view-info-date').textContent = dateShow;
       viewInfo.querySelector('.me-view-info-copyright').textContent = rowData.copyright || '';
+      showStory(viewInfo, date);
       viewInfo.classList.remove('w3-hide');
     }
   } else {
@@ -801,6 +845,7 @@ function showImg(date) {
         viewInfo.querySelector('.me-view-info-title').textContent = rowData.title || '';
         viewInfo.querySelector('.me-view-info-date').textContent = dateShow;
         viewInfo.querySelector('.me-view-info-copyright').textContent = rowData.copyright || '';
+        showStory(viewInfo, date);
         viewInfo.classList.remove('w3-hide');
       }
     }
