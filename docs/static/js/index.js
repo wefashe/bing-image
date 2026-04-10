@@ -322,7 +322,7 @@ function loadData(db) {
                     </a>
                 </div>
                 <div class="w3-row w3-padding-small w3-small me-meta">
-                    <div class="w3-left w3-show-inline-block"><i class="fa fa-clock-o"></i> ${dateShow}</div>
+                    <div class="w3-left w3-show-inline-block"><i class="fa fa-calendar"></i> ${dateShow}</div>
                     <div class="w3-right w3-show-inline-block w3-row-padding">
                         <div class="w3-show-inline-block"><i class="fa fa-eye"></i> <span>${viewCount}</span></div>
                         <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer" data-view=${viewImg}></i> <span class="me-download-count">${downCount}</span></div>
