@@ -1491,7 +1491,7 @@ document.getElementById('me-theme-btn') && (document.getElementById('me-theme-bt
 
 // 注册 Service Worker，缓存 Bing CDN 图片
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('static/js/sw.js', { scope: '../../' }).catch(() => {});
+  navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {});
 }
 
 // 悼念日网站变灰
