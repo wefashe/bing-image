@@ -426,15 +426,7 @@ html.me-no-scroll {
 }
 
 .me-view-info::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 30%;
-    height: 40%;
-    background: linear-gradient(to left, transparent, rgba(0,0,0,0.12));
-    z-index: -1;
-    pointer-events: none;
+    content: none;
 }
 
 .me-view-info-inner {
