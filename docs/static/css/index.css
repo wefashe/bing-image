@@ -244,62 +244,53 @@ img.me-img-error {
 }
 
 .me-load-logo {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    animation: me-load-pulse 1.5s ease-in-out infinite;
+    animation: me-load-float 2s ease-in-out infinite;
 }
 
-@keyframes me-load-pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.7; }
+@keyframes me-load-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
 }
 
 .me-load-text {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
     color: var(--theme-color, black);
-    letter-spacing: 2px;
+    letter-spacing: 4px;
 }
 
-.me-load-spinner {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.me-load-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: var(--theme-color, black);
-    opacity: 0.3;
-    animation: me-load-bounce 1.2s ease-in-out infinite;
-}
-
-.me-load-dot:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.me-load-dot:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes me-load-bounce {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-    40% { transform: scale(1.2); opacity: 1; }
-}
-
-.me-load-hint {
+.me-load-subtitle {
     font-size: 13px;
     color: var(--theme-color, black);
-    opacity: 0.5;
-    animation: me-load-fade 2s ease-in-out infinite;
+    opacity: 0.4;
+    letter-spacing: 6px;
+    margin-top: -8px;
 }
 
-@keyframes me-load-fade {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
+.me-load-progress {
+    width: 120px;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.me-load-progress-bar {
+    width: 30%;
+    height: 100%;
+    background: var(--theme-color, black);
+    border-radius: 1px;
+    opacity: 0.5;
+    animation: me-load-progress-move 1.2s ease-in-out infinite;
+}
+
+@keyframes me-load-progress-move {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
 }
 
 .me-lodding {
