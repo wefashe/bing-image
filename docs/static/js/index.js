@@ -461,7 +461,9 @@ function setMetaContent(name, content) {
 }
 
 loadStories(function () {
+  if (window.__debugDetected) return;
   dbFileGet(function (session) {
+  if (window.__debugDetected) return;
   dbSession = session;
   // 初始化懒加载观察器
   initLazyObserver();
@@ -673,7 +675,7 @@ loadStories(function () {
   });
 });
 
-document.querySelector('#image-list').onclick = (event) => {
+document.querySelector('#image-list') && (document.querySelector('#image-list').onclick = (event) => {
   const target = event.target
   if (target.classList.contains('w3-image')) {
     preview(target)
@@ -681,7 +683,7 @@ document.querySelector('#image-list').onclick = (event) => {
   if (target.classList.contains('fa-download')) {
     download(target, target.getAttribute('data-view'), true);
   }
-}
+})
 
 function imgBigShow(img) {
   var image = new Image();

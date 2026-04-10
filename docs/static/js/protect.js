@@ -7,7 +7,12 @@ if (isBot) {
   (() => {
     function block() {
       if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {
-        document.body.innerHTML = "检测到非法调试,请关闭后刷新重试!";
+        window.__debugDetected = true;
+        document.body.innerHTML = "";
+        var msg = document.createElement("div");
+        msg.style.cssText = "display:flex;justify-content:center;align-items:center;min-height:100vh;font-size:18px;color:#e74c3c;font-family:sans-serif;text-align:center;padding:20px;";
+        msg.textContent = "检测到非法调试,请关闭后刷新重试!";
+        document.body.appendChild(msg);
       }
     }
     const timer = setInterval(() => {
