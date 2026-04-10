@@ -75,6 +75,8 @@
 "use strict";
 // 前缀
 const bing_api_prefix = 'https://cn.bing.com';
+// 调试模式：复用 protect.js 中已声明的 isDebugMode 和 _log
+const isDebug = typeof isDebugMode !== 'undefined' ? isDebugMode : new URLSearchParams(location.search).get('debug') === 'true';
 // 分页
 let pageIndex = 1, pageSize = 24, year = null, month = null;
 let allDataLoaded = false;
@@ -89,34 +91,46 @@ const SCROLL_RESTORE_KEY = 'bing_image_scroll_restore';
 // 读取 stories.json（按日期缓存，当天有效，隔天重新请求）
 function loadStories(callback) {
   var dateKey;
-  try {
-    const today = chinaDate();
-    dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    const cached = sessionStorage.getItem('bing_stories_' + dateKey);
-    if (cached) {
-      storiesData = JSON.parse(cached);
-      if (callback) callback();
-      return;
-    }
-  } catch (e) {}
+  if (!isDebug) {
+    try {
+      const today = chinaDate();
+      dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      const cached = sessionStorage.getItem('bing_stories_' + dateKey);
+      if (cached) {
+        storiesData = JSON.parse(cached);
+        if (callback) callback();
+        return;
+      }
+    } catch (e) {}
+  } else {
+    _log('[Debug] stories.json 跳过缓存，直接请求');
+  }
+  _log('[Debug] stories.json 开始请求...');
   const xhr = new XMLHttpRequest();
-  xhr.open('GET', 'data/stories.json?v=' + (dateKey || Date.now()), true);
+  xhr.open('GET', 'data/stories.json?v=' + Date.now(), true);
   xhr.onload = function () {
     if (xhr.status >= 200 && xhr.status < 300) {
       try {
         storiesData = JSON.parse(xhr.responseText);
-        try {
-          const today = chinaDate();
-          const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-          sessionStorage.setItem('bing_stories_' + dateKey, xhr.responseText);
-        } catch (e) {}
+        _log('[Debug] stories.json 加载完成, 条目数:', Object.keys(storiesData).length);
+        if (!isDebug) {
+          try {
+            const today = chinaDate();
+            const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+            sessionStorage.setItem('bing_stories_' + dateKey, xhr.responseText);
+          } catch (e) {}
+        }
       } catch (e) {
+        _log('[Debug] stories.json 解析失败:', e.message);
         storiesData = {};
       }
+    } else {
+      _log('[Debug] stories.json 请求失败, status:', xhr.status);
     }
     if (callback) callback();
   };
   xhr.onerror = function () {
+    _log('[Debug] stories.json 网络错误');
     if (callback) callback();
   };
   xhr.send();
@@ -157,43 +171,54 @@ function showStory(infoEl, date) {
 
 // 读取文件（按日期缓存，当天有效，隔天重新请求）
 function dbFileGet(callback) {
+  _log('[Debug] dbFileGet 开始加载...');
   let config = {
     locateFile: () => "static/js/sql-wasm.wasm",
   };
   initSqlJs(config).then(function (SQL) {
     // 尝试从缓存读取
-    const today = chinaDate();
-    const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    try {
-      const cached = sessionStorage.getItem('bing_db_' + dateKey);
-      if (cached) {
-        const binary = atob(cached);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        callback(new SQL.Database(bytes));
-        return;
-      }
-    } catch (e) {}
+    if (!isDebug) {
+      const today = chinaDate();
+      const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      try {
+        const cached = sessionStorage.getItem('bing_db_' + dateKey);
+        if (cached) {
+          const binary = atob(cached);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          callback(new SQL.Database(bytes));
+          return;
+        }
+      } catch (e) {}
+    } else {
+      _log('[Debug] images.db 跳过缓存，直接请求');
+    }
+    _log('[Debug] images.db 开始网络请求...');
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', "data/images.db?v=" + dateKey, true);
+    xhr.open('GET', "data/images.db?v=" + Date.now(), true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const today = chinaDate();
-          const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-          const bytes = new Uint8Array(xhr.response);
-          let binary = '';
-          for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-          sessionStorage.setItem('bing_db_' + dateKey, btoa(binary));
-        } catch (e) {}
+        _log('[Debug] images.db 加载完成, size:', (xhr.response.byteLength / 1024).toFixed(1), 'KB');
+        if (!isDebug) {
+          try {
+            const today = chinaDate();
+            const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+            const bytes = new Uint8Array(xhr.response);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+            sessionStorage.setItem('bing_db_' + dateKey, btoa(binary));
+          } catch (e) {}
+        }
         callback(new SQL.Database(new Uint8Array(xhr.response)));
       } else {
+        _log('[Debug] images.db 加载失败, status:', xhr.status);
         hideElementById('me-full-load', true);
         showToast('数据库加载失败，请刷新页面重试');
       }
     };
     xhr.onerror = function () {
+      _log('[Debug] images.db 网络错误');
       hideElementById('me-full-load', true);
       showToast('网络错误，请刷新页面重试');
     };
@@ -259,6 +284,7 @@ function batchLoad(db, totalPages) {
 function loadData(db) {
   var yearParam = year ? year.replace(/[^\d]/g, '') : null;
   var monthParam = month ? month.replace(/[^\d]/g, '') : null;
+  _log('[Debug] loadData: pageIndex=' + pageIndex + ', year=' + yearParam + ', month=' + monthParam);
   // 用范围查询替代 substring 函数，确保索引生效
   var conditions = '';
   if (yearParam && monthParam) {
@@ -389,6 +415,7 @@ function loadData(db) {
     }
     hideElementById('me-bottom-load', true);
     allDataLoaded = true;
+    _log('[Debug] loadData: 无更多数据, allDataLoaded=true');
   } else {
     hideElementById('me-bottom-load', false);
   }
@@ -398,6 +425,7 @@ function loadData(db) {
   const imageList = document.getElementById('image-list');
   // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
   imageList.appendChild(document.createRange().createContextualFragment(parts.join('')));
+  _log('[Debug] loadData: 本页渲染 ' + parts.length + ' 张, pageIndex → ' + (pageIndex + 1));
   pageIndex++;
   // 刷新后恢复滚动位置
   restoreScrollPosition();
@@ -426,6 +454,7 @@ function restoreScrollPosition() {
     if (!state || !state.scrollTop || state.scrollTop <= 0) return;
     // 只在 pageIndex 追赶到保存的页码之后才恢复滚动
     if (state.pageIndex && pageIndex > state.pageIndex) {
+      _log('[Debug] 恢复滚动位置: scrollTop=' + state.scrollTop + ', savedPage=' + state.pageIndex);
       window.scrollTo(0, state.scrollTop);
       scrollRestored = true;
       sessionStorage.removeItem(SCROLL_RESTORE_KEY);
@@ -461,6 +490,7 @@ function setMetaContent(name, content) {
 }
 
 loadStories(function () {
+  _log('[Debug] loadStories 回调触发, 开始加载 DB');
   if (window.__debugDetected) return;
   dbFileGet(function (session) {
   if (window.__debugDetected) return;
@@ -468,6 +498,7 @@ loadStories(function () {
   // 初始化懒加载观察器
   initLazyObserver();
   const years = session.exec("select distinct substr(enddate,1,4) year from wallpaper order by enddate desc");
+  _log('[Debug] DB 加载完成, 年份列表:', years.length > 0 ? years[0].values.map(function(v){return v[0]}) : []);
   if (years.length > 0) {
     const values = years[0]['values'];
     if (values.length > 0) {
@@ -619,6 +650,7 @@ loadStories(function () {
       lazyload();
     }
   }
+  _log('[Debug] 页面初始化完成');
   // 加载更多按钮只绑定一次
   const loadMoreBtn = document.querySelector('#me-bottom-load-btn .w3-button');
   if (loadMoreBtn) {
@@ -708,6 +740,7 @@ function imgBigShow(img) {
 // IntersectionObserver 懒加载
 let lazyObserver = null;
 function initLazyObserver() {
+  _log('[Debug] initLazyObserver: IntersectionObserver', 'IntersectionObserver' in window ? '支持' : '不支持');
   if (lazyObserver || !('IntersectionObserver' in window)) return;
   lazyObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
@@ -778,6 +811,7 @@ window.addEventListener("error", function (event) {
   const target = event.target;
   if (target instanceof HTMLImageElement) {
     const curTimes = Number(target.dataset.retryTimes) || 0
+    _log('[Debug] 图片加载错误: src=' + target.src.substring(0, 80) + '..., retryTimes=' + curTimes);
     // 重试2次
     if (curTimes >= 2) {
       // 去除，防止滚动重复加载
@@ -794,6 +828,7 @@ window.addEventListener("error", function (event) {
 
 // 图片下载
 function download(element, url, download) {
+  _log('[Debug] download: url=' + url);
   if (!url) {
     element.classList.remove('me-cursor-pointer');
     element.onclick = null;
@@ -896,6 +931,7 @@ function getDbBounds() {
 }
 
 function showImg(date) {
+  _log('[Debug] showImg: date=' + date + ', direction=' + currentPreviewDirection);
   const bigImgView = document.getElementById('me-big-img-show');
   const bigImgs = bigImgView.getElementsByTagName("img");
   const viewInfo = document.getElementById('me-view-info');
@@ -1154,6 +1190,8 @@ function showToast(msg) {
 // 图片预览功能
 
 function preview(img) {
+  const date = img.getAttribute('data-date');
+  _log('[Debug] preview 打开, date:', date);
   const view = document.getElementById('me-view')
   view.classList.remove('w3-hide');
   // 锁定页面滚动，记录并保持滚动位置
@@ -1358,7 +1396,6 @@ function preview(img) {
   view.addEventListener('wheel', wheelFunc, { passive: false });
   document.addEventListener('keydown', previewKeyHandler);
 
-  const date = img.getAttribute('data-date')
   currentPreviewDate = date;
   currentPreviewDirection = 0;
   showImg(date)
@@ -1490,8 +1527,18 @@ document.getElementById('me-theme-btn') && (document.getElementById('me-theme-bt
 });
 
 // 注册 Service Worker，缓存 Bing CDN 图片
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && !isDebug) {
   navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {});
+} else if ('serviceWorker' in navigator && isDebug) {
+  _log('[Debug] 调试模式: 注销 Service Worker 并清除缓存');
+  navigator.serviceWorker.getRegistrations().then(function (regs) {
+    _log('[Debug] 发现 ' + regs.length + ' 个 Service Worker 注册');
+    regs.forEach(function (r) { r.unregister(); });
+    caches.keys().then(function (keys) {
+      _log('[Debug] 发现缓存:', keys);
+      keys.forEach(function (k) { caches.delete(k); });
+    });
+  });
 }
 
 // 悼念日网站变灰

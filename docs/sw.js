@@ -6,7 +6,7 @@
  *   2. 动态数据（images.db/stories） → Cache-First，URL 按天版本化，离线回退最近版本
  *   3. Bing CDN 图片                → Cache-First，500 条上限 FIFO 淘汰
  */
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 4;
 const STATIC_CACHE = 'bing-static-v' + CACHE_VERSION;
 const DATA_CACHE = 'bing-data-v' + CACHE_VERSION;
 const IMG_CACHE = 'bing-img'; // 图片缓存不携带版本号，部署更新时不清空

@@ -1,7 +1,10 @@
-// 搜索引擎爬虫检测，爬虫不执行保护脚本
+// 调试模式或搜索引擎爬虫，不执行保护脚本
 const isBot = /bot|crawl|spider|slurp|mediapartners|google|bing|baidu|sogou|duckduckgo|yandex|teoma/i.test(navigator.userAgent);
-if (isBot) {
-  // 爬虫直接退出，不执行任何保护逻辑
+const isDebugMode = new URLSearchParams(location.search).get('debug') === 'true';
+const _log = isDebugMode ? console.log : function(){};
+_log('[Protect] isBot:', isBot, '| isDebugMode:', isDebugMode, '| UA:', navigator.userAgent);
+if (isBot || isDebugMode) {
+  _log('[Protect] 已跳过所有保护逻辑');
 } else {
   // 禁止调试
   (() => {
