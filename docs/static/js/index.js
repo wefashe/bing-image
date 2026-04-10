@@ -99,7 +99,7 @@ function loadStories(callback) {
     }
   } catch (e) {}
   const xhr = new XMLHttpRequest();
-  xhr.open('GET', 'data/stories.json', true);
+  xhr.open('GET', 'data/stories.json?v=' + dateKey, true);
   xhr.onload = function () {
     if (xhr.status >= 200 && xhr.status < 300) {
       try {
@@ -161,9 +161,9 @@ function dbFileGet(callback) {
   };
   initSqlJs(config).then(function (SQL) {
     // 尝试从缓存读取
+    const today = chinaDate();
+    const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     try {
-      const today = chinaDate();
-      const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
       const cached = sessionStorage.getItem('bing_db_' + dateKey);
       if (cached) {
         const binary = atob(cached);
@@ -174,7 +174,7 @@ function dbFileGet(callback) {
       }
     } catch (e) {}
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', "data/images.db", true);
+    xhr.open('GET', "data/images.db?v=" + dateKey, true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
@@ -1485,6 +1485,11 @@ function swithDark() {
 document.getElementById('me-theme-btn').onclick = function () {
   swithDark()
 };
+
+// 注册 Service Worker，缓存 Bing CDN 图片
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js', { scope: '../../' }).catch(() => {});
+}
 
 // 悼念日网站变灰
 function mourningDay(dates) {
