@@ -1485,9 +1485,9 @@ function swithDark() {
   }
 }
 
-document.getElementById('me-theme-btn').onclick = function () {
+document.getElementById('me-theme-btn') && (document.getElementById('me-theme-btn').onclick = function () {
   swithDark()
-};
+});
 
 // 注册 Service Worker，缓存 Bing CDN 图片
 if ('serviceWorker' in navigator) {
