@@ -931,7 +931,9 @@ function showImg(date) {
     if (slideFinished) return;
     slideFinished = true;
     // 解锁容器高度，让新图(文档流)接管高度
-    bigImgView.style.height = '';
+    if (!bigImgView.classList.contains('w3-col')) {
+      bigImgView.style.height = '';
+    }
     isSliding = false;
   }
 
@@ -939,8 +941,10 @@ function showImg(date) {
     isSliding = true;
     slideFinished = false;
 
-    // 锁定容器高度，防止旧图脱离文档流后容器塌陷闪烁
-    bigImgView.style.height = bigImgView.offsetHeight + 'px';
+    // 锁定容器高度，防止旧图脱离文档流后容器塌陷闪烁（最大化状态下不需要）
+    if (!bigImgView.classList.contains('w3-col')) {
+      bigImgView.style.height = bigImgView.offsetHeight + 'px';
+    }
 
     // 旧图滑出动画（旧图脱离文档流：position: absolute）
     const outClass = dir > 0 ? 'me-img-slide-out-right' : 'me-img-slide-out-left';
@@ -1071,6 +1075,14 @@ function showImg(date) {
     bigImgView.appendChild(newImg);
   }
   currentPreviewDate = date;
+
+  // 如果当前处于最大化状态，确保新图片也应用最大化样式
+  if (bigImgView.classList.contains('w3-col')) {
+    var visibleImgs = bigImgView.querySelectorAll('img[data-date]:not(.w3-hide)');
+    visibleImgs.forEach(function (img) {
+      img.style.cssText = 'position:absolute!important;top:0!important;left:0!important;width:100%!important;height:100%!important;object-fit:fill!important;display:block!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;border:none!important;outline:none!important';
+    });
+  }
 }
 
 // 轻量提示
@@ -1127,6 +1139,26 @@ function preview(img) {
     sizeIcon.classList.toggle("fa-search-minus");
     bigImgView.classList.toggle("w3-threequarter");
     bigImgView.classList.toggle("w3-col");
+
+    if (bigImgView.classList.contains('w3-col')) {
+      // 最大化：容器铺满整个视口，图片fill拉伸铺满
+      bigImgView.style.cssText = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;height:auto!important;z-index:1!important;overflow:hidden!important;border-radius:0!important;padding:0!important;margin:0!important;display:block!important;background:#000!important';
+      var imgs = bigImgView.querySelectorAll('img[data-date]:not(.w3-hide)');
+      imgs.forEach(function (img) {
+        img.style.cssText = 'position:absolute!important;top:0!important;left:0!important;width:100%!important;height:100%!important;object-fit:fill!important;display:block!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;border:none!important;outline:none!important';
+      });
+      // 确保按钮容器在图片之上
+      var topBar = view.querySelector('.w3-top');
+      if (topBar) topBar.style.zIndex = '10';
+    } else {
+      // 退出最大化：恢复原始样式
+      bigImgView.style.cssText = '';
+      bigImgView.querySelectorAll('img[data-date]').forEach(function (img) {
+        img.style.cssText = '';
+      });
+      var topBar = view.querySelector('.w3-top');
+      if (topBar) topBar.style.zIndex = '';
+    }
   };
 
   const closeBtn = document.getElementById('me-view-close-btn')
@@ -1146,6 +1178,11 @@ function preview(img) {
       bigImgView.classList.add('w3-threequarter');
       bigImgView.classList.remove('w3-col');
     }
+    // 清理最大化内联样式
+    bigImgView.style.cssText = '';
+    bigImgView.querySelectorAll('img[data-date]').forEach(function (img) {
+      img.style.cssText = '';
+    });
     if (!sizeIcon.classList.contains('fa-search-plus')) {
       sizeIcon.classList.add('fa-search-plus');
       sizeIcon.classList.remove('fa-search-minus');
