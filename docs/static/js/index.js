@@ -900,10 +900,10 @@ function showImg(date) {
   const dlUhdUrl = dlUrl.replace(dlUrl.substring(dlUrl.lastIndexOf('_') + 1, dlUrl.lastIndexOf('.')), 'UHD');
   currentPreviewDownloadUrl = bing_api_prefix + dlUhdUrl;
 
-  // 查找当前可见的旧图
+  // 查找当前可见的旧图（只查找带data-date的预览图片）
   let oldImg = null;
   for (let img_obj of bigImgs) {
-    if (!img_obj.classList.contains('w3-hide')) {
+    if (img_obj.getAttribute('data-date') && !img_obj.classList.contains('w3-hide')) {
       oldImg = img_obj;
     }
   }
@@ -1311,6 +1311,7 @@ function preview(img) {
 
   const date = img.getAttribute('data-date')
   currentPreviewDate = date;
+  currentPreviewDirection = 0;
   showImg(date)
 }
 
