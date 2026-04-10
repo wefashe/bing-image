@@ -317,6 +317,22 @@ img.me-img-error {
     padding-top: 0 !important;
 }
 
+/* 遮罩层打开动画 - 幕布技术：内容先完成布局渲染，再由幕布淡出揭示 */
+.me-view-mask:not(.w3-hide)::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-color: var(--theme-background, white);
+    z-index: 10000;
+    pointer-events: none;
+    animation: meViewCurtainFade 0.3s ease both;
+}
+
+@keyframes meViewCurtainFade {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
 .me-view-mask .w3-text-white {
     color: var(--theme-color, black) !important;
 }
