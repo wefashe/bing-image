@@ -86,14 +86,29 @@ let storiesData = {};
 let scrollRestored = false;
 const SCROLL_RESTORE_KEY = 'bing_image_scroll_restore';
 
-// 读取 stories.json
+// 读取 stories.json（按日期缓存，当天有效，隔天重新请求）
 function loadStories(callback) {
+  try {
+    const today = chinaDate();
+    const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const cached = sessionStorage.getItem('bing_stories_' + dateKey);
+    if (cached) {
+      storiesData = JSON.parse(cached);
+      if (callback) callback();
+      return;
+    }
+  } catch (e) {}
   const xhr = new XMLHttpRequest();
   xhr.open('GET', 'data/stories.json', true);
   xhr.onload = function () {
     if (xhr.status >= 200 && xhr.status < 300) {
       try {
         storiesData = JSON.parse(xhr.responseText);
+        try {
+          const today = chinaDate();
+          const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+          sessionStorage.setItem('bing_stories_' + dateKey, xhr.responseText);
+        } catch (e) {}
       } catch (e) {
         storiesData = {};
       }
@@ -232,7 +247,7 @@ function loadData(db) {
   var stmt = db.prepare(`select enddate, startdate, url, urlbase, copyright, copyrightlink, title from wallpaper w where 1 = 1 ${conditions}
   order by enddate desc limit $pageSize offset($pageIndex - 1) * $pageSize`);
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
-  var content = '';
+  var parts = [];
   const tags = new Map([
     [0, '必应今日'],
     [1, '去年今日'],
@@ -293,7 +308,7 @@ function loadData(db) {
     }
     title = title.replace(/^[\s,，]+|[\s,，]+$/g, '');
 
-    if (pageIndex == 1 && content.length == 0) {
+    if (pageIndex == 1 && parts.length == 0) {
       const todayShow = document.getElementById('me-today-show');
       var img = new Image();
       img.onload = function () {
@@ -316,7 +331,7 @@ function loadData(db) {
     }
 
     // 渐进式图片
-    content += `
+    parts.push(`
     <div class="w3-col l3 m4 s6 w3-margin-top">
         <div class="w3-card w3-hover-shadow w3-round-large me-card">
             <div class="me-list-img w3-center">
@@ -338,29 +353,29 @@ function loadData(db) {
                     <div class="w3-left w3-show-inline-block"><i class="fa fa-calendar"></i> ${dateShow}</div>
                     <div class="w3-right w3-show-inline-block w3-row-padding">
                         <div class="w3-show-inline-block"><i class="fa fa-eye"></i> <span>${viewCount}</span></div>
-                        <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer" data-view=${viewImg}></i> <span class="me-download-count">${downCount}</span></div>
+                        <div class="w3-show-inline-block w3-hide-medium w3-hide-small"><i class="fa fa-download me-cursor-pointer" data-view="${viewImg}"></i> <span class="me-download-count">${downCount}</span></div>
                     </div>
                 </div>
             </div>
         </div >
-    </div > `;
+    </div > `);
   }
-  if (content.length == 0) {
+  if (parts.length == 0) {
     if (pageIndex == 1) {
       document.getElementById('image-list').innerHTML = '';
-      content = '<div class="w3-center">没有图片了</div>';
+      parts.push('<div class="w3-center">没有图片了</div>');
     }
     hideElementById('me-bottom-load', true);
     allDataLoaded = true;
   } else {
     hideElementById('me-bottom-load', false);
   }
-  if (content.length == 0) {
+  if (parts.length == 0) {
     return;
   }
   const imageList = document.getElementById('image-list');
   // 用appendChild代替innerHTML不会进行image-list元素全局重新渲染
-  imageList.appendChild(document.createRange().createContextualFragment(content));
+  imageList.appendChild(document.createRange().createContextualFragment(parts.join('')));
   pageIndex++;
   // 刷新后恢复滚动位置
   restoreScrollPosition();
@@ -594,26 +609,28 @@ loadStories(function () {
     }
   }
   // 节流函数只创建一次，避免每次滚动都新建实例
+  // DOM引用缓存到闭包外，避免每次滚动重复查询
+  const todayShowEl = document.getElementById('me-today-show');
+  const menuEl = document.getElementById('me-menu');
+  const todayInfoEl = document.getElementById('me-today-info');
   const throttledScroll = throttle(function () {
-    const height = document.getElementById('me-today-show').clientHeight;
+    const height = todayShowEl.clientHeight;
     var scrollTop = document.body.scrollTop || document.documentElement.scrollTop || window.screenY;
-    var menu = document.getElementById('me-menu')
     // 导航栏随滚动渐显：滚过20%开始渐显，滚过60%完全显示
     var menuRatio = Math.min(1, Math.max(0, (scrollTop - height * 0.2) / (height * 0.4)));
     if (menuRatio > 0) {
-      menu.style.opacity = 0.1 + menuRatio * 0.8;
-      menu.style.pointerEvents = 'auto';
-      menu.style.background = 'var(--theme-background, white)';
+      menuEl.style.opacity = 0.1 + menuRatio * 0.8;
+      menuEl.style.pointerEvents = 'auto';
+      menuEl.style.background = 'var(--theme-background, white)';
     } else {
-      menu.style.opacity = '0';
-      menu.style.pointerEvents = 'none';
-      menu.style.background = '';
+      menuEl.style.opacity = '0';
+      menuEl.style.pointerEvents = 'none';
+      menuEl.style.background = '';
     }
     // 首页信息栏随滚动渐隐：滚过20%开始渐隐，滚过60%完全消失
-    var todayInfo = document.getElementById('me-today-info');
-    if (todayInfo && !todayInfo.classList.contains('w3-hide')) {
+    if (todayInfoEl && !todayInfoEl.classList.contains('w3-hide')) {
       var ratio = Math.min(1, Math.max(0, (scrollTop - height * 0.2) / (height * 0.4)));
-      todayInfo.style.opacity = 1 - ratio;
+      todayInfoEl.style.opacity = 1 - ratio;
     }
     // 浏览器滚动触发（数据全部加载完后跳过）
     if (!allDataLoaded && pageIndex <= 2) {
@@ -673,6 +690,7 @@ function initLazyObserver() {
       if (entry.isIntersecting) {
         const img = entry.target;
         lazyObserver.unobserve(img);
+        img.classList.remove('me-lazy');
         if (img.complete) {
           imgBigShow(img);
         } else {
@@ -688,7 +706,7 @@ function initLazyObserver() {
 
 // 图片懒加载：注册观察或回退到手动检测
 function lazyload() {
-  var lazyImgs = document.querySelectorAll('img[data-big]');
+  var lazyImgs = document.querySelectorAll('img.me-lazy[data-big]');
   if (lazyObserver) {
     lazyImgs.forEach(function (img) { lazyObserver.observe(img); });
   } else {
