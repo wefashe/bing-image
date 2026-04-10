@@ -88,9 +88,10 @@ const SCROLL_RESTORE_KEY = 'bing_image_scroll_restore';
 
 // 读取 stories.json（按日期缓存，当天有效，隔天重新请求）
 function loadStories(callback) {
+  var dateKey;
   try {
     const today = chinaDate();
-    const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     const cached = sessionStorage.getItem('bing_stories_' + dateKey);
     if (cached) {
       storiesData = JSON.parse(cached);
@@ -99,7 +100,7 @@ function loadStories(callback) {
     }
   } catch (e) {}
   const xhr = new XMLHttpRequest();
-  xhr.open('GET', 'data/stories.json?v=' + dateKey, true);
+  xhr.open('GET', 'data/stories.json?v=' + (dateKey || Date.now()), true);
   xhr.onload = function () {
     if (xhr.status >= 200 && xhr.status < 300) {
       try {
