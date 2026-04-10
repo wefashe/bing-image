@@ -315,9 +315,17 @@ img.me-img-error {
     z-index: 9999;
     overflow: hidden;
     padding-top: 0 !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-/* 遮罩层打开动画 - 幕布技术：内容先完成布局渲染，再由幕布淡出揭示 */
+/* 打开：瞬间设为不透明，由幕布淡出揭示内容（禁止过渡，避免与幕布叠加） */
+.me-view-mask:not(.w3-hide) {
+    opacity: 1;
+    transition: none;
+}
+
+/* 打开幕布：内容已完成布局渲染，幕布从遮挡淡出以揭示 */
 .me-view-mask:not(.w3-hide)::after {
     content: '';
     position: fixed;
@@ -326,6 +334,14 @@ img.me-img-error {
     z-index: 10000;
     pointer-events: none;
     animation: meViewCurtainFade 0.3s ease both;
+}
+
+/* 关闭：覆盖 w3-hide 的 display:none，改用 opacity 过渡实现淡出 */
+.me-view-mask.w3-hide {
+    display: inline-block !important;
+    pointer-events: none !important;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 @keyframes meViewCurtainFade {
