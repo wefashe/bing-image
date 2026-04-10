@@ -1137,27 +1137,78 @@ function preview(img) {
   const sizeFunc = function () {
     sizeIcon.classList.toggle("fa-search-plus");
     sizeIcon.classList.toggle("fa-search-minus");
-    bigImgView.classList.toggle("w3-threequarter");
-    bigImgView.classList.toggle("w3-col");
+    var isMaximizing = !bigImgView.classList.contains('w3-col');
 
-    if (bigImgView.classList.contains('w3-col')) {
-      // 最大化：容器铺满整个视口，图片fill拉伸铺满
+    if (isMaximizing) {
+      // First: 记录正常布局位置和圆角（class切换前）
+      var first = bigImgView.getBoundingClientRect();
+      var firstRadius = getComputedStyle(bigImgView).borderRadius;
+      bigImgView.classList.remove('w3-threequarter');
+      bigImgView.classList.add('w3-col');
+      // 应用全屏样式
       bigImgView.style.cssText = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;height:auto!important;z-index:1!important;overflow:hidden!important;border-radius:0!important;padding:0!important;margin:0!important;display:block!important;background:#000!important';
       var imgs = bigImgView.querySelectorAll('img[data-date]:not(.w3-hide)');
       imgs.forEach(function (img) {
         img.style.cssText = 'position:absolute!important;top:0!important;left:0!important;width:100%!important;height:100%!important;object-fit:fill!important;display:block!important;margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;border:none!important;outline:none!important';
       });
-      // 确保按钮容器在图片之上
       var topBar = view.querySelector('.w3-top');
       if (topBar) topBar.style.zIndex = '10';
+      // Last: 记录全屏位置
+      var last = bigImgView.getBoundingClientRect();
+      // Invert: 让元素看起来还在原始位置，保留原始圆角
+      var dx = first.left - last.left;
+      var dy = first.top - last.top;
+      var sw = first.width / last.width;
+      var sh = first.height / last.height;
+      bigImgView.style.transformOrigin = 'top left';
+      bigImgView.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sw + ',' + sh + ')';
+      bigImgView.style.borderRadius = firstRadius;
+      // Play: 过渡到全屏位置
+      requestAnimationFrame(function () {
+        bigImgView.style.transition = 'transform 0.3s ease-out, border-radius 0.3s ease-out';
+        bigImgView.style.transform = '';
+        bigImgView.style.borderRadius = '0';
+        bigImgView.addEventListener('transitionend', function handler() {
+          bigImgView.removeEventListener('transitionend', handler);
+          bigImgView.style.transition = '';
+          bigImgView.style.transformOrigin = '';
+        });
+      });
     } else {
-      // 退出最大化：恢复原始样式
+      // First: 记录全屏位置（样式移除前）
+      var first = bigImgView.getBoundingClientRect();
+      // 恢复样式和class
       bigImgView.style.cssText = '';
       bigImgView.querySelectorAll('img[data-date]').forEach(function (img) {
         img.style.cssText = '';
       });
+      bigImgView.classList.remove('w3-col');
+      bigImgView.classList.add('w3-threequarter');
       var topBar = view.querySelector('.w3-top');
       if (topBar) topBar.style.zIndex = '';
+      // Last: 记录正常布局位置和目标圆角
+      var last = bigImgView.getBoundingClientRect();
+      var targetRadius = getComputedStyle(bigImgView).borderRadius;
+      // Invert: 让元素看起来还在全屏位置，圆角为0
+      var dx = first.left - last.left;
+      var dy = first.top - last.top;
+      var sw = first.width / last.width;
+      var sh = first.height / last.height;
+      bigImgView.style.transformOrigin = 'top left';
+      bigImgView.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sw + ',' + sh + ')';
+      bigImgView.style.borderRadius = '0';
+      // Play: 过渡到正常位置
+      requestAnimationFrame(function () {
+        bigImgView.style.transition = 'transform 0.3s ease-out, border-radius 0.3s ease-out';
+        bigImgView.style.transform = '';
+        bigImgView.style.borderRadius = targetRadius;
+        bigImgView.addEventListener('transitionend', function handler() {
+          bigImgView.removeEventListener('transitionend', handler);
+          bigImgView.style.transition = '';
+          bigImgView.style.transformOrigin = '';
+          bigImgView.style.borderRadius = '';
+        });
+      });
     }
   };
 
