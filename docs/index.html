@@ -84,44 +84,43 @@
         }
 
         .me-noscript img {
-            width: 72px;
-            height: 72px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, .08)
+            margin-bottom: 24px
         }
 
         .me-noscript h1 {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
-            margin: 0 0 8px;
-            letter-spacing: 2px;
-            color: #333
+            margin: 0 0 6px;
+            letter-spacing: 4px;
+            color: var(--theme-color, #333)
+        }
+
+        .me-noscript .me-noscript-subtitle {
+            font-size: 13px;
+            letter-spacing: 6px;
+            opacity: .35;
+            margin-bottom: 16px;
+            color: var(--theme-color, #333)
         }
 
         .me-noscript .me-noscript-divider {
-            width: 32px;
-            height: 3px;
-            border-radius: 2px;
-            background: #0e90d2;
+            width: 24px;
+            height: 2px;
+            border-radius: 1px;
+            background: var(--theme-color, #333);
+            opacity: .15;
             margin: 16px auto
         }
 
         .me-noscript p {
             font-size: 14px;
-            line-height: 2;
-            color: #333;
-            opacity: .55;
+            line-height: 1.8;
+            color: var(--theme-color, #333);
+            opacity: .45;
             margin: 0
-        }
-
-        .me-noscript .me-noscript-link {
-            display: inline-block;
-            margin-top: 24px;
-            font-size: 13px;
-            color: #0e90d2;
-            opacity: .7;
-            word-break: break-all
         }
 
         body {
@@ -304,7 +303,8 @@
     <noscript>
         <div class="me-noscript">
             <img src="static/img/favicon-3.ico" alt="必应壁纸" />
-            <h1>必应壁纸 每日一图</h1>
+            <h1>必应壁纸</h1>
+            <div class="me-noscript-subtitle">每日一图</div>
             <div class="me-noscript-divider"></div>
             <p>请启用 JavaScript 以浏览完整壁纸列表和使用图片预览功能</p>
         </div>

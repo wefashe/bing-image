@@ -7,25 +7,51 @@
     <meta name="robots" content="noindex, follow" />
     <link rel="icon" type="image/vnd.microsoft.icon" href="static/img/favicon-3.ico" />
     <style>
+        :root {
+            --theme-color: #333;
+            --theme-background: #fff;
+            --theme-mode: light;
+        }
+        [data-theme='dark'] {
+            --theme-color: hsl(228, 5%, 80%);
+            --theme-background: hsl(228, 5%, 15%);
+            --theme-mode: dark;
+        }
+        [data-theme='dark'] img {
+            filter: brightness(0.8) contrast(1.2);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; background: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #333;
+            min-height: 100vh; background: var(--theme-background); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--theme-color);
+            transition: background-color .5s ease, color .5s ease;
+            color-scheme: var(--theme-mode, light);
         }
         .container { text-align: center; padding: 48px 24px; }
-        .container img { width: 64px; height: 64px; border-radius: 50%; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-        .container h1 { font-size: 20px; font-weight: 600; letter-spacing: 2px; margin-bottom: 8px; }
-        .container .divider { width: 32px; height: 3px; border-radius: 2px; background: #0e90d2; margin: 16px auto; }
-        .container p { font-size: 14px; line-height: 2; opacity: .55; }
-        .container a { display: inline-block; margin-top: 24px; font-size: 14px; color: #0e90d2; text-decoration: none; }
+        .container img { width: 56px; height: 56px; border-radius: 50%; margin-bottom: 24px; }
+        .container h1 { font-size: 22px; font-weight: 600; letter-spacing: 4px; margin-bottom: 6px; color: var(--theme-color); }
+        .container .subtitle { font-size: 13px; letter-spacing: 6px; opacity: .35; margin-bottom: 16px; color: var(--theme-color); }
+        .container .divider { width: 24px; height: 2px; border-radius: 1px; background: var(--theme-color); opacity: .15; margin: 0 auto 20px; }
+        .container p { font-size: 14px; line-height: 1.8; opacity: .45; }
+        .container a { display: inline-block; margin-top: 24px; font-size: 13px; color: #0e90d2; text-decoration: none; letter-spacing: 1px; opacity: .7; transition: opacity .2s; }
+        .container a:hover { opacity: 1; }
     </style>
+    <script>
+        (function () {
+            var d = localStorage.getItem('dark');
+            if (d && d === '1') { document.documentElement.setAttribute('data-theme', 'dark') }
+            else if (!d && window.matchMedia('(prefers-color-scheme:dark)').matches) { document.documentElement.setAttribute('data-theme', 'dark') }
+            else if (!d) { var h = new Date().getHours(); if (h >= 21 || h < 7) { document.documentElement.setAttribute('data-theme', 'dark') } }
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
         <img src="static/img/favicon-3.ico" alt="必应壁纸" />
-        <h1>页面未找到</h1>
+        <h1>必应壁纸</h1>
+        <div class="subtitle">每日一图</div>
         <div class="divider"></div>
-        <p>您访问的页面不存在或已被移除</p>
+        <p>页面未找到，您访问的页面不存在或已被移除</p>
         <a href="./">返回首页</a>
     </div>
 </body>
