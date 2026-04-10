@@ -1197,7 +1197,7 @@ function preview(img) {
     window.scrollTo(0, scrollY);
     closeBtn.removeEventListener('click', clickFunc);
     sizeBtn.removeEventListener('click', sizeFunc);
-    bigImgView.removeEventListener('click', sizeFunc);
+    bigImgView.removeEventListener('dblclick', sizeFunc);
     downloadBtn.removeEventListener('click', downloadFunc);
     view.removeEventListener('wheel', wheelFunc);
     document.removeEventListener('keydown', previewKeyHandler);
@@ -1207,7 +1207,13 @@ function preview(img) {
   const previewKeyHandler = function (e) {
     if (e.code === 'Escape') {
       e.preventDefault();
-      clickFunc();
+      if (bigImgView.classList.contains('w3-col')) {
+        // 第一次ESC：退出最大化
+        sizeFunc();
+      } else {
+        // 第二次ESC：退出预览
+        clickFunc();
+      }
     } else if (bigImgView.classList.contains('w3-col')) {
       // 最大化状态下禁用切换快捷键
       return;
@@ -1226,7 +1232,9 @@ function preview(img) {
 
   closeBtn.addEventListener("click", clickFunc);
   sizeBtn.addEventListener("click", sizeFunc);
-  bigImgView.addEventListener("click", sizeFunc);
+  bigImgView.addEventListener("dblclick", sizeFunc);
+
+
   downloadBtn.addEventListener("click", downloadFunc);
   // 监听滚轮事件，阻止冒泡并切换图片
   view.addEventListener('wheel', wheelFunc, { passive: false });
