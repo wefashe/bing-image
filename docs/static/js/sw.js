@@ -9,7 +9,7 @@
 const CACHE_VERSION = 3;
 const STATIC_CACHE = 'bing-static-v' + CACHE_VERSION;
 const DATA_CACHE = 'bing-data-v' + CACHE_VERSION;
-const IMG_CACHE = 'bing-img-v' + CACHE_VERSION;
+const IMG_CACHE = 'bing-img'; // 图片缓存不携带版本号，部署更新时不清空
 const MAX_IMG_ITEMS = 500;
 
 // 安装时预缓存 App Shell
@@ -38,7 +38,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => !k.includes('v' + CACHE_VERSION)).map(k => caches.delete(k))
+        keys.filter(k => k !== IMG_CACHE && !k.includes('v' + CACHE_VERSION)).map(k => caches.delete(k))
       )
     ).then(() => self.clients.claim())
   );
