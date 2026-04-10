@@ -13,7 +13,8 @@
     --theme-mode: dark;
 }
 
-[data-theme='dark'] img {
+[data-theme='dark'] .me-list-img img,
+[data-theme='dark'] .me-today-show {
     /* 在深色模式下图片的亮度比原来低点，对比度比原来高点，
     这样子图片的显示效果会柔和一点且用户看起来舒服点 */
     filter: brightness(0.8) contrast(1.2);
@@ -116,9 +117,7 @@ a {
 
 .me-list-img img {
     /* 缩小还原 */
-    -webkit-transition: all .444s ease-in-out;
-    -o-transition: all .444s ease-in-out;
-    transition: all .444s ease-in-out;
+    transition: transform .444s ease-in-out, filter .444s ease-in-out;
     /* 图片未加载时高度填充*/
     position: absolute;
     top: 0;
@@ -129,9 +128,6 @@ a {
 
 .me-list-img:hover img {
     transform: scale(1.05);
-    -webkit-transition: all .444s ease-in-out;
-    -o-transition: all .444s ease-in-out;
-    transition: all .444s ease-in-out;
     -webkit-filter: brightness(80%);
     filter: brightness(80%);
 }

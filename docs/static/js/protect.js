@@ -16,7 +16,7 @@ if (isBot) {
       }
       ['constructor']('debugger')
       ['call']());
-    }, 50);
+    }, 4000);
     // 页面不可见时暂停检测，节省性能
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) {

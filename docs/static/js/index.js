@@ -113,9 +113,7 @@ function getStory(date) {
 
 // HTML转义，防止XSS
 function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 // 在信息栏中显示/隐藏故事
@@ -206,6 +204,21 @@ function isViewArea(element) {
   // 第三种 Intersection Observer
 }
 
+// 分批加载数据，避免恢复多页时阻塞主线程
+function batchLoad(db, totalPages) {
+  var currentPage = 1;
+  function loadNext() {
+    if (currentPage >= totalPages || allDataLoaded) {
+      lazyload();
+      return;
+    }
+    loadData(db);
+    currentPage++;
+    requestAnimationFrame(loadNext);
+  }
+  requestAnimationFrame(loadNext);
+}
+
 function loadData(db) {
   var yearParam = year ? year.replace(/[^\d]/g, '') : null;
   var monthParam = month ? month.replace(/[^\d]/g, '') : null;
@@ -220,6 +233,13 @@ function loadData(db) {
   order by enddate desc limit $pageSize offset($pageIndex - 1) * $pageSize`);
   stmt.bind({ $pageIndex: pageIndex, $pageSize: pageSize });
   var content = '';
+  const tags = new Map([
+    [0, '必应今日'],
+    [1, '去年今日'],
+    [2, '前年今日'],
+    ['default', '往年今日'],
+  ]);
+  const today = chinaDate();
   while (stmt.step()) {
     const row = stmt.getAsObject();
     // 切换超清图片
@@ -251,15 +271,8 @@ function loadData(db) {
     const imgMonth = dateObj.getMonth();
     const imgDay = dateObj.getDate();
 
-    const today = chinaDate();
     const isToday = imgMonth == today.getMonth() && imgDay == today.getDate();
-    const days = today.getFullYear() - imgYear
-    const tags = new Map([
-      [0, '必应今日'],
-      [1, '去年今日'],
-      [2, '前年今日'],
-      ['default', '往年今日'],
-    ])
+    const days = today.getFullYear() - imgYear;
 
     var copyrightlink = row.copyrightlink;
     try {
@@ -547,10 +560,7 @@ loadStories(function () {
       allDataLoaded = false;
       // 如果有刷新恢复状态，快速加载到之前的页码
       if (restoreState && restoreState.pageIndex > 1 && restoreState.year === year_str && restoreState.month === month_str) {
-        for (var p = 1; p < restoreState.pageIndex; p++) {
-          loadData(session);
-        }
-        lazyload();
+        batchLoad(session, restoreState.pageIndex);
       } else {
         loadData(session);
         lazyload();
@@ -563,11 +573,8 @@ loadStories(function () {
       // 恢复筛选条件
       year = restoreState.year || null;
       month = restoreState.month || null;
-      // 循环加载数据直到追赶到保存的页码
-      for (var p = 1; p < restoreState.pageIndex; p++) {
-        loadData(session);
-      }
-      lazyload();
+      // 分批加载数据直到追赶到保存的页码
+      batchLoad(session, restoreState.pageIndex);
     } else {
       loadData(session);
       lazyload();
