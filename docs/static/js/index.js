@@ -1143,6 +1143,9 @@ function preview(img) {
       // First: 记录正常布局位置和圆角（class切换前）
       var first = bigImgView.getBoundingClientRect();
       var firstRadius = getComputedStyle(bigImgView).borderRadius;
+      // 记录信息栏原始位置，动画期间脱离文档流固定定位
+      var viewInfo = bigImgView.querySelector('.me-view-info');
+      var infoRect = viewInfo ? viewInfo.getBoundingClientRect() : null;
       bigImgView.classList.remove('w3-threequarter');
       bigImgView.classList.add('w3-col');
       // 应用全屏样式
@@ -1153,6 +1156,11 @@ function preview(img) {
       });
       var topBar = view.querySelector('.w3-top');
       if (topBar) topBar.style.zIndex = '10';
+      // 信息栏：脱离文档流，固定在原始位置，平滑淡出
+      if (viewInfo && infoRect) {
+        viewInfo.style.cssText = 'position:fixed!important;top:' + infoRect.top + 'px!important;left:' + infoRect.left + 'px!important;width:' + infoRect.width + 'px!important;z-index:20!important;opacity:1;transition:opacity 0.3s ease-out!important;pointer-events:none';
+        requestAnimationFrame(function () { viewInfo.style.opacity = '0'; });
+      }
       // Last: 记录全屏位置
       var last = bigImgView.getBoundingClientRect();
       // Invert: 让元素看起来还在原始位置，保留原始圆角
@@ -1172,6 +1180,8 @@ function preview(img) {
           bigImgView.removeEventListener('transitionend', handler);
           bigImgView.style.transition = '';
           bigImgView.style.transformOrigin = '';
+          // 动画结束后彻底隐藏信息栏
+          if (viewInfo) viewInfo.style.cssText = '';
         });
       });
     } else {
@@ -1186,6 +1196,11 @@ function preview(img) {
       bigImgView.classList.add('w3-threequarter');
       var topBar = view.querySelector('.w3-top');
       if (topBar) topBar.style.zIndex = '';
+      // 信息栏：初始透明，准备淡入
+      var viewInfo = bigImgView.querySelector('.me-view-info');
+      if (viewInfo) {
+        viewInfo.style.cssText = 'opacity:0;transition:opacity 0.3s ease-out!important;pointer-events:none';
+      }
       // Last: 记录正常布局位置和目标圆角
       var last = bigImgView.getBoundingClientRect();
       var targetRadius = getComputedStyle(bigImgView).borderRadius;
@@ -1197,16 +1212,19 @@ function preview(img) {
       bigImgView.style.transformOrigin = 'top left';
       bigImgView.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sw + ',' + sh + ')';
       bigImgView.style.borderRadius = '0';
-      // Play: 过渡到正常位置
+      // Play: 过渡到正常位置，信息栏淡入
       requestAnimationFrame(function () {
         bigImgView.style.transition = 'transform 0.3s ease-out, border-radius 0.3s ease-out';
         bigImgView.style.transform = '';
         bigImgView.style.borderRadius = targetRadius;
+        if (viewInfo) viewInfo.style.opacity = '1';
         bigImgView.addEventListener('transitionend', function handler() {
           bigImgView.removeEventListener('transitionend', handler);
           bigImgView.style.transition = '';
           bigImgView.style.transformOrigin = '';
           bigImgView.style.borderRadius = '';
+          // 清理信息栏样式
+          if (viewInfo) viewInfo.style.cssText = '';
         });
       });
     }
