@@ -154,17 +154,38 @@ function showStory(infoEl, date) {
   }
 }
 
-// 读取文件
+// 读取文件（按日期缓存，当天有效，隔天重新请求）
 function dbFileGet(callback) {
   let config = {
     locateFile: () => "static/js/sql-wasm.wasm",
   };
   initSqlJs(config).then(function (SQL) {
+    // 尝试从缓存读取
+    try {
+      const today = chinaDate();
+      const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      const cached = sessionStorage.getItem('bing_db_' + dateKey);
+      if (cached) {
+        const binary = atob(cached);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        callback(new SQL.Database(bytes));
+        return;
+      }
+    } catch (e) {}
     const xhr = new XMLHttpRequest();
     xhr.open('GET', "data/images.db", true);
     xhr.responseType = 'arraybuffer';
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const today = chinaDate();
+          const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+          const bytes = new Uint8Array(xhr.response);
+          let binary = '';
+          for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+          sessionStorage.setItem('bing_db_' + dateKey, btoa(binary));
+        } catch (e) {}
         callback(new SQL.Database(new Uint8Array(xhr.response)));
       } else {
         hideElementById('me-full-load', true);
