@@ -398,6 +398,8 @@ function dbFileGet(callback) {
         _log('[Debug] images.db 重试耗尽');
         hideElementById('me-full-load', true);
         showToast('加载壁纸数据失败，请刷新页面重新尝试');
+        // 仍调用 callback 以便页面能部分初始化
+        callback(null);
         return;
       }
       _log('[Debug] images.db 第 ' + retryCount + '/' + maxRetry + ' 次重试...');
@@ -685,6 +687,10 @@ let dbReady = false;
 
 function onBothReady(session) {
   if (window.__debugDetected) return;
+  if (!session) {
+    _log('[Debug] db 加载失败，跳过页面初始化');
+    return;
+  }
   dbSession = session;
   // 初始化懒加载观察器
   initLazyObserver();
@@ -900,6 +906,7 @@ function onBothReady(session) {
 // 并行加载 stories.json 和 images.db，两者都完成后初始化页面
 loadStories(function () {
   _log('[Debug] loadStories 回调触发');
+  if (window.__debugDetected) return;
   storiesReady = true;
   if (dbReady) {
     _log('[Debug] stories 与 db 均已就绪，开始初始化');
@@ -909,6 +916,7 @@ loadStories(function () {
 
 dbFileGet(function (session) {
   _log('[Debug] dbFileGet 回调触发');
+  if (window.__debugDetected) return;
   dbReady = true;
   dbSession = session;
   if (storiesReady) {
