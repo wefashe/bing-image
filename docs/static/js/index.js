@@ -119,42 +119,57 @@ function clearStoriesCache() {
   } catch (e) {}
 }
 
-// 清理过期的 sessionStorage 缓存（非当天日期的 key）
-function cleanExpiredCache(prefix) {
+// 清理指定前缀的旧日期缓存（只保留今天key，删除其他日期key）
+function cleanOtherDateCache(prefix, todayKey) {
   try {
-    const today = chinaDate();
-    const todayKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const targetKey = prefix + todayKey;
     const keysToRemove = [];
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
-      if (key && key.startsWith(prefix) && !key.endsWith(todayKey)) {
+      if (key && key.startsWith(prefix) && key !== targetKey) {
         keysToRemove.push(key);
       }
     }
     keysToRemove.forEach(function (k) { sessionStorage.removeItem(k); });
     if (keysToRemove.length > 0) {
-      _log('[Debug] 清理过期缓存:', keysToRemove);
+      _log('[Debug] 清理旧日期缓存:', keysToRemove);
     }
   } catch (e) {}
 }
 
-// 读取 stories.json（按日期缓存，当天有效，隔天重新请求）
+// 获取今天的缓存key
+function getTodayKey() {
+  const today = chinaDate();
+  return today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+}
+
+// 获取今天的日期字符串 YYYYMMDD
+function getTodayStr() {
+  const today = chinaDate();
+  return today.getFullYear().toString() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
+}
+
+// 读取 stories.json（缓存key为今天，读取缓存后校验最新日期，非今日则清除缓存重新请求）
 function loadStories(callback) {
-  var dateKey;
+  var dateKey = getTodayKey();
+  var todayStr = getTodayStr();
   if (!isDebug) {
     try {
-      // 如果之前已标记 stories 缓存不可用，直接跳过
-      if (sessionStorage.getItem('bing_no_stories_cache')) {
-        _log('[Debug] stories.json 已标记跳过缓存');
-      } else {
-        cleanExpiredCache('bing_stories_');
-        const today = chinaDate();
-        dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        const cached = sessionStorage.getItem('bing_stories_' + dateKey);
-        if (cached) {
-          storiesData = JSON.parse(cached);
+      // 清除其他日期的缓存key
+      cleanOtherDateCache('bing_stories_', dateKey);
+      const cached = sessionStorage.getItem('bing_stories_' + dateKey);
+      if (cached) {
+        storiesData = JSON.parse(cached);
+        // 校验缓存中最新故事日期是否为今天，不是则清除缓存
+        var maxDate = '';
+        Object.keys(storiesData).forEach(function (k) { if (k > maxDate) maxDate = k; });
+        if (maxDate >= todayStr) {
+          _log('[Debug] stories.json 使用缓存，最新日期:', maxDate);
           if (callback) callback();
           return;
+        } else {
+          _log('[Debug] stories.json 缓存最新日期', maxDate, '≠ 今日', todayStr, '，清除缓存');
+          sessionStorage.removeItem('bing_stories_' + dateKey);
         }
       }
     } catch (e) {}
@@ -177,10 +192,9 @@ function loadStories(callback) {
           _log('[Debug] stories.json 加载完成, 条目数:', Object.keys(storiesData).length);
           if (!isDebug) {
             try {
-              const today = chinaDate();
-              const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-              // 检查最新故事日期是否为当天，不是则不缓存，确保定时任务更新后能及时获取
-              const todayStr = today.getFullYear().toString() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
+              dateKey = getTodayKey();
+              todayStr = getTodayStr();
+              // 最新日期是今天才缓存
               var maxDate = '';
               Object.keys(storiesData).forEach(function (k) { if (k > maxDate) maxDate = k; });
               if (maxDate >= todayStr) {
@@ -264,22 +278,23 @@ function showStory(infoEl, date) {
   }
 }
 
-// 读取文件（按日期缓存，当天有效，隔天重新请求）
+// 读取文件（缓存key为今天，读取缓存后校验最新日期，非今日则清除缓存重新请求）
 function dbFileGet(callback) {
   _log('[Debug] dbFileGet 开始加载...');
   let config = {
     locateFile: () => "static/js/sql-wasm.wasm",
   };
   initSqlJs(config).then(function (SQL) {
+    var dateKey = getTodayKey();
+    var todayStr = getTodayStr();
     // 尝试从缓存读取
     if (!isDebug) {
       try {
+        // 清除其他日期的缓存key
+        cleanOtherDateCache('bing_db_', dateKey);
         if (sessionStorage.getItem('bing_no_db_cache')) {
           _log('[Debug] images.db 已标记跳过缓存');
         } else {
-          cleanExpiredCache('bing_db_');
-          const today = chinaDate();
-          const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
           try {
             const cached = sessionStorage.getItem('bing_db_' + dateKey);
             if (cached) {
@@ -287,8 +302,18 @@ function dbFileGet(callback) {
               const bytes = new Uint8Array(binary.length);
               for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
               try {
-                callback(new SQL.Database(bytes));
-                return;
+                // 校验缓存中最新壁纸日期是否为今天，不是则清除缓存
+                const tempDb = new SQL.Database(bytes);
+                const result = tempDb.exec("select max(enddate) from wallpaper");
+                const maxEndDate = (result.length > 0 && result[0].values.length > 0) ? result[0].values[0][0] : '';
+                if (maxEndDate >= todayStr) {
+                  _log('[Debug] images.db 使用缓存，最新日期:', maxEndDate);
+                  callback(tempDb);
+                  return;
+                } else {
+                  _log('[Debug] images.db 缓存最新日期', maxEndDate, '≠ 今日', todayStr, '，清除缓存');
+                  sessionStorage.removeItem('bing_db_' + dateKey);
+                }
               } catch (e) {
                 _log('[Debug] 缓存的 db 数据损坏，清除并重新请求:', e.message);
                 sessionStorage.removeItem('bing_db_' + dateKey);
@@ -322,13 +347,12 @@ function dbFileGet(callback) {
           }
           if (!isDebug) {
             try {
-              const today = chinaDate();
-              const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+              dateKey = getTodayKey();
+              todayStr = getTodayStr();
               const bytes = new Uint8Array(xhr.response);
               let binary = '';
               for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-              // 查询最新壁纸日期，与当天比较，不是今天则不缓存
-              var todayStr = today.getFullYear().toString() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
+              // 最新日期是今天才缓存
               var result = db.exec("select max(enddate) from wallpaper");
               var maxEndDate = (result.length > 0 && result[0].values.length > 0) ? result[0].values[0][0] : '';
               if (maxEndDate >= todayStr) {
@@ -336,7 +360,6 @@ function dbFileGet(callback) {
                   sessionStorage.removeItem('bing_no_db_cache');
                   _log('[Debug] images.db 已缓存，最新日期:', maxEndDate);
                 } else {
-                  // 额度不足，尝试清除 stories 缓存腾出空间，优先缓存 db
                   clearStoriesCache();
                   if (trySetCache('bing_db_' + dateKey, btoa(binary))) {
                     sessionStorage.removeItem('bing_no_db_cache');
@@ -657,10 +680,10 @@ function setMetaContent(name, content) {
   }
 }
 
-loadStories(function () {
-  _log('[Debug] loadStories 回调触发, 开始加载 DB');
-  if (window.__debugDetected) return;
-  dbFileGet(function (session) {
+let storiesReady = false;
+let dbReady = false;
+
+function onBothReady(session) {
   if (window.__debugDetected) return;
   dbSession = session;
   // 初始化懒加载观察器
@@ -872,7 +895,26 @@ loadStories(function () {
     lazyload();
   }, 200);
   window.addEventListener('scroll', throttledScroll);
-  });
+}
+
+// 并行加载 stories.json 和 images.db，两者都完成后初始化页面
+loadStories(function () {
+  _log('[Debug] loadStories 回调触发');
+  storiesReady = true;
+  if (dbReady) {
+    _log('[Debug] stories 与 db 均已就绪，开始初始化');
+    onBothReady(dbSession);
+  }
+});
+
+dbFileGet(function (session) {
+  _log('[Debug] dbFileGet 回调触发');
+  dbReady = true;
+  dbSession = session;
+  if (storiesReady) {
+    _log('[Debug] stories 与 db 均已就绪，开始初始化');
+    onBothReady(session);
+  }
 });
 
 document.querySelector('#image-list') && (document.querySelector('#image-list').onclick = (event) => {
