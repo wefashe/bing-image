@@ -1355,16 +1355,20 @@ function showImg(date) {
     // 显示加载动画
     const lodding = bigImgView.querySelector('.me-lodding');
     if (lodding) lodding.classList.remove('w3-hide');
-    newImg.onload = function () {
-      newImg.onload = null;
+
+    function onPreviewLoaded() {
       if (lodding) lodding.classList.add('w3-hide');
       if (shouldSlide) {
-        // 加载图：加载完成后与新图一起滑入
         slideInNewImg(newImg);
       } else {
         newImg.classList.remove('w3-hide');
         updateViewInfo(viewInfo, rowData, date);
       }
+    }
+
+    newImg.onload = function () {
+      newImg.onload = null;
+      onPreviewLoaded();
     }
     newImg.onerror = function () {
       newImg.onerror = null;
@@ -1375,7 +1379,23 @@ function showImg(date) {
       newImg.classList.remove('w3-hide');
       newImg.classList.add('me-img-error');
     }
-    newImg.src = viewUrl;
+
+    // 优先从 Cache API 直接读取缓存，命中则立即展示（绕过 SW 通信开销）
+    if ('caches' in window) {
+      caches.match(viewUrl).then(function (cached) {
+        if (cached && cached.ok) {
+          cached.blob().then(function (blob) {
+            newImg.src = URL.createObjectURL(blob);
+          });
+        } else {
+          newImg.src = viewUrl;
+        }
+      }).catch(function () {
+        newImg.src = viewUrl;
+      });
+    } else {
+      newImg.src = viewUrl;
+    }
     newImg.classList.add('w3-hide');
     newImg.setAttribute('data-date', date);
     newImg.classList.add('w3-image');
