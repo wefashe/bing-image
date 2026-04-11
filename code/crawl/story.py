@@ -20,11 +20,11 @@ STORIES_PATH = os.path.join(
 
 def get_stories_from_api():
     """
-    从 cn.bing.com/hp/api/model 获取壁纸故事
+    从 www.bing.com/hp/api/model 获取壁纸故事
     返回 dict: { 'Ssd日期': '故事文本', ... }
     """
-    headers = {"User-Agent": fc.user_agent(), "Referer": "https://cn.bing.com"}
-    url = "https://cn.bing.com/hp/api/model"
+    headers = {"User-Agent": fc.user_agent(), "Referer": "https://www.bing.com"}
+    url = "https://www.bing.com/hp/api/model?mkt=zh-CN"
     resp = requests.get(url, headers=headers, timeout=10)
     resp.encoding = resp.apparent_encoding
     if resp.status_code != 200:
