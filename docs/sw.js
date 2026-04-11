@@ -6,7 +6,7 @@
  *   2. 动态数据（images.db/stories） → Cache-First，URL 按天版本化，离线回退最近版本
  *   3. Bing CDN 图片                → Cache-First，500 条上限 FIFO 淘汰
  */
-const CACHE_VERSION = 4;
+const CACHE_VERSION = 5;
 const STATIC_CACHE = 'bing-static-v' + CACHE_VERSION;
 const DATA_CACHE = 'bing-data-v' + CACHE_VERSION;
 const IMG_CACHE = 'bing-img'; // 图片缓存不携带版本号，部署更新时不清空
@@ -100,9 +100,17 @@ function cacheFirstData(cacheName, request) {
         }
         return response;
       }).catch(() => {
-        // 离线兜底：匹配同路径无版本号的最近缓存
+        // 离线兜底：匹配同路径的任意版本缓存（模糊匹配），使用最近一次
         const url = new URL(request.url);
-        return cache.match(url.origin + url.pathname);
+        const pathname = url.pathname;
+        return cache.keys().then(keys => {
+          const match = keys.find(k => {
+            try { return new URL(k.url).pathname === pathname; } catch(e) { return false; }
+          });
+          return match ? cache.match(match) : new Response('{"error":"offline"}', {
+            status: 503, headers: { 'Content-Type': 'application/json' }
+          });
+        });
       });
     })
   );
