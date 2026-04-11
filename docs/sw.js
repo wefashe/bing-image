@@ -3,7 +3,7 @@
  *
  * 三级缓存策略：
  *   1. App Shell（HTML/CSS/JS/字体）  → 安装时预缓存，Cache-First
- *   2. 动态数据（images.db/stories） → Cache-First，URL 按天版本化，离线回退最近版本
+ *   2. 动态数据（images.db/stories） → Network-First，确保每次获取最新数据，离线回退最近版本
  *   3. Bing CDN 图片                → Cache-First，500 条上限 FIFO 淘汰
  */
 const CACHE_VERSION = 5;
@@ -58,10 +58,9 @@ self.addEventListener('fetch', (event) => {
   // 同源请求才处理
   if (url.origin !== self.location.origin) return;
 
-  // 动态数据：Cache-First（URL 已按天版本化，同天直接命中缓存）
-  // 离线时回退匹配无版本号路径，使用最近一次缓存
+  // 动态数据：Network-First（确保每次获取最新数据，离线回退最近版本）
   if (url.pathname.endsWith('images.db') || url.pathname.endsWith('stories.json')) {
-    event.respondWith(cacheFirstData(DATA_CACHE, event.request));
+    event.respondWith(networkFirstData(DATA_CACHE, event.request));
     return;
   }
 
@@ -88,29 +87,35 @@ function cacheFirst(cacheName, request, maxItems) {
 }
 
 /**
- * Cache-First 数据策略：优先版本化 URL 缓存，离线时回退最近版本
+ * Network-First 数据策略：优先走网络获取最新数据，网络失败时回退缓存
+ * 确保每次都能拿到最新的壁纸和故事数据
  */
-function cacheFirstData(cacheName, request) {
+function networkFirstData(cacheName, request) {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
   return caches.open(cacheName).then(cache =>
-    cache.match(request).then(cached => {
-      if (cached) return cached;
-      return fetch(request).then(response => {
-        if (response.ok) {
-          cache.put(request, response.clone());
-        }
-        return response;
-      }).catch(() => {
-        // 离线兜底：匹配同路径的任意版本缓存（模糊匹配），使用最近一次
-        const url = new URL(request.url);
-        const pathname = url.pathname;
-        return cache.keys().then(keys => {
-          const match = keys.find(k => {
-            try { return new URL(k.url).pathname === pathname; } catch(e) { return false; }
-          });
-          return match ? cache.match(match) : new Response('{"error":"offline"}', {
-            status: 503, headers: { 'Content-Type': 'application/json' }
-          });
+    fetch(request).then(response => {
+      if (response.ok) {
+        // 网络成功，先清理同路径旧版本再写入，避免冗余缓存
+        return cache.keys().then(keys =>
+          Promise.all(
+            keys.filter(k => {
+              try { return new URL(k.url).pathname === pathname && k.url !== request.url; } catch(e) { return false; }
+            ).map(k => cache.delete(k))
+          ).then(() => {
+            cache.put(request, response.clone());
+            return response;
+          })
+        );
+      }
+      return response;
+    }).catch(() => {
+      // 网络失败，回退到同路径的任意版本缓存
+      return cache.keys().then(keys => {
+        const match = keys.find(k => {
+          try { return new URL(k.url).pathname === pathname; } catch(e) { return false; }
         });
+        return match ? cache.match(match) : new Response('', { status: 503 });
       });
     })
   );

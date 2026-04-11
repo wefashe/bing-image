@@ -88,18 +88,74 @@ let storiesData = {};
 let scrollRestored = false;
 const SCROLL_RESTORE_KEY = 'bing_image_scroll_restore';
 
+// 尝试写入 sessionStorage，检测额度不足，返回是否成功
+function trySetCache(key, value) {
+  try {
+    sessionStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    if (e && (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e.code === 22 || e.code === 1014)) {
+      _log('[Debug] sessionStorage 额度不足, key:', key);
+      return false;
+    }
+    throw e;
+  }
+}
+
+// 清除所有 stories 缓存，为 db 缓存腾出空间
+function clearStoriesCache() {
+  try {
+    const keysToRemove = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key && key.startsWith('bing_stories_')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(function (k) { sessionStorage.removeItem(k); });
+    if (keysToRemove.length > 0) {
+      _log('[Debug] 清除 stories 缓存以腾出空间:', keysToRemove);
+    }
+  } catch (e) {}
+}
+
+// 清理过期的 sessionStorage 缓存（非当天日期的 key）
+function cleanExpiredCache(prefix) {
+  try {
+    const today = chinaDate();
+    const todayKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const keysToRemove = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key && key.startsWith(prefix) && !key.endsWith(todayKey)) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(function (k) { sessionStorage.removeItem(k); });
+    if (keysToRemove.length > 0) {
+      _log('[Debug] 清理过期缓存:', keysToRemove);
+    }
+  } catch (e) {}
+}
+
 // 读取 stories.json（按日期缓存，当天有效，隔天重新请求）
 function loadStories(callback) {
   var dateKey;
   if (!isDebug) {
     try {
-      const today = chinaDate();
-      dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-      const cached = sessionStorage.getItem('bing_stories_' + dateKey);
-      if (cached) {
-        storiesData = JSON.parse(cached);
-        if (callback) callback();
-        return;
+      // 如果之前已标记 stories 缓存不可用，直接跳过
+      if (sessionStorage.getItem('bing_no_stories_cache')) {
+        _log('[Debug] stories.json 已标记跳过缓存');
+      } else {
+        cleanExpiredCache('bing_stories_');
+        const today = chinaDate();
+        dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        const cached = sessionStorage.getItem('bing_stories_' + dateKey);
+        if (cached) {
+          storiesData = JSON.parse(cached);
+          if (callback) callback();
+          return;
+        }
       }
     } catch (e) {}
   } else {
@@ -128,8 +184,13 @@ function loadStories(callback) {
               var maxDate = '';
               Object.keys(storiesData).forEach(function (k) { if (k > maxDate) maxDate = k; });
               if (maxDate >= todayStr) {
-                sessionStorage.setItem('bing_stories_' + dateKey, xhr.responseText);
-                _log('[Debug] stories.json 已缓存');
+                if (trySetCache('bing_stories_' + dateKey, xhr.responseText)) {
+                  sessionStorage.removeItem('bing_no_stories_cache');
+                  _log('[Debug] stories.json 已缓存');
+                } else {
+                  sessionStorage.setItem('bing_no_stories_cache', '1');
+                  _log('[Debug] stories.json 缓存失败，标记跳过');
+                }
               } else {
                 _log('[Debug] stories.json 最新日期', maxDate, '非今日，不缓存');
               }
@@ -212,16 +273,28 @@ function dbFileGet(callback) {
   initSqlJs(config).then(function (SQL) {
     // 尝试从缓存读取
     if (!isDebug) {
-      const today = chinaDate();
-      const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
       try {
-        const cached = sessionStorage.getItem('bing_db_' + dateKey);
-        if (cached) {
-          const binary = atob(cached);
-          const bytes = new Uint8Array(binary.length);
-          for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-          callback(new SQL.Database(bytes));
-          return;
+        if (sessionStorage.getItem('bing_no_db_cache')) {
+          _log('[Debug] images.db 已标记跳过缓存');
+        } else {
+          cleanExpiredCache('bing_db_');
+          const today = chinaDate();
+          const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+          try {
+            const cached = sessionStorage.getItem('bing_db_' + dateKey);
+            if (cached) {
+              const binary = atob(cached);
+              const bytes = new Uint8Array(binary.length);
+              for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+              try {
+                callback(new SQL.Database(bytes));
+                return;
+              } catch (e) {
+                _log('[Debug] 缓存的 db 数据损坏，清除并重新请求:', e.message);
+                sessionStorage.removeItem('bing_db_' + dateKey);
+              }
+            }
+          } catch (e) {}
         }
       } catch (e) {}
     } else {
@@ -239,6 +312,14 @@ function dbFileGet(callback) {
       xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
           _log('[Debug] images.db 加载完成, size:', (xhr.response.byteLength / 1024).toFixed(1), 'KB');
+          var db;
+          try {
+            db = new SQL.Database(new Uint8Array(xhr.response));
+          } catch (e) {
+            _log('[Debug] images.db 解析失败（非有效 SQLite）:', e.message);
+            retryDb();
+            return;
+          }
           if (!isDebug) {
             try {
               const today = chinaDate();
@@ -247,20 +328,31 @@ function dbFileGet(callback) {
               let binary = '';
               for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
               // 查询最新壁纸日期，与当天比较，不是今天则不缓存
-              var tempDb = new SQL.Database(new Uint8Array(xhr.response));
-              var result = tempDb.exec("select max(enddate) from wallpaper");
-              var maxEndDate = (result.length > 0 && result[0].values.length > 0) ? result[0].values[0][0] : '';
-              tempDb.close();
               var todayStr = today.getFullYear().toString() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
+              var result = db.exec("select max(enddate) from wallpaper");
+              var maxEndDate = (result.length > 0 && result[0].values.length > 0) ? result[0].values[0][0] : '';
               if (maxEndDate >= todayStr) {
-                sessionStorage.setItem('bing_db_' + dateKey, btoa(binary));
-                _log('[Debug] images.db 已缓存，最新日期:', maxEndDate);
+                if (trySetCache('bing_db_' + dateKey, btoa(binary))) {
+                  sessionStorage.removeItem('bing_no_db_cache');
+                  _log('[Debug] images.db 已缓存，最新日期:', maxEndDate);
+                } else {
+                  // 额度不足，尝试清除 stories 缓存腾出空间，优先缓存 db
+                  clearStoriesCache();
+                  if (trySetCache('bing_db_' + dateKey, btoa(binary))) {
+                    sessionStorage.removeItem('bing_no_db_cache');
+                    sessionStorage.setItem('bing_no_stories_cache', '1');
+                    _log('[Debug] images.db 已缓存（清除 stories 缓存后），最新日期:', maxEndDate);
+                  } else {
+                    sessionStorage.setItem('bing_no_db_cache', '1');
+                    _log('[Debug] images.db 缓存失败，标记跳过');
+                  }
+                }
               } else {
                 _log('[Debug] images.db 最新日期', maxEndDate, '非今日，不缓存');
               }
             } catch (e) {}
           }
-          callback(new SQL.Database(new Uint8Array(xhr.response)));
+          callback(db);
         } else {
           _log('[Debug] images.db 加载失败, status:', xhr.status);
           retryDb();
@@ -291,6 +383,10 @@ function dbFileGet(callback) {
 
     _log('[Debug] images.db 开始网络请求...');
     fetchDb();
+  }).catch(function (e) {
+    _log('[Debug] sql-wasm.wasm 加载失败:', e.message);
+    hideElementById('me-full-load', true);
+    showToast('加载壁纸引擎失败，请刷新页面重新尝试');
   });
 };
 
@@ -429,6 +525,10 @@ function loadData(db) {
       var img = new Image();
       img.onload = function () {
         img.onload = null;
+        todayShow.classList.add('me-img-complete');
+      };
+      img.onerror = function () {
+        img.onerror = null;
         todayShow.classList.add('me-img-complete');
       };
       img.src = viewImg;
@@ -905,6 +1005,7 @@ function download(element, url, download) {
   const xhr = new XMLHttpRequest();
   xhr.open('GET', url, true)
   xhr.responseType = 'blob'
+  xhr.timeout = 60000;
   // 请求成功
   xhr.onload = function () {
     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
@@ -946,7 +1047,10 @@ function download(element, url, download) {
   });
   // 错误处理
   xhr.addEventListener('error', function (e) {
-    // todo
+    showToast('图片下载失败，请重试');
+  });
+  xhr.addEventListener('timeout', function (e) {
+    showToast('图片下载超时，请重试');
   });
   xhr.send()
 }
