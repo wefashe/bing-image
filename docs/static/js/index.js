@@ -123,7 +123,16 @@ function loadStories(callback) {
             try {
               const today = chinaDate();
               const dateKey = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-              sessionStorage.setItem('bing_stories_' + dateKey, xhr.responseText);
+              // 检查最新故事日期是否为当天，不是则不缓存，确保定时任务更新后能及时获取
+              const todayStr = today.getFullYear().toString() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
+              var maxDate = '';
+              Object.keys(storiesData).forEach(function (k) { if (k > maxDate) maxDate = k; });
+              if (maxDate >= todayStr) {
+                sessionStorage.setItem('bing_stories_' + dateKey, xhr.responseText);
+                _log('[Debug] stories.json 已缓存');
+              } else {
+                _log('[Debug] stories.json 最新日期', maxDate, '非今日，不缓存');
+              }
             } catch (e) {}
           }
         } catch (e) {
@@ -237,7 +246,18 @@ function dbFileGet(callback) {
               const bytes = new Uint8Array(xhr.response);
               let binary = '';
               for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-              sessionStorage.setItem('bing_db_' + dateKey, btoa(binary));
+              // 查询最新壁纸日期，与当天比较，不是今天则不缓存
+              var tempDb = new SQL.Database(new Uint8Array(xhr.response));
+              var result = tempDb.exec("select max(enddate) from wallpaper");
+              var maxEndDate = (result.length > 0 && result[0].values.length > 0) ? result[0].values[0][0] : '';
+              tempDb.close();
+              var todayStr = today.getFullYear().toString() + (today.getMonth() + 1).toString().padStart(2, '0') + today.getDate().toString().padStart(2, '0');
+              if (maxEndDate >= todayStr) {
+                sessionStorage.setItem('bing_db_' + dateKey, btoa(binary));
+                _log('[Debug] images.db 已缓存，最新日期:', maxEndDate);
+              } else {
+                _log('[Debug] images.db 最新日期', maxEndDate, '非今日，不缓存');
+              }
             } catch (e) {}
           }
           callback(new SQL.Database(new Uint8Array(xhr.response)));
