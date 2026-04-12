@@ -77,6 +77,8 @@
 const bing_api_prefix = 'https://cn.bing.com';
 // 调试模式：复用 protect.js 中已声明的 isDebugMode 和 _log
 const isDebug = typeof isDebugMode !== 'undefined' ? isDebugMode : new URLSearchParams(location.search).get('debug') === 'true';
+// 图片加载错误占位图（淡灰渐变 + 图标 + "图片不存在"，1920x1080与原图一致，slice确保铺满无白边）
+const PLACEHOLDER_IMG = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23dfe6ed'/%3E%3Cstop offset='100%25' stop-color='%23c8d2dc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1920' height='1080' fill='url(%23g)'/%3E%3Cg opacity='.3'%3E%3Crect x='890' y='400' width='140' height='100' rx='8' fill='none' stroke='%23888' stroke-width='3'/%3E%3Ccircle cx='930' cy='435' r='7' fill='%23888'/%3E%3Cpath d='M890,475 940,445 965,460 995,430 1030,465' fill='none' stroke='%23888' stroke-width='3' stroke-linejoin='round'/%3E%3C/g%3E%3Ctext x='960' y='570' text-anchor='middle' fill='%23999' font-size='28' font-family='system-ui,sans-serif'%3E图片不存在%3C/text%3E%3C/svg%3E";
 // 分页
 let pageIndex = 1, pageSize = 24, year = null, month = null;
 let allDataLoaded = false;
@@ -1035,8 +1037,13 @@ window.addEventListener("error", function (event) {
       // 去除，防止滚动重复加载
       target.removeAttribute('data-big');
       target.classList.add("me-img-error");
-      target.classList.remove("me-cursor-pointer");
+      target.classList.remove("me-cursor-pointer", "me-lazy");
       target.onclick = null;
+      // 设置占位图，与原图一致铺满容器
+      target.src = PLACEHOLDER_IMG;
+      // 隐藏加载中的spinner
+      var lodding = target.closest('.me-list-img') && target.closest('.me-list-img').querySelector('.me-lodding');
+      if (lodding) lodding.classList.add('w3-hide');
     } else {
       target.dataset.retryTimes = curTimes + 1
       target.src = target.src
@@ -1378,6 +1385,8 @@ function showImg(date) {
       }
       newImg.classList.remove('w3-hide');
       newImg.classList.add('me-img-error');
+      // 设置占位图，与原图一致铺满容器
+      newImg.src = PLACEHOLDER_IMG;
     }
 
     // 优先从 Cache API 直接读取缓存，命中则立即展示（绕过 SW 通信开销）
